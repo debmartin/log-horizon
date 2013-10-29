@@ -1,0 +1,47 @@
+{
+   <XGetDefault>
+   Memcheck:Leak
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   fun:_XlcCreateLC
+   fun:_XlcDefaultLoader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   fun:XrmGetStringDatabase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   fun:XGetDefault
+}
+{
+   <SDL_VideoInit>
+   Memcheck:Leak
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   fun:_XlcCreateLC
+   fun:_XlcDefaultLoader
+   fun:_XOpenLC
+   fun:_XlcCurrentLC
+   fun:XSetLocaleModifiers
+   obj:/usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4
+   obj:/usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4
+   fun:SDL_VideoInit
+}
+{
+   <SDL_Init>
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0
+   fun:_XimSetICValueData
+   fun:_XimLocalCreateIC
+   fun:XCreateIC
+   obj:/usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4
+   obj:/usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4
+   fun:SDL_VideoInit
+   fun:SDL_InitSubSystem
+   fun:SDL_Init
+}

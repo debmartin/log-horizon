@@ -3,7 +3,7 @@
 #include <string.h>
 #include <string>
 
-#include "common-socket.h"
+#include "socket.h"
 
 
 using std::string;
