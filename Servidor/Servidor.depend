@@ -1,0 +1,41 @@
+# depslib dependency file v1.0
+1383055332 source:/home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Matriz.cpp
+	"Matriz.h"
+	<iostream>
+
+1383057737 /home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Matriz.h
+	"dimension.h"
+
+1383069404 /home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/dimension.h
+
+1383069412 source:/home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/dimension.cpp
+	"dimension.h"
+
+1383069899 source:/home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/main.cpp
+	<iostream>
+	<string.h>
+	<stdlib.h>
+	"Juego.h"
+
+1383069851 /home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Juego.h
+	"dimension.h"
+	"Matriz.h"
+	"Cola.h"
+	"Lista.h"
+
+1383069886 source:/home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Juego.cpp
+	"Juego.h"
+
+1383067802 /home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Cola.h
+	<stdbool.h>
+	<stddef.h>
+
+1382240832 /home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Lista.h
+	<iostream>
+
+1383050022 source:/home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Nivel.cpp
+	"Nivel.h"
+
+1383069699 /home/chicas/Documentos/Facultad/Cursando/Taller I/Servidor/Nivel.h
+	"Matriz.h"
+
