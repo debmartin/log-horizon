@@ -29,9 +29,10 @@ class Cola {
         explicit Cola(bool destruir = false);
         ~Cola();
         bool esVacia();
-        void encolar(U& valor);
+        void encolar(const U& valor);
         U& desencolar();
         U verPrimero();
+        Cola<U>& operator+=(const U& dato);
     private:
         bool destruirDato;
         NodoCola<U>* nodoPrim;
@@ -70,7 +71,7 @@ bool Cola<U>::esVacia(){
 }
 
 template <class U>
-void Cola<U>::encolar(U& valor){
+void Cola<U>::encolar(const U& valor){
 	NodoCola<U>* nodoNuevo = new NodoCola<U>(valor);
 
 	if (esVacia()) {
@@ -98,5 +99,19 @@ U& Cola<U>::desencolar(){
 	return dato;
 }
 
+template <class U>
+Cola<U>& Cola<U>::operator+=(const U& dato){
+    encolar(dato);
+    return *this;
+}
+
+template <class U>
+Cola<U>& Cola<U>::operator+=(const Cola<U>& otra){
+
+    while (! iter->alFinal())
+        this->insertarUltimo(iter->verActual());
+    delete iter;
+    return *this;
+}
 
 #endif // COLA_H

@@ -35,6 +35,10 @@ Celda::Celda(char cel_color, char cel_tipo) :
 Celda::~Celda(){
 }
 
+bool Celda::esEstrella(){
+    return (tipo == ESTRELLA);
+}
+
 Celda& Celda::operator=(const Celda& otra){
     if (this == &otra) return *this;
 

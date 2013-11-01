@@ -12,7 +12,7 @@ class Celda {
         void setTipo(char n_tipo) { tipo = n_tipo; }
         char getColor() { return color; }
         char getTipo() { return tipo; }
-        bool esEstrella() { return (tipo == ESTRELLA); }
+        bool esEstrella();
     private:
         static char rand;
         friend char random(Celda* This);

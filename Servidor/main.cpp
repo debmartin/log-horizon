@@ -19,17 +19,17 @@ void capturar_entrada(int& i, int& j){
 }
 
 int main(){
-    Juego juego;
+    Juego* juego = new Juego();
     int i, j, puntaje_nivel = juego.getLimite();
 
-    while (juego.hayMovimientos() && (juego.getPuntaje() < puntaje_nivel)){
-        juego.imprimirTablero();
+    while (juego->hayMovimientos() && (juego->getPuntaje() < puntaje_nivel)){
+        juego->imprimirTablero();
         capturar_entrada(i, j);
         Dimension una(i, j);
         capturar_entrada(i, j);
         Dimension otra(i, j);
 
-        int res = juego.realizarJugada(una, otra);
+        int res = juego->realizarJugada(una, otra);
         if (res == 2) {
             std::cout << "Inválida\n";
             continue;

@@ -23,6 +23,9 @@ class Juego {
         void contarPuntos(int largo_linea);
         bool intentarJugada(Dimension& una, Dimension& otra);
         void rellenarCelda(Dimension& pos);
+        int borrarLinea(Dimension& pos, int orient_bar, int orientacion);
+        int borrarCelda(Dimension* pos, Celda& celda_no_est, int& cant);
+        int procesarEstrella(Dimension& una, Dimension& otra);
     private:
         const int puntaje_nivel;
         int puntaje;

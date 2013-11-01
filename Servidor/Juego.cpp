@@ -34,43 +34,51 @@ void Juego::imprimirTablero(){
     matriz->imprimir();
 }
 
+int Juego::borrarLinea(Dimension& pos, int orient_bar, int orientacion){
+    int fila = pos.getFila(), col = pos.getCol(), contador = 0, tam_matriz = matriz->getTamanio();
+    int j = (orientacion == orient_bar) ? ((orientacion == FILA) ? fila : col) : 0;
+    int& fila_n = (orient_bar == FILA) ? j : fila;
+    int& col_n = (orient_bar == FILA) ? col : j;
+
+    for (; j < tam_matriz; j++) {
+        *borrados += new Dimension(fila_n, col_n);
+        contador++;
+    }
+    return contador;
+}
+
 int Juego::buscarLinea(Dimension& pos, int orientacion){
-    bool borrar_todos = false;
     int fila = pos.getFila(), col = pos.getCol();
     int tam_matriz = matriz->getTamanio(), cant = 0, i = 0;
     char color_pos = (*matriz)[pos].getColor();
 
     int& fila_n = (orientacion == FILA) ? i : fila;
     int& col_n = (orientacion == FILA) ? col : i;
-    char orient_linea = (orientacion == FILA) ? MINIBARV : MINIBARH;
-    char orient_contraria = (orientacion == FILA) ? MINIBARH : MINIBARV;
 
-    for(i = 0; i < tam_matriz; i++){
+    while (i < tam_matriz){
         Dimension* pos_actual = new Dimension(fila_n, col_n);
-        if (((*matriz)[*pos_actual].getColor() != color_pos) && (!borrar_todos)){
+        if ((*matriz)[*pos_actual].getColor() != color_pos){
             delete pos_actual;
-            if (borrados->esVacia())
+            if (borrados->esVacia()) {
+                i++;
                 continue;
-            else
+            } else {
                 break;
-        }
-
-        char tipo = (*matriz)[*pos_actual].getTipo();
-        if (tipo == orient_linea) {
-            borrar_todos = true;
-            *borrados += pos_actual;
-        } else if (tipo == orient_contraria) {
-            for (int j = 0; j < tam_matriz; j++) {
-                if (orientacion == FILA)
-                    *borrados += new Dimension(fila_n, j);
-                else
-                    *borrados += new Dimension(j, col_n);
             }
+        }
+        char tipo = (*matriz)[*pos_actual].getTipo();
+
+        if (tipo == MINIBARH || tipo == MINIBARV) {
+            int orient_bar = (tipo == MINIBARH) ? FILA : COLUMNA;
+            int cant_linea = borrarLinea(*pos_actual, orient_bar, orientacion);
+            if (orientacion == orient_bar) i += cant_linea;
+            cant += cant_linea;
             delete pos_actual;
         } else {
             *borrados += pos_actual;
+            cant++;
+            i++;
         }
-        cant++;
     }
     return cant;
 }
@@ -98,43 +106,52 @@ bool Juego::procesarLinea(Dimension& pos, int orientacion){
     return true;
 }
 
-int borrarCelda(Dimension* pos, Celda& celda_no_est, int& cant){
+int Juego::borrarCelda(Dimension* pos, Celda& celda_no_est, int& cant){
     Celda& actual = (*matriz)[*pos];
     char color_act = actual.getColor();
     char tipo = celda_no_est.getTipo(), color = celda_no_est.getColor();
     int salida = 0;
 
-    if((tipo == BUTTON) && (color == color_act)){
-        borrados += pos;
+    if((color != color_act) && (tipo != ESTRELLA))
+        return salida;
+
+    if ((tipo == BUTTON) || (tipo == ESTRELLA)){
+        *borrados += pos;
         cant++;
-    } else if ((tipo == MINIBARH) && (color == color_act)){
-        cant += borrarFila(pos);
-        salida = 1;
-    } else if ((tipo == MINIBARV) && (color == color_act)){
-        cant += borrarColumna(pos);
-        salida = 2;
-    } else if (tipo == ESTRELLA){
-        borrados += pos;
-        cant++;
+        salida = (tipo == ESTRELLA) ? 3 : 0;
+    } else if ((tipo == MINIBARH) || (tipo == MINIBARV)){
+        int orient_bar = (tipo == MINIBARH) ? FILA : COLUMNA;
+        cant += borrarLinea(*pos, orient_bar, FILA);
+        salida = (tipo == MINIBARH) ? 1 : 2;
     }
     return salida;
 }
 
-void procesarEstrella(Dimension& una, Dimension& otra){
+int Juego::procesarEstrella(Dimension& una, Dimension& otra){
     Dimension& pos_est= (*matriz)[una].esEstrella() ? una : otra;
-    borrados += &pos_est;
-    int cant = 1;
-
     Celda& celda_no_est = (*matriz)[una].esEstrella() ? (*matriz)[otra] : (*matriz)[una];
+    Lista<int> col_borradas;
+    int salida = 0, cant = 0;
 
     for(int i=0; i < matriz->getTamanio(); i++){
         for(int j=0; j < matriz->getTamanio(); j++){
+            if (col_borradas.pertenece(j)) continue;
+
             Dimension* pos = new Dimension(i,j);
-            int salida = borrarCelda(pos, celda_no_est, cant);
-
+            salida = borrarCelda(pos, celda_no_est, cant);
+            if (salida == 1){
+                delete pos;
+                break;
+            } else if (salida == 2) {
+                col_borradas += j;
+                delete pos;
+            } else if (salida == 3) {
+                break;
+            }
         }
+        if (salida == 3) break;
     }
-
+    return cant;
 }
 
 bool Juego::intentarJugada(Dimension& una, Dimension& otra){
