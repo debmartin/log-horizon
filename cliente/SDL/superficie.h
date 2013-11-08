@@ -27,6 +27,9 @@ class Superficie{
     bool cargar(const std::string &archivo);
     
     //
+    bool escalar(int ancho, int alto);
+    
+    //
     bool color_clave(Uint8 R, Uint8 G, Uint8 B);
     
     //

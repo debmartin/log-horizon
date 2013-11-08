@@ -22,6 +22,19 @@ bool Superficie::cargar(const std::string &archivo){
 }
 
 //
+bool Superficie::escalar(int ancho, int alto){
+  if (!surface) return false;
+  SDL_Surface *temp = SDL_CreateRGBSurface(surface->flags, ancho, alto, surface->format->BitsPerPixel,
+        surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+  if (!temp) return false;
+  SDL_BlitScaled(surface, NULL, temp, NULL);
+  
+  SDL_FreeSurface(surface);
+  surface = temp;
+  return true;
+}
+
+//
 bool Superficie::color_clave(Uint8 r, Uint8 g, Uint8 b){
   if (!surface) return false;
   Uint32 color = SDL_MapRGB(surface->format, r, g, b);
