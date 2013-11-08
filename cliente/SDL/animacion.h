@@ -1,7 +1,7 @@
 #ifndef ANIMACION_H
 #define ANIMACION_H
 
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include "ventana.h"
 #include "superficie.h"
 
