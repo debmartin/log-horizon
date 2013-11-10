@@ -26,6 +26,8 @@ Animacion::Animacion(){
   imagen_actual.h = 0;
   desp_x = 0;
   desp_y = 0;
+  tiempo = 0;
+  frame_rate = 0;
 }
 
 //
@@ -75,6 +77,19 @@ bool Animacion::fuera_del_sprite(){
 //
 bool Animacion::al_inicio(){
   return (imagen_actual.x == imagen_inicial.x && imagen_actual.y == imagen_inicial.y);
+}
+
+//
+void Animacion::establecer_fps(int fps){
+	frame_rate = 1000 / fps;
+}
+
+//
+void Animacion::animar(){
+  if (tiempo + frame_rate > SDL_GetTicks()) return;
+	tiempo = SDL_GetTicks();
+	Animacion::siguiente();
+  if (Animacion::fuera_del_sprite()) Animacion::reiniciar();
 }
 
 

@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "SDL/SDL.h"
+#include "SDL/fps.h"
 #include "nivel.h"
 #include "matriz.h"
 
@@ -12,7 +13,6 @@
 #define POS_Y 100 // posicion de y en la matriz
 #define LARGO_CELDA_X 50
 #define LARGO_CELDA_Y 40
-#define DELAY 16
 #define CANT_ANIMACIONES 1
 #define CANT_CELDAS_X 10
 #define CANT_CELDAS_Y 8
@@ -50,6 +50,7 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
   Nivel::inicializar_datos(path, ventana);
   SDL_Event evento;
   bool corriendo = true;
+  FPS frames;
   while (corriendo){
     while (SDL_PollEvent(&evento)){
       corriendo = Nivel::analizar_evento(evento);
@@ -57,14 +58,17 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
     ventana->limpiar();
     Nivel::dibujar(ventana);
     Nivel::actualizar_animaciones();
-    ventana->presentar(DELAY);
+    frames.actualizar();
+    int delay = (1000.0f/60.0f) * (frames.ver_fps() / 60.0f);
+    std::cout << "fps = "<< frames.ver_fps() << std::endl;
+    ventana->presentar(delay);
   }
 }
 
 //
 void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   Superficie *fondo_sup = new Superficie;
-  fondo_sup->cargar(path + "fondo.png");
+  fondo_sup->cargar(path + "fondo1.png");
   fondo_sup->escalar(840,525);
   
   Superficie *fondo_celda = new Superficie;

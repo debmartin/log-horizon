@@ -38,12 +38,20 @@ class Animacion{
     //
     bool al_inicio();
     
+    //
+    void animar();
+    
+    //
+    void establecer_fps(int fps);
+    
   private:
     SDL_Rect dimension_total;
     SDL_Rect imagen_inicial;
     SDL_Rect imagen_actual;
     int desp_x;
     int desp_y;
+    int frame_rate;
+    int tiempo;
 };
 
 
