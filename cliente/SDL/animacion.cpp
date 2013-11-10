@@ -93,11 +93,11 @@ void Animacion::establecer_fps(int fps){
 //
 void Animacion::animar(){
   if (tiempo + frame_rate > SDL_GetTicks()) return;
-	if (Animacion::fuera_del_sprite()){ 
+	Animacion::siguiente();
+  if (Animacion::fuera_del_sprite()){ 
     Animacion::reiniciar();
   }
   tiempo = SDL_GetTicks();
-	Animacion::siguiente();
 }
 
 

@@ -16,6 +16,7 @@
 #define CANT_ANIMACIONES 1
 #define CANT_CELDAS_X 10
 #define CANT_CELDAS_Y 8
+#define CANTIDAD_FPS 15.0f
 
 //
 Nivel::Nivel(){
@@ -48,15 +49,19 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
+  int tiempo_actual = SDL_GetTicks();
+  int delay = 16;
   while (corriendo){
     while (SDL_PollEvent(&evento)){
       corriendo = Nivel::analizar_evento(evento);
     }
     ventana->limpiar();
     Nivel::dibujar(ventana);
-    frames.actualizar();
-    Nivel::actualizar_animaciones(frames.ver_fps());
-    int delay = (1000.0f/60.0f) * (frames.ver_fps() / 60.0f);
+    Nivel::actualizar_animaciones();
+    if ( SDL_GetTicks() - tiempo_actual < 1000){
+      frames.actualizar();
+      delay = (1000/60.0f) * (frames.ver_fps() / 60.0f);
+    }
     ventana->presentar(delay);
   }
 }
@@ -147,6 +152,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     animacion_temp->textura = animacion_tex;
     animacion_temp->animacion = animacion;
     animaciones[i] = animacion_temp;
+    animaciones[i]->animacion->establecer_fps(CANTIDAD_FPS);
     cant_animaciones++;
   }
   
@@ -158,6 +164,8 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
       tablero->insertar(animaciones[0]->textura, animaciones[0]->animacion, celda);
     }
   }
+  
+  
   
   // TEXTURA DE SELECCION
   seleccion = new Textura;
@@ -214,10 +222,10 @@ void Nivel::dibujar(Ventana *ventana){
   tablero->dibujar(ventana);
 }
 
-void Nivel::actualizar_animaciones(int fps){
-  std::cout << fps << std::endl;
-  animaciones[0]->animacion->establecer_fps(fps/3.0f);
-  explosion->animar(fps/3.0f);
+//
+void Nivel::actualizar_animaciones(){
+  
+  explosion->animar();
   animaciones[0]->animacion->animar();
   
   if (explosion->finalizada()){
@@ -277,6 +285,7 @@ void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
   
   animacion = new Animacion;
   animacion->cargar_sprite(exp);
+  animacion->establecer_fps(CANTIDAD_FPS);
 }
 
 //
@@ -293,7 +302,7 @@ bool Explosion::explosion_en_curso(){
 
 //
 bool Explosion::finalizada(){
-  return animacion->fuera_del_sprite();
+  return animacion->al_final();
 }
 
 //
@@ -307,12 +316,11 @@ SDL_Rect Explosion::borrar_primera(){
 }
 
 //
-void Explosion::animar(int fps){
-  if (animacion->fuera_del_sprite()){
+void Explosion::animar(){
+  if (animacion->al_final()){
     en_curso = false;
     animacion->animar();
   }
   if (!en_curso) return;
-  animacion->establecer_fps(fps);
   animacion->animar();
 }

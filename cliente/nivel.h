@@ -29,7 +29,7 @@ class Explosion{
     bool explosion_en_curso();
     
     //
-    void animar(int fps);
+    void animar();
   
     //
     SDL_Rect borrar_primera();
@@ -69,7 +69,7 @@ class Nivel{
     bool analizar_evento(SDL_Event &evento);
     
     //
-    void actualizar_animaciones(int fps);
+    void actualizar_animaciones();
   
   private:
     int cant_animaciones;
