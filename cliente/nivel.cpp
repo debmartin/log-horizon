@@ -25,17 +25,13 @@ Nivel::Nivel(){
   seleccion = NULL;
   explosion = NULL;
   tablero = NULL;
-  en_explosion = false;
-  explosion_finalizada = false;
-  contador_animacion = 8;
-  contador_explosion = 3;
+  explosion = new Explosion;
 }
 
 //
 Nivel::~Nivel(){
   if (fondo) delete fondo;
   if (seleccion) delete seleccion;
-  if (explosion) delete explosion;
   if (tablero) delete tablero;
   for (int i = 0; i < cant_animaciones; i++){
     delete animaciones[i]->animacion;
@@ -43,6 +39,7 @@ Nivel::~Nivel(){
     delete animaciones[i];
   }
   delete[] animaciones;
+  delete explosion;
 }
 
 //
@@ -57,10 +54,9 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
     }
     ventana->limpiar();
     Nivel::dibujar(ventana);
-    Nivel::actualizar_animaciones();
     frames.actualizar();
+    Nivel::actualizar_animaciones(frames.ver_fps());
     int delay = (1000.0f/60.0f) * (frames.ver_fps() / 60.0f);
-    std::cout << "fps = "<< frames.ver_fps() << std::endl;
     ventana->presentar(delay);
   }
 }
@@ -173,6 +169,86 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   seleccion_src.w = 69;
 
   // EXPLOSION
+  explosion->cargar_animacion(path, ventana);
+  
+  sonido = Mix_LoadWAV("sonidos/sound.wav");   // FALTA DEFINIR CLASE SONIDO
+}
+
+//
+bool Nivel::analizar_evento(SDL_Event &evento){
+  if (evento.type == SDL_QUIT){ 
+    return false;
+    
+  }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){
+    if (evento.type == SDL_MOUSEBUTTONDOWN){
+      SDL_Rect celda;
+      celda.x = (evento.button.x - POS_X) / LARGO_CELDA_X;
+      celda.y = (evento.button.y - POS_Y) / LARGO_CELDA_Y;
+      if (evento.button.x - POS_X >= 0 && 
+      evento.button.y - POS_Y >= 0 && 
+      celda.x < CANT_CELDAS_X && 
+      celda.y < CANT_CELDAS_Y){
+            
+        Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
+        
+        if(evento.button.button == SDL_BUTTON_LEFT){
+          SDL_Rect celda_adyacente;
+          if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
+            tablero->intercambiar(celda, celda_adyacente);
+          }else{
+            tablero->seleccionar(seleccion, celda);
+          }
+        }else if(evento.button.button == SDL_BUTTON_RIGHT){
+          tablero->quitar_seleccion();
+          explosion->explotar(celda, tablero);
+        }
+      }
+    }
+  }
+  return true;
+}
+
+//
+void Nivel::dibujar(Ventana *ventana){
+  fondo->dibujar(ventana);
+  tablero->dibujar(ventana);
+}
+
+void Nivel::actualizar_animaciones(int fps){
+  std::cout << fps << std::endl;
+  animaciones[0]->animacion->establecer_fps(fps/3.0f);
+  explosion->animar(fps/3.0f);
+  animaciones[0]->animacion->animar();
+  
+  if (explosion->finalizada()){
+    while (explosion->celdas_vacias()){
+      SDL_Rect celda = explosion->borrar_primera();
+      tablero->apilar(animaciones[0]->textura, animaciones[0]->animacion, celda);
+    }
+  }
+}
+
+/* ********************************************************************
+ *                        EXPLOSION
+ * ********************************************************************/
+
+//
+Explosion::Explosion(){
+  animacion = NULL;
+  textura = NULL;
+  en_curso = false;
+  celdas = new Lista<SDL_Rect>;
+}
+
+//
+Explosion::~Explosion(){
+  delete celdas;
+  if (textura) delete textura;
+  if (animacion) delete animacion;
+}
+
+//
+void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
   SpritePos_t exp;
   SDL_Rect SrcE;
   SDL_Rect DestE;
@@ -190,96 +266,53 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   exp.desplazamiento_y = 0;
   
   Superficie *exp_sup = new Superficie;
-  exp_sup->cargar("imagenes/explosion.png");
+  exp_sup->cargar(path + "explosion.png");
   SDL_Color color_exp;
   exp_sup->color_pixel(0,0, color_exp);
   exp_sup->color_clave(color_exp);
   
-  Textura* explosion_textura = new Textura;
-  explosion_textura->cargar_textura(exp_sup, ventana);
+  textura = new Textura;
+  textura->cargar_textura(exp_sup, ventana);
   delete exp_sup;
   
-  Animacion *explosion_animacion = new Animacion;
-  explosion_animacion->cargar_sprite(exp);
-  explosion = new animacion_t;
-  explosion->animacion = explosion_animacion;
-  explosion->textura = explosion_textura;
-  
-  // FALTA DEFINIR CLASE SONIDO
-  sonido = Mix_LoadWAV("sonidos/sound.wav");
-  if (!sonido) std::cout << "error al cargar" << std::endl;
+  animacion = new Animacion;
+  animacion->cargar_sprite(exp);
 }
 
 //
-bool Nivel::analizar_evento(SDL_Event &evento){
-  if (evento.type == SDL_QUIT){ 
-    return false;
-  }else if (!tablero->esta_ocupada() && explosion->animacion->al_inicio()){
-    if (evento.type == SDL_MOUSEBUTTONDOWN){
-      SDL_Rect celda;
-      celda.x = (evento.button.x - POS_X) / LARGO_CELDA_X;
-      celda.y = (evento.button.y - POS_Y) / LARGO_CELDA_Y;
-      if (evento.button.x - POS_X >= 0 && evento.button.y - POS_Y >= 0 && celda.x < CANT_CELDAS_X && celda.y < CANT_CELDAS_Y){
-        // FALTA DEFINIR CLASE SONIDO
-        Mix_PlayChannel(-1, sonido, 0);
-        if(evento.button.button == SDL_BUTTON_LEFT){
-          SDL_Rect celda_adyacente;
-          if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
-            tablero->intercambiar(celda, celda_adyacente);
-          }else{
-            tablero->seleccionar(seleccion, celda);
-          }
-        }else if(evento.button.button == SDL_BUTTON_RIGHT){
-          tablero->quitar_seleccion();
-          tablero->insertar(explosion->textura, explosion->animacion, celda);
-          en_explosion = true;
-          explosion_finalizada = false;
-          celdas_explotar.push_back(celda);
-        }
-      }
-    }
-  }
-  return true;
+void Explosion::explotar(SDL_Rect &celda, Matriz* tablero){
+  en_curso = true;
+  tablero->insertar(textura, animacion, celda);
+  celdas->insertar_ultimo(celda);
 }
 
 //
-void Nivel::dibujar(Ventana *ventana){
-  fondo->dibujar(ventana);
-  tablero->dibujar(ventana);
-  contador_animacion--;
+bool Explosion::explosion_en_curso(){
+  return en_curso;
 }
 
-void Nivel::actualizar_animaciones(){
-  if (explosion_finalizada){
-    explosion->animacion->reiniciar();
-    while (!celdas_explotar.empty()){
-      int largo = celdas_explotar.size();
-      SDL_Rect celda;
-      celda.x = celdas_explotar[largo-1].x;
-      celda.y = celdas_explotar[largo-1].y;
-      tablero->apilar(animaciones[0]->textura, animaciones[0]->animacion, celda);
-      celdas_explotar.pop_back();
-    }
-    explosion_finalizada = false;
+//
+bool Explosion::finalizada(){
+  return animacion->fuera_del_sprite();
+}
+
+//
+bool Explosion::celdas_vacias(){
+  return !celdas->esta_vacia();
+}
+
+//
+SDL_Rect Explosion::borrar_primera(){
+  return celdas->borrar_primero();
+}
+
+//
+void Explosion::animar(int fps){
+  if (animacion->fuera_del_sprite()){
+    en_curso = false;
+    animacion->animar();
   }
-  if (en_explosion){
-    contador_explosion--;
-    if (contador_explosion == 0){
-      explosion->animacion->siguiente();
-      
-      if (explosion->animacion->fuera_del_sprite()){
-        en_explosion = false;
-        explosion_finalizada = true;
-      }
-      contador_explosion = 3;
-    }
-  }
-  if (contador_animacion == 0){
-    for (int i = 0; i < cant_animaciones; i++){
-      animaciones[i]->animacion->siguiente();
-      if (animaciones[i]->animacion->fuera_del_sprite())
-        animaciones[i]->animacion->reiniciar();
-    }
-    contador_animacion = 8;
-  }
+  if (!en_curso) return;
+  animacion->establecer_fps(fps);
+  animacion->animar();
 }

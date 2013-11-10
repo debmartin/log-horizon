@@ -3,13 +3,49 @@
 
 #include "SDL/SDL.h"
 #include "matriz.h"
+#include "lista.h"
 #include <vector>
 
 typedef struct animacion_textura{
   Animacion *animacion;
   Textura *textura;
-  int contador;
 }animacion_t;
+
+class Explosion{
+  public:
+    //
+    Explosion();
+    
+    //
+    ~Explosion();
+    
+    //
+    void cargar_animacion(const std::string &path, Ventana *ventana);
+    
+    //
+    void explotar(SDL_Rect &celda, Matriz* tablero);
+    
+    //
+    bool explosion_en_curso();
+    
+    //
+    void animar(int fps);
+  
+    //
+    SDL_Rect borrar_primera();
+    
+    //
+    bool finalizada();
+    
+    //
+    bool celdas_vacias();
+  
+  private:
+    Textura *textura;
+    Animacion *animacion;
+    Lista<SDL_Rect> *celdas;
+    bool en_curso;
+};
 
 class Nivel{
   public:
@@ -33,21 +69,18 @@ class Nivel{
     bool analizar_evento(SDL_Event &evento);
     
     //
-    void actualizar_animaciones();
+    void actualizar_animaciones(int fps);
   
   private:
     int cant_animaciones;
     animacion_t **animaciones;
+    Matriz *tablero;
+    Explosion *explosion;
+    
     Textura *fondo;
     Textura *seleccion;
-    animacion_t *explosion;
-    Matriz *tablero;
-    bool en_explosion;
-    bool explosion_finalizada;
-    int contador_animacion;
-    int contador_explosion;
-    std::vector<SDL_Rect> celdas_explotar;
     Mix_Chunk *sonido;
+    
 };
 
 #endif // NIVEL_H

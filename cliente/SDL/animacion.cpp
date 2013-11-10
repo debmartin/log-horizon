@@ -26,6 +26,8 @@ Animacion::Animacion(){
   imagen_actual.h = 0;
   desp_x = 0;
   desp_y = 0;
+  tiempo = 0;
+  frame_rate = 0;
 }
 
 //
@@ -73,8 +75,29 @@ bool Animacion::fuera_del_sprite(){
 }
 
 //
+bool Animacion::al_final(){
+  return (imagen_actual.x + imagen_actual.w  + desp_x > dimension_total.x + dimension_total.w || 
+          imagen_actual.y + imagen_actual.h  + desp_y > dimension_total.y + dimension_total.h);
+}
+
+//
 bool Animacion::al_inicio(){
   return (imagen_actual.x == imagen_inicial.x && imagen_actual.y == imagen_inicial.y);
+}
+
+//
+void Animacion::establecer_fps(int fps){
+	frame_rate = 1000.0f / fps;
+}
+
+//
+void Animacion::animar(){
+  if (tiempo + frame_rate > SDL_GetTicks()) return;
+	if (Animacion::fuera_del_sprite()){ 
+    Animacion::reiniciar();
+  }
+  tiempo = SDL_GetTicks();
+	Animacion::siguiente();
 }
 
 
