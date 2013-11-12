@@ -22,15 +22,16 @@ Dimension& Dimension::operator=(Dimension& otra){
     return *this;
 }
 
-bool sonAdyacentes(Dimension& una, Dimension& otra){
-    int unaf = una.getFila(), unac = una.getCol();
-    int otraf = otra.getFila(), otrac = otra.getCol();
+bool sonAdyacentesFila(Dimension& una, Dimension& otra){
+    return (una.filas == otra.filas && ((una.cols + otra.cols) % 2) == 1);
+}
 
-    if(unaf == otraf && ((unac + otrac) % 2) == 1)
-        return true;
-    if(unac == otrac && ((unaf + otraf) % 2) == 1)
-        return true;
-    return false;
+bool sonAdyacentesCol(Dimension& una, Dimension& otra){
+    return (una.cols == otra.cols && ((una.filas + otra.filas) % 2) == 1);
+}
+
+bool sonAdyacentes(Dimension& una, Dimension& otra){
+    return (sonAdyacentesFila(una, otra) || sonAdyacentesCol(una, otra));
 }
 
 int operator==(const Dimension& una, const Dimension& otra){

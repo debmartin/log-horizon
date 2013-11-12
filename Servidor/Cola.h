@@ -12,14 +12,14 @@ class NodoCola {
          * Pre: prox es el nodo siguiente al nodo que se crea. Si no hay
          * siguiente, debe ser NULL.
          * Post: Guarda en el nuevo nodo su valor y su nodo siguiente.*/
-        NodoCola(T& valor);
+        NodoCola(const T& valor);
         /* Destruye el nodo.
          * Pre: El nodo fue creado.
          * Post: No se destruyeron ni el dato, ni el siguiente al nodo.*/
         ~NodoCola();
 
     private:
-        T dato;
+        const T dato;
         NodoCola<T>* nodoSig;
 };
 
@@ -33,6 +33,7 @@ class Cola {
         U& desencolar();
         U verPrimero();
         Cola<U>& operator+=(const U& dato);
+        Cola<U>& operator+=(const Cola<U>& otra);
     private:
         bool destruirDato;
         NodoCola<U>* nodoPrim;
@@ -43,7 +44,7 @@ class Cola {
 
 
 template <class T>
-NodoCola<T>::NodoCola(T& valor) :
+NodoCola<T>::NodoCola(const T& valor) :
     dato(valor), nodoSig(NULL) {
 }
 
@@ -59,7 +60,7 @@ Cola<U>::Cola(bool destruir) :
 template <class U>
 Cola<U>::~Cola(){
 	while (! esVacia()) {
-		U dato = desencolar();
+		U& dato = desencolar();
 		if (destruirDato)
             delete dato;
 	}
@@ -92,7 +93,7 @@ template <class U>
 U& Cola<U>::desencolar(){
 	if (esVacia()) return NULL;
 
-	U dato = verPrimero();
+	U& dato = verPrimero();
 	NodoCola<U>* nodoIn = nodoPrim;
 	nodoPrim = nodoPrim->nodoSig;
 	delete nodoIn;
@@ -107,10 +108,15 @@ Cola<U>& Cola<U>::operator+=(const U& dato){
 
 template <class U>
 Cola<U>& Cola<U>::operator+=(const Cola<U>& otra){
+    Cola<U> aux;
+    while (! otra.esVacia()){
+        U& dato = otra.desencolar();
+        encolar(dato);
+        aux.encolar(dato);
+    }
+    while (! aux.esVacia())
+        otra.encolar(aux.desencolar());
 
-    while (! iter->alFinal())
-        this->insertarUltimo(iter->verActual());
-    delete iter;
     return *this;
 }
 

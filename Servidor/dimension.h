@@ -11,6 +11,8 @@ class Dimension {
         int getCol() { return cols; }
         Dimension& operator=(Dimension& otra);
         friend int operator==(const Dimension& una, const Dimension& otra);
+        friend bool sonAdyacentesFila(Dimension& una, Dimension& otra);
+        friend bool sonAdyacentesCol(Dimension& una, Dimension& otra);
         friend bool sonAdyacentes(Dimension& una, Dimension& otra);
     private:
         int filas;
