@@ -58,9 +58,10 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
     ventana->limpiar();
     Nivel::dibujar(ventana);
     Nivel::actualizar_animaciones();
-    if ( SDL_GetTicks() - tiempo_actual < 1000){
-      frames.actualizar();
-      delay = (1000/60.0f) * (frames.ver_fps() / 60.0f);
+    
+    if (SDL_GetTicks() - tiempo_actual < 2500){
+      delay = Nivel::calcular_delay(frames);
+      std::cout << delay << std::endl;
     }
     ventana->presentar(delay);
   }
@@ -224,7 +225,6 @@ void Nivel::dibujar(Ventana *ventana){
 
 //
 void Nivel::actualizar_animaciones(){
-  
   explosion->animar();
   animaciones[0]->animacion->animar();
   
@@ -234,6 +234,12 @@ void Nivel::actualizar_animaciones(){
       tablero->apilar(animaciones[0]->textura, animaciones[0]->animacion, celda);
     }
   }
+}
+
+//
+int Nivel::calcular_delay(FPS &frames){
+  frames.actualizar();
+  return (1000/60.0f) * (frames.ver_fps() / 60.0f);
 }
 
 /* ********************************************************************

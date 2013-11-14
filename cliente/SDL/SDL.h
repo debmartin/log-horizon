@@ -9,6 +9,7 @@
 #include "ventana.h"
 #include "superficie.h"
 #include "animacion.h"
+#include "fps.h"
 
 class SDL {
   public:

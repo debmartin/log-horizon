@@ -45,6 +45,8 @@ class Explosion{
     Animacion *animacion;
     Lista<SDL_Rect> *celdas;
     bool en_curso;
+    
+  protected:
 };
 
 class Nivel{
@@ -80,6 +82,10 @@ class Nivel{
     Textura *fondo;
     Textura *seleccion;
     Mix_Chunk *sonido;
+    
+  protected:
+    //
+    int calcular_delay(FPS &frames);
     
 };
 
