@@ -23,7 +23,7 @@ class Explosion{
     void cargar_animacion(const std::string &path, Ventana *ventana);
     
     //
-    void explotar(SDL_Rect &celda, Matriz* tablero);
+    void explotar(coordenada_t &celda, Matriz* tablero);
     
     //
     bool explosion_en_curso();
@@ -32,7 +32,7 @@ class Explosion{
     void animar();
   
     //
-    SDL_Rect borrar_primera();
+    coordenada_t borrar_primera();
     
     //
     bool finalizada();
@@ -43,7 +43,7 @@ class Explosion{
   private:
     Textura *textura;
     Animacion *animacion;
-    Lista<SDL_Rect> *celdas;
+    Lista<coordenada_t> *celdas;
     bool en_curso;
     
   protected:
@@ -87,6 +87,8 @@ class Nivel{
     //
     int calcular_delay(FPS &frames);
     
+    //
+    void intercambiar(coordenada_t &inicio, coordenada_t &fin);
 };
 
 #endif // NIVEL_H

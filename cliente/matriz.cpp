@@ -116,7 +116,7 @@ Matriz::~Matriz(){
 }
 
 //
-void Matriz::definir_forma(char **estructura, SDL_Rect &dimension, SDL_Rect &celda){
+void Matriz::definir_forma(char **estructura, coordenada_t &dimension, SDL_Rect &celda){
   primer_celda = celda;
   columnas = dimension.x;
   filas = dimension.y;
@@ -133,7 +133,7 @@ void Matriz::definir_forma(char **estructura, SDL_Rect &dimension, SDL_Rect &cel
 }
 
 //
-void Matriz::insertar(Textura *tex, Animacion *anim, SDL_Rect &celda){
+void Matriz::insertar(Textura *tex, Animacion *anim, coordenada_t &celda){
   if (!celdas[celda.x][celda.y]) return;
   SDL_Rect destino;
   destino.x = primer_celda.x + celda.x * primer_celda.w;
@@ -145,14 +145,14 @@ void Matriz::insertar(Textura *tex, Animacion *anim, SDL_Rect &celda){
 }
 
 //
-void Matriz::seleccionar(Textura *tex, SDL_Rect &celda){
+void Matriz::seleccionar(Textura *tex, coordenada_t &celda){
   if (celda.x < 0 || celda.x > columnas || celda.y < 0 || celda.y > filas) return;
   
   if (celdas[celda.x][celda.y]){
     if (celda_seleccionada){
       celdas[celda_seleccionada->x][celda_seleccionada->y]->quitar_seleccion();
     }else{
-      celda_seleccionada = new SDL_Rect;
+      celda_seleccionada = new coordenada_t;
     }
     celda_seleccionada->x = celda.x;
     celda_seleccionada->y = celda.y;
@@ -169,7 +169,7 @@ void Matriz::quitar_seleccion(){
 }
 
 //
-bool Matriz::intercambiar(SDL_Rect &celda1, SDL_Rect &celda2){
+bool Matriz::intercambiar(coordenada_t &celda1, coordenada_t &celda2){
   Celda *primer_celda = celdas[celda1.x][celda1.y];
   Celda *segunda_celda = celdas[celda2.x][celda2.y];
   if (!primer_celda || !segunda_celda) return false;
@@ -182,7 +182,7 @@ bool Matriz::intercambiar(SDL_Rect &celda1, SDL_Rect &celda2){
 }
 
 //
-bool Matriz::apilar(Textura *tex, Animacion* anim, SDL_Rect &celda){
+bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
   if (!celdas[celda.x][celda.y]) return false;
   celdas[celda.x][celda.y]->quitar_textura();
   
@@ -267,16 +267,12 @@ bool Matriz::dibujar(Ventana *ventana){
 }
 
 //
-bool Matriz::dibujar_celda(Textura *tex, SDL_Rect &celda, Ventana* ventana){
-  return true;
-}
-
 bool Matriz::esta_ocupada(){
   return ocupada;
 }
 
 //
-bool Matriz::adyacente_seleccionado(SDL_Rect &celda, SDL_Rect &celda_adyacente){
+bool Matriz::adyacente_seleccionado(coordenada_t &celda, coordenada_t &celda_adyacente){
   if (!celda_seleccionada || celda.x < 0 || celda.x > columnas || celda.y < 0 || celda.y > filas) return false;
   if (celda.x + 1 == celda_seleccionada->x && celda.y == celda_seleccionada->y){
     celda_adyacente.x = celda.x + 1;

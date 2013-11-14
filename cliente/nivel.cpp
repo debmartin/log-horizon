@@ -44,30 +44,6 @@ Nivel::~Nivel(){
 }
 
 //
-void Nivel::correr(const std::string &path, Ventana* ventana){
-  Nivel::inicializar_datos(path, ventana);
-  SDL_Event evento;
-  bool corriendo = true;
-  FPS frames;
-  int tiempo_actual = SDL_GetTicks();
-  int delay = 16;
-  while (corriendo){
-    while (SDL_PollEvent(&evento)){
-      corriendo = Nivel::analizar_evento(evento);
-    }
-    ventana->limpiar();
-    Nivel::dibujar(ventana);
-    Nivel::actualizar_animaciones();
-    
-    if (SDL_GetTicks() - tiempo_actual < 2500){
-      delay = Nivel::calcular_delay(frames);
-      std::cout << delay << std::endl;
-    }
-    ventana->presentar(delay);
-  }
-}
-
-//
 void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   Superficie *fondo_sup = new Superficie;
   fondo_sup->cargar(path + "fondo1.png");
@@ -80,7 +56,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   tablero = new Matriz;
   
   // LO SIGUIENTE LO DEBE RECIBIR DEL SERVIDOR
-  SDL_Rect dimension;
+  coordenada_t dimension;
   dimension.x = CANT_CELDAS_X;
   dimension.y = CANT_CELDAS_Y;
   char **estructura = new char*[dimension.x];
@@ -157,7 +133,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     cant_animaciones++;
   }
   
-  SDL_Rect celda;
+  coordenada_t celda;
   for (int i = 0; i < dimension.x; i++){
     celda.x = i;
     for (int z = 0; z < dimension.y; z++){
@@ -184,13 +160,37 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
 }
 
 //
+void Nivel::correr(const std::string &path, Ventana* ventana){
+  Nivel::inicializar_datos(path, ventana);
+  SDL_Event evento;
+  bool corriendo = true;
+  FPS frames;
+  int tiempo_actual = SDL_GetTicks();
+  int delay = 16;
+  while (corriendo){
+    while (SDL_PollEvent(&evento)){
+      corriendo = Nivel::analizar_evento(evento);
+    }
+    ventana->limpiar();
+    Nivel::dibujar(ventana);
+    Nivel::actualizar_animaciones();
+    
+    if (SDL_GetTicks() - tiempo_actual < 2500){
+      delay = Nivel::calcular_delay(frames);
+      std::cout << delay << std::endl;
+    }
+    ventana->presentar(delay);
+  }
+}
+
+//
 bool Nivel::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){ 
     return false;
     
   }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){
     if (evento.type == SDL_MOUSEBUTTONDOWN){
-      SDL_Rect celda;
+      coordenada_t celda;
       celda.x = (evento.button.x - POS_X) / LARGO_CELDA_X;
       celda.y = (evento.button.y - POS_Y) / LARGO_CELDA_Y;
       if (evento.button.x - POS_X >= 0 && 
@@ -201,7 +201,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
         Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
         
         if(evento.button.button == SDL_BUTTON_LEFT){
-          SDL_Rect celda_adyacente;
+          coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
             tablero->intercambiar(celda, celda_adyacente);
           }else{
@@ -227,10 +227,12 @@ void Nivel::dibujar(Ventana *ventana){
 void Nivel::actualizar_animaciones(){
   explosion->animar();
   animaciones[0]->animacion->animar();
+  if (animaciones[0]->animacion->fuera_del_sprite())
+    animaciones[0]->animacion->reiniciar();
   
   if (explosion->finalizada()){
     while (explosion->celdas_vacias()){
-      SDL_Rect celda = explosion->borrar_primera();
+      coordenada_t celda = explosion->borrar_primera();
       tablero->apilar(animaciones[0]->textura, animaciones[0]->animacion, celda);
     }
   }
@@ -251,7 +253,7 @@ Explosion::Explosion(){
   animacion = NULL;
   textura = NULL;
   en_curso = false;
-  celdas = new Lista<SDL_Rect>;
+  celdas = new Lista<coordenada_t>;
 }
 
 //
@@ -295,7 +297,7 @@ void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
 }
 
 //
-void Explosion::explotar(SDL_Rect &celda, Matriz* tablero){
+void Explosion::explotar(coordenada_t &celda, Matriz* tablero){
   en_curso = true;
   tablero->insertar(textura, animacion, celda);
   celdas->insertar_ultimo(celda);
@@ -308,7 +310,7 @@ bool Explosion::explosion_en_curso(){
 
 //
 bool Explosion::finalizada(){
-  return animacion->al_final();
+  return animacion->fuera_del_sprite();
 }
 
 //
@@ -317,15 +319,15 @@ bool Explosion::celdas_vacias(){
 }
 
 //
-SDL_Rect Explosion::borrar_primera(){
+coordenada_t Explosion::borrar_primera(){
   return celdas->borrar_primero();
 }
 
 //
 void Explosion::animar(){
-  if (animacion->al_final()){
+  if (animacion->fuera_del_sprite()){
     en_curso = false;
-    animacion->animar();
+    animacion->reiniciar();
   }
   if (!en_curso) return;
   animacion->animar();

@@ -50,6 +50,11 @@ class Celda{
     SDL_Rect seleccion_src;
 };
 
+typedef struct coordenada{
+  int x;
+  int y;
+}coordenada_t;
+
 class Matriz{
   public:
     //
@@ -59,29 +64,26 @@ class Matriz{
     ~Matriz();
     
     //
-    void definir_forma(char **estructura, SDL_Rect &dimension, SDL_Rect &celda);
+    void definir_forma(char **estructura, coordenada_t &dimension, SDL_Rect &celda);
     
     //
-    void insertar(Textura *tex, Animacion *anim, SDL_Rect &celda);
+    void insertar(Textura *tex, Animacion *anim, coordenada_t &celda);
     
     //
-    void seleccionar(Textura *tex, SDL_Rect &celda);
+    void seleccionar(Textura *tex, coordenada_t &celda);
     
     //
-    bool intercambiar(SDL_Rect &celda1, SDL_Rect &celda2);
+    bool intercambiar(coordenada_t &celda1, coordenada_t &celda2);
     
     //
-    bool apilar(Textura *tex, Animacion *anim, SDL_Rect &celda);
+    bool apilar(Textura *tex, Animacion *anim, coordenada_t &celda);
     
     //
     bool dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Superficie *fondo);
     
     //
     bool dibujar(Ventana *ventana);
-    
-    //
-    bool dibujar_celda(Textura *tex, SDL_Rect &celda, Ventana* ventana);
-    
+        
     //
     void quitar_seleccion();
     
@@ -89,7 +91,7 @@ class Matriz{
     bool esta_ocupada();
     
     //
-    bool adyacente_seleccionado(SDL_Rect &celda,SDL_Rect &celda_adyacente);
+    bool adyacente_seleccionado(coordenada_t &celda,coordenada_t &celda_adyacente);
     
   private:
     Celda ***celdas;
@@ -97,7 +99,7 @@ class Matriz{
     unsigned int columnas;
     SDL_Rect primer_celda;
     bool ocupada;
-    SDL_Rect *celda_seleccionada;
+    coordenada_t *celda_seleccionada;
 };
 
 #endif // MATRIZ_H
