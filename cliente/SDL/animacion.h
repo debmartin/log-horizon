@@ -53,8 +53,8 @@ class Animacion{
     SDL_Rect imagen_actual;
     int desp_x;
     int desp_y;
-    int frame_rate;
-    int tiempo;
+    Uint32 frame_rate;
+    Uint32 tiempo;
 };
 
 

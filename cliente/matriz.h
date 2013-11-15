@@ -95,8 +95,8 @@ class Matriz{
     
   private:
     Celda ***celdas;
-    unsigned int filas;
-    unsigned int columnas;
+    int filas;
+    int columnas;
     SDL_Rect primer_celda;
     bool ocupada;
     coordenada_t *celda_seleccionada;

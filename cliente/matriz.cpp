@@ -217,7 +217,7 @@ bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
   celdas[celda.x][primer_fila]->asignar_animacion(tex, anim);
   celdas[celda.x][primer_fila]->asignar_posicion(origen);
   celdas[celda.x][primer_fila]->mover(destino);
-  
+  return true;
 }
 
 //

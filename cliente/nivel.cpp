@@ -91,7 +91,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     tam.y = 0;
     tam.w = 352;
     tam.h = 40;
-    origen;
     origen.x = 0;
     origen.y = 0;
     origen.w = 32;
@@ -135,11 +134,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   // TEXTURA DE SELECCION
   seleccion = new Textura;
   seleccion->cargar_textura("imagenes/celda_seleccion.png", ventana);
-  SDL_Rect seleccion_src;
-  seleccion_src.x = 0;
-  seleccion_src.y = 0;
-  seleccion_src.h = 74;
-  seleccion_src.w = 69;
 
   // EXPLOSION
   explosion->cargar_animacion(path, ventana);
