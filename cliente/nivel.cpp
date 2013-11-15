@@ -67,18 +67,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     }
   }
   
-  estructura[1][5] = 0;
-  estructura[1][6] = 0;
-  
-  estructura[2][0] = 0;
-  estructura[2][3] = 0;
-  
-  estructura[3][5] = 0;
-  estructura[3][6] = 0;
-  
-  estructura[5][0] = 0;
-  estructura[5][3] = 0;
-  
   // HASTA ACA
   
   SDL_Rect origen;
@@ -175,9 +163,8 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
     Nivel::dibujar(ventana);
     Nivel::actualizar_animaciones();
     
-    if (SDL_GetTicks() - tiempo_actual < 2500){
+    if (SDL_GetTicks() - tiempo_actual < 2000){
       delay = Nivel::calcular_delay(frames);
-      std::cout << delay << std::endl;
     }
     ventana->presentar(delay);
   }
@@ -203,13 +190,13 @@ bool Nivel::analizar_evento(SDL_Event &evento){
         if(evento.button.button == SDL_BUTTON_LEFT){
           coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
-            tablero->intercambiar(celda, celda_adyacente);
+            Nivel::intercambiar(celda, celda_adyacente);
           }else{
             tablero->seleccionar(seleccion, celda);
           }
         }else if(evento.button.button == SDL_BUTTON_RIGHT){
           tablero->quitar_seleccion();
-          explosion->explotar(celda, tablero);
+          explotar(celda);
         }
       }
     }
@@ -233,7 +220,7 @@ void Nivel::actualizar_animaciones(){
   if (explosion->finalizada()){
     while (explosion->celdas_vacias()){
       coordenada_t celda = explosion->borrar_primera();
-      tablero->apilar(animaciones[0]->textura, animaciones[0]->animacion, celda);
+      Nivel::apilar(0, celda);
     }
   }
 }
@@ -242,6 +229,38 @@ void Nivel::actualizar_animaciones(){
 int Nivel::calcular_delay(FPS &frames){
   frames.actualizar();
   return (1000/60.0f) * (frames.ver_fps() / 60.0f);
+}
+
+//
+void Nivel::intercambiar(coordenada_t &origen, coordenada_t &destino){
+  tablero->intercambiar(origen, destino);
+}
+
+//
+void Nivel::apilar(int producto, coordenada_t &celda){
+  tablero->apilar(animaciones[producto]->textura, animaciones[producto]->animacion, celda);
+}
+
+//
+void Nivel::explotar(coordenada_t &celda){
+  explosion->explotar(celda, tablero);
+}
+
+//
+void Nivel::explotar_segmento(coordenada_t &origen, coordenada_t &destino){
+  int desp_x = destino.x - origen.x;
+  if (desp_x != 0) desp_x = desp_x / abs(desp_x);
+  
+  int desp_y = destino.y - origen.y;
+  if (desp_y != 0) desp_y = desp_y / abs(desp_y);
+  
+  coordenada_t actual = origen;
+  Nivel::explotar(actual);
+  while (actual.x != destino.x || actual.y != destino.y){
+    actual.x += desp_x;
+    actual.y += desp_y;
+    Nivel::explotar(actual);
+  }
 }
 
 /* ********************************************************************

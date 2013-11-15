@@ -88,7 +88,16 @@ class Nivel{
     int calcular_delay(FPS &frames);
     
     //
-    void intercambiar(coordenada_t &inicio, coordenada_t &fin);
+    void intercambiar(coordenada_t &origen, coordenada_t &destino);
+    
+    //
+    void apilar(int producto, coordenada_t &celda);
+    
+    //
+    void explotar(coordenada_t &celda);
+    
+    //
+    void explotar_segmento(coordenada_t &origen, coordenada_t &destino);
 };
 
 #endif // NIVEL_H
