@@ -189,8 +189,9 @@ bool Nivel::analizar_evento(SDL_Event &evento){
             tablero->seleccionar(seleccion, celda);
           }
         }else if(evento.button.button == SDL_BUTTON_RIGHT){
-          tablero->quitar_seleccion();
-          explotar(celda);
+          Nivel::secuencia_prueba();
+          //tablero->quitar_seleccion();
+          //explotar(celda);
         }
       }
     }
@@ -208,14 +209,17 @@ void Nivel::dibujar(Ventana *ventana){
 void Nivel::actualizar_animaciones(){
   explosion->animar();
   animaciones[0]->animacion->animar();
-  if (animaciones[0]->animacion->fuera_del_sprite())
+  if (animaciones[0]->animacion->fuera_del_sprite()){
     animaciones[0]->animacion->reiniciar();
-  
-  if (explosion->finalizada()){
-    while (explosion->celdas_vacias()){
-      coordenada_t celda = explosion->borrar_primera();
+  }  
+  if (explosion->celdas_vacias() && !tablero->esta_ocupada() && !explosion->explosion_en_curso()){
+    coordenada_t celda, proxima;
+    do{
+      celda = explosion->borrar_primera();
       Nivel::apilar(0, celda);
-    }
+      if (!explosion->celdas_vacias()) break;
+      proxima = explosion->ver_primera();
+    }while (proxima.x > celda.x && explosion->celdas_vacias());
   }
 }
 
@@ -255,6 +259,21 @@ void Nivel::explotar_segmento(coordenada_t &origen, coordenada_t &destino){
     actual.y += desp_y;
     Nivel::explotar(actual);
   }
+}
+
+
+void Nivel::secuencia_prueba(){
+  coordenada_t inicio;
+  inicio.x = 0;
+  inicio.y = 0;
+  coordenada_t fin;
+  fin.x = 5;
+  fin.y = 0;
+  Nivel::explotar_segmento(inicio,fin);
+  inicio.y = 1;
+  fin.x = 0;
+  fin.y = 5;
+  Nivel::explotar_segmento(inicio,fin);
 }
 
 /* ********************************************************************
@@ -311,6 +330,7 @@ void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
 
 //
 void Explosion::explotar(coordenada_t &celda, Matriz* tablero){
+  animacion->reiniciar();
   en_curso = true;
   tablero->insertar(textura, animacion, celda);
   celdas->insertar_ultimo(celda);
@@ -337,10 +357,14 @@ coordenada_t Explosion::borrar_primera(){
 }
 
 //
+coordenada_t Explosion::ver_primera(){
+  return celdas->ver_primero();
+}
+
+//
 void Explosion::animar(){
   if (animacion->fuera_del_sprite()){
     en_curso = false;
-    animacion->reiniciar();
   }
   if (!en_curso) return;
   animacion->animar();

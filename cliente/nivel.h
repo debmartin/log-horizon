@@ -39,14 +39,15 @@ class Explosion{
     
     //
     bool celdas_vacias();
+    
+    //
+    coordenada_t ver_primera();
   
   private:
     Textura *textura;
     Animacion *animacion;
     Lista<coordenada_t> *celdas;
     bool en_curso;
-    
-  protected:
 };
 
 class Nivel{
@@ -98,6 +99,8 @@ class Nivel{
     
     //
     void explotar_segmento(coordenada_t &origen, coordenada_t &destino);
+    
+    void secuencia_prueba();
 };
 
 #endif // NIVEL_H
