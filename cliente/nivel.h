@@ -53,6 +53,12 @@ class Explosion{
 
 class ColumnaInvalida: public std::exception{};
 
+typedef struct reemplzado{
+  coordenada_t celda;
+  int color;
+  int tipo;
+}reemplazo_t;
+
 class CeldasVacias{
   public:
     //
@@ -72,10 +78,14 @@ class CeldasVacias{
 
     //
     coordenada_t borrar_proxima(int columna)throw(ListaVacia, ColumnaInvalida);
+    
+    //
+    bool existentes();
 
   private:
     Lista<coordenada_t> **celdas_vacias;
     int columnas;  
+    int contador;
 };
 
 /* ********************************************************************

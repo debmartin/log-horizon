@@ -16,7 +16,8 @@
 #define CANT_ANIMACIONES 1
 #define CANT_CELDAS_X 10
 #define CANT_CELDAS_Y 8
-#define CANTIDAD_FPS 15.0f
+#define FPS_ANIMACION 5.0f
+#define FPS_EXPLOSION 15.0f
 
 //
 Nivel::Nivel(){
@@ -91,19 +92,19 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     SDL_Rect tam;
     tam.x = 0;
     tam.y = 0;
-    tam.w = 352;
-    tam.h = 40;
+    tam.w = 240;
+    tam.h = 60;
     origen.x = 0;
     origen.y = 0;
-    origen.w = 32;
-    origen.h = 40;
+    origen.w = 60;
+    origen.h = 60;
     sprite.dimension_total = tam;
     sprite.imagen_inicial = origen;
-    sprite.desplazamiento_x = 32;
+    sprite.desplazamiento_x = 60;
     sprite.desplazamiento_y = 0;
     
     Superficie *animacion_sup = new Superficie;
-    animacion_sup->cargar(path + "estrella.png");
+    animacion_sup->cargar(path + "verde.png");
     SDL_Color color;
     animacion_sup->color_pixel(0,0, color);
     animacion_sup->color_clave(color);
@@ -118,7 +119,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     animacion_temp->textura = animacion_tex;
     animacion_temp->animacion = animacion;
     animaciones[i] = animacion_temp;
-    animaciones[i]->animacion->establecer_fps(CANTIDAD_FPS);
+    animaciones[i]->animacion->establecer_fps(FPS_ANIMACION);
     cant_animaciones++;
   }
   
@@ -194,9 +195,9 @@ bool Nivel::analizar_evento(SDL_Event &evento){
             tablero->seleccionar(seleccion, celda);
           }
         }else if(evento.button.button == SDL_BUTTON_RIGHT){
-          Nivel::secuencia_prueba();
-          //tablero->quitar_seleccion();
-          //explotar(celda);
+          //Nivel::secuencia_prueba();
+          tablero->quitar_seleccion();
+          explotar(celda);
         }
       }
     }
@@ -222,7 +223,7 @@ void Nivel::actualizar_animaciones(){
   }
   
   // actualizar celdas vacias
-  if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){
+  if (!tablero->esta_ocupada() && !explosion->explosion_en_curso() && celdas_vacias->existentes()){
     coordenada_t celda;
     for (int i = 0; i < tablero->numero_columnas(); i++){
       if (!celdas_vacias->esta_vacia(i)){
@@ -295,6 +296,7 @@ void Nivel::secuencia_prueba(){
 //
 CeldasVacias::CeldasVacias(){
   celdas_vacias = NULL;
+  contador = 0;
 }
 
 //
@@ -332,6 +334,7 @@ void CeldasVacias::agregar(coordenada_t &celda){
     }
     iterador.insertar(celda);
   }
+  contador++;
 }
 
 //
@@ -345,7 +348,13 @@ bool CeldasVacias::esta_vacia(int columna){
 coordenada_t CeldasVacias::borrar_proxima(int columna)throw(ListaVacia, ColumnaInvalida){
   if (columna < 0 || columna >= columnas) throw ColumnaInvalida();
   Lista<coordenada_t> *lista = celdas_vacias[columna];
+  contador--;
   return lista->borrar_primero();
+}
+
+//
+bool CeldasVacias::existentes(){
+  return contador != 0;
 }
 
 /* ********************************************************************
@@ -395,7 +404,7 @@ void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
   
   animacion = new Animacion;
   animacion->cargar_sprite(exp);
-  animacion->establecer_fps(CANTIDAD_FPS);
+  animacion->establecer_fps(FPS_EXPLOSION);
 }
 
 //
