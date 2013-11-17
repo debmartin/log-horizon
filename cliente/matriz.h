@@ -93,6 +93,12 @@ class Matriz{
     //
     bool adyacente_seleccionado(coordenada_t &celda,coordenada_t &celda_adyacente);
     
+    //
+    int numero_filas(){return filas;}
+    
+    //
+    int numero_columnas(){return columnas;}
+    
   private:
     Celda ***celdas;
     int filas;

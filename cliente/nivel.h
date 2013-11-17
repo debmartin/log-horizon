@@ -11,6 +11,10 @@ typedef struct animacion_textura{
   Textura *textura;
 }animacion_t;
 
+/* ********************************************************************
+ *                            EXPLOSION
+ * ********************************************************************/
+
 class Explosion{
   public:
     //
@@ -30,15 +34,9 @@ class Explosion{
     
     //
     void animar();
-  
-    //
-    coordenada_t borrar_primera();
     
     //
     bool finalizada();
-    
-    //
-    bool celdas_vacias();
     
     //
     coordenada_t ver_primera();
@@ -46,9 +44,43 @@ class Explosion{
   private:
     Textura *textura;
     Animacion *animacion;
-    Lista<coordenada_t> *celdas;
     bool en_curso;
 };
+
+/* ********************************************************************
+ *                            CELDAS VACIAS
+ * ********************************************************************/
+
+class ColumnaInvalida: public std::exception{};
+
+class CeldasVacias{
+  public:
+    //
+    CeldasVacias();
+    
+    //
+    ~CeldasVacias();
+    
+    //
+    void inicializar(int cantidad_columnas);
+    
+    //
+    void agregar(coordenada_t &celda);
+    
+    //
+    bool esta_vacia(int columna);
+
+    //
+    coordenada_t borrar_proxima(int columna)throw(ListaVacia, ColumnaInvalida);
+
+  private:
+    Lista<coordenada_t> **celdas_vacias;
+    int columnas;  
+};
+
+/* ********************************************************************
+ *                            NIVEL
+ * ********************************************************************/
 
 class Nivel{
   public:
@@ -61,7 +93,6 @@ class Nivel{
     //
     void correr(const std::string &path, Ventana* ventana);
   
-  protected:
     //
     void inicializar_datos(const std::string &path, Ventana *ventana);
     
@@ -79,6 +110,7 @@ class Nivel{
     animacion_t **animaciones;
     Matriz *tablero;
     Explosion *explosion;
+    CeldasVacias *celdas_vacias;
     
     Textura *fondo;
     Textura *seleccion;
