@@ -46,11 +46,12 @@ void Tablero::estabilizar(Dimension& una, Dimension& otra){
 
         while(!ultimo){
             int cant = 0;
+//            std::cout<<"entra";
             Dimension inicial(actual), final(actual);
             cant += this->buscarConfEspecial(actual, orientacion, inicial, final);
             if(cant >= MIN_LINEA){
                 contarPuntos(cant, false);
-                cant = this->borrarLinea(inicial, final) - cant;
+                this->borrarLinea(inicial, final);
                 contarPuntos(cant, false);
                 this->reemplazarOriginal(cant, actual, orientacion);
             }
@@ -86,7 +87,10 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
         Dimension actual(dest.x() -i, dest.y());
         Dimension superior(origen.x() -i-1, origen.y());
         char tipo = (*this)[actual].getTipo();
-
+        Celda salida = (*this)[actual];
+            std::cout << '(' << salida.getColor() << ',' << salida.getTipo() << ')';
+                std::cout<<actual.x()<<" "<<actual.y()<<"\n";
+//    std::cout<<fin.x()<<" "<<su.y()<<"\n
         if (tipo == MINIBARH && !borrando){
             Dimension principio(actual.x(), 0);
             Dimension final(actual.x(), tamanio);
@@ -109,7 +113,7 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
 
 int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
     int max = fin.y() - inicio.y(), cant = 0;
-    for(int i=0; i<max; i++){
+    for(int i=0; i<=max; i++){
         Dimension actual(inicio.x(), inicio.y()+i);
 
         char tipo = (*this)[actual].getTipo();
@@ -282,8 +286,8 @@ void Tablero::estabilizar(){
     while(! modificados->esVacia()){
         Dimension* pos = modificados->borrarPrimero();
         *borrados += pos;
-        for(int i = pos->x()-1; i <= pos->x()+1; i+=2){
-            for(int j = pos->y()-1; j <= pos->y()+1; j+=2){
+        for(int i = pos->x()-1; i <= pos->x()+1; i++){
+            for(int j = (i==pos->x()) ? pos->y()-1 : pos->y(); (i==pos->x()) ? (j <= pos->y()+1) : (j == pos->y()); j+=2){
                 Dimension adyacente(i, j);
                 if(!enRango(adyacente, tamanio)) continue;
 
