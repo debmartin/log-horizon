@@ -6,10 +6,6 @@
 #include "lista.h"
 #include <vector>
 
-typedef struct animacion_textura{
-  Animacion *animacion;
-  Textura *textura;
-}animacion_t;
 
 /* ********************************************************************
  *                            EXPLOSION
@@ -89,6 +85,45 @@ class CeldasVacias{
 };
 
 /* ********************************************************************
+ *                           PRODUCTOS
+ * ********************************************************************/
+
+typedef struct animacion_textura{
+  Animacion *animacion;
+  Textura *textura;
+}animacion_t;
+
+class Productos{
+  public:
+    //
+    Productos();
+    
+    //
+    ~Productos();
+    
+    //
+    void cargar_animaciones(const std::string &path, Ventana *ventana);
+      
+    //
+    void animar();
+    
+    //
+    void dibujar(int tipo, int color, coordenada_t &celda, Matriz* matriz);
+    
+    //
+    Animacion *ver_animacion(int tipo, int color);
+
+    //
+    Textura *ver_textura(int tipo, int color);
+      
+  private:
+    animacion_t ***animaciones;
+    int cant_tipos;
+    int cant_colores;
+};
+
+
+/* ********************************************************************
  *                            NIVEL
  * ********************************************************************/
 
@@ -101,7 +136,7 @@ class Nivel{
     ~Nivel();
     
     //
-    void correr(const std::string &path, Ventana* ventana);
+    void correr(const std::string &path, Ventana *ventana);
   
     //
     void inicializar_datos(const std::string &path, Ventana *ventana);
@@ -116,8 +151,7 @@ class Nivel{
     void actualizar_animaciones();
   
   private:
-    int cant_animaciones;
-    animacion_t **animaciones;
+    Productos *productos;
     Matriz *tablero;
     Explosion *explosion;
     CeldasVacias *celdas_vacias;
@@ -134,7 +168,7 @@ class Nivel{
     void intercambiar(coordenada_t &origen, coordenada_t &destino);
     
     //
-    void apilar(int producto, coordenada_t &celda);
+    void apilar(int tipo, int color, coordenada_t &celda);
     
     //
     void explotar(coordenada_t &celda);

@@ -9,26 +9,24 @@
 // largo inicial del vector animaciones
 #define LARGO 15
 
-#define POS_X 180 // posicion en x de la matriz
-#define POS_Y 100 // posicion de y en la matriz
+#define POS_X 100 // posicion en x de la matriz
+#define POS_Y 50 // posicion de y en la matriz
 #define LARGO_CELDA_X 50
 #define LARGO_CELDA_Y 40
-#define CANT_ANIMACIONES 1
-#define CANT_CELDAS_X 10
-#define CANT_CELDAS_Y 8
-#define FPS_ANIMACION 5.0f
+#define CANT_CELDAS_X 12
+#define CANT_CELDAS_Y 10
+#define FPS_ANIMACION 8.0f
 #define FPS_EXPLOSION 15.0f
 
 //
 Nivel::Nivel(){
-  animaciones = new animacion_t*[LARGO];
-  cant_animaciones = 0;
   fondo = NULL;
   seleccion = NULL;
   explosion = NULL;
   tablero = NULL;
   explosion = new Explosion;
   celdas_vacias = new CeldasVacias;
+  productos = new Productos;
 }
 
 //
@@ -36,14 +34,10 @@ Nivel::~Nivel(){
   if (fondo) delete fondo;
   if (seleccion) delete seleccion;
   if (tablero) delete tablero;
-  for (int i = 0; i < cant_animaciones; i++){
-    delete animaciones[i]->animacion;
-    delete animaciones[i]->textura;
-    delete animaciones[i];
-  }
-  delete[] animaciones;
+  
   delete explosion;
   delete celdas_vacias;
+  delete productos;
 }
 
 //
@@ -70,6 +64,13 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     }
   }
   
+  estructura[1][2] = 0;
+  estructura[3][4] = 0;
+  estructura[5][2] = 0;
+  estructura[7][4] = 0;
+  estructura[9][2] = 0;
+  estructura[11][4] = 0;
+  
   // HASTA ACA
   
   SDL_Rect origen;
@@ -87,52 +88,19 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
   delete fondo_celda;
 
   // ANIMACIONES
-  for (int i = 0; i < CANT_ANIMACIONES; i++){
-    SpritePos_t sprite;
-    SDL_Rect tam;
-    tam.x = 0;
-    tam.y = 0;
-    tam.w = 240;
-    tam.h = 60;
-    origen.x = 0;
-    origen.y = 0;
-    origen.w = 60;
-    origen.h = 60;
-    sprite.dimension_total = tam;
-    sprite.imagen_inicial = origen;
-    sprite.desplazamiento_x = 60;
-    sprite.desplazamiento_y = 0;
-    
-    Superficie *animacion_sup = new Superficie;
-    animacion_sup->cargar(path + "verde.png");
-    SDL_Color color;
-    animacion_sup->color_pixel(0,0, color);
-    animacion_sup->color_clave(color);
-    
-    Textura* animacion_tex = new Textura;
-    animacion_tex->cargar_textura(animacion_sup, ventana);
-    delete animacion_sup;
-    
-    Animacion *animacion = new Animacion;
-    animacion->cargar_sprite(sprite);
-    animacion_t *animacion_temp = new animacion_t;
-    animacion_temp->textura = animacion_tex;
-    animacion_temp->animacion = animacion;
-    animaciones[i] = animacion_temp;
-    animaciones[i]->animacion->establecer_fps(FPS_ANIMACION);
-    cant_animaciones++;
-  }
+  productos->cargar_animaciones(path,ventana);
   
-  coordenada_t celda;
   for (int i = 0; i < dimension.x; i++){
-    celda.x = i;
     for (int z = 0; z < dimension.y; z++){
-      celda.y = z;
-      tablero->insertar(animaciones[0]->textura, animaciones[0]->animacion, celda);
+      coordenada_t coord;
+      coord.x = i;
+      coord.y = z;
+      int color = rand() % 5;
+      int tipo = rand() % 4;
+      if (tipo == 3) color = 0;
+      tablero->insertar(productos->ver_textura(tipo,color), productos->ver_animacion(tipo,color),coord); 
     }
   }
-  
-  
   
   // TEXTURA DE SELECCION
   seleccion = new Textura;
@@ -217,10 +185,7 @@ void Nivel::actualizar_animaciones(){
   explosion->animar();
   
   // actualizar animaciones
-  animaciones[0]->animacion->animar();
-  if (animaciones[0]->animacion->fuera_del_sprite()){
-    animaciones[0]->animacion->reiniciar();
-  }
+  productos->animar();
   
   // actualizar celdas vacias
   if (!tablero->esta_ocupada() && !explosion->explosion_en_curso() && celdas_vacias->existentes()){
@@ -228,7 +193,10 @@ void Nivel::actualizar_animaciones(){
     for (int i = 0; i < tablero->numero_columnas(); i++){
       if (!celdas_vacias->esta_vacia(i)){
         celda = celdas_vacias->borrar_proxima(i);
-        Nivel::apilar(0,celda);
+        int color = rand() % 5;
+        int tipo = rand() % 4;
+        if (tipo == 3) color = 0;
+        Nivel::apilar(tipo,color,celda);
       }
     }
   }
@@ -246,8 +214,8 @@ void Nivel::intercambiar(coordenada_t &origen, coordenada_t &destino){
 }
 
 //
-void Nivel::apilar(int producto, coordenada_t &celda){
-  tablero->apilar(animaciones[producto]->textura, animaciones[producto]->animacion, celda);
+void Nivel::apilar(int tipo, int color, coordenada_t &celda){
+  tablero->apilar(productos->ver_textura(tipo, color), productos->ver_animacion(tipo, color), celda);
 }
 
 //
@@ -431,4 +399,166 @@ void Explosion::animar(){
   }
   if (!en_curso) return;
   animacion->animar();
+}
+
+/* ********************************************************************
+ *                           PRODUCTOS
+ * ********************************************************************/
+
+//
+Productos::Productos(){
+  cant_tipos = 4;
+  cant_colores = 5;
+  animaciones = new animacion_t**[cant_tipos];
+  for (int i = 0; i < cant_tipos - 1; i++){
+    animaciones[i] = new animacion_t*[cant_colores];
+    for (int w = 0; w < cant_colores; w++){
+      animaciones[i][w] = new animacion_t;
+      animaciones[i][w]->textura = new Textura;
+      animaciones[i][w]->animacion = new Animacion;
+    }
+  }
+  animaciones[cant_tipos-1] = new animacion_t*;
+  animaciones[cant_tipos-1][0] = new animacion_t;
+  animaciones[cant_tipos-1][0]->textura = new Textura;
+  animaciones[cant_tipos-1][0]->animacion = new Animacion;
+}
+
+//
+Productos::~Productos(){
+  delete animaciones[cant_tipos -1][0]->animacion;
+  delete animaciones[cant_tipos -1][0]->textura;
+  delete animaciones[cant_tipos -1][0];
+  delete animaciones[cant_tipos-1];
+  for (int i = 0; i < cant_tipos - 1; i++){
+    for (int w = 0; w < cant_colores; w++){
+      delete animaciones[i][w]->animacion;
+      delete animaciones[i][w]->textura;
+      delete animaciones[i][w];
+    }
+    delete[] animaciones[i];
+  }  
+  delete[] animaciones;
+}
+
+//
+void Productos::cargar_animaciones(const std::string &path, Ventana *ventana){
+  SpritePos_t exp;
+  SDL_Rect SrcE;
+  SDL_Rect DestE;
+  Superficie *exp_sup = new Superficie;
+  for (int i = 0; i < cant_colores; i++){
+    switch(i){
+      case 0:
+        exp_sup->cargar(path + "rojo.png");
+        break;
+      case 1:
+        exp_sup->cargar(path + "amarillo.png");
+        break;
+      case 2:
+        exp_sup->cargar(path + "verde.png");
+        break;
+      case 3:
+        exp_sup->cargar(path + "azul.png");
+        break;
+      case 4:
+        exp_sup->cargar(path + "violeta.png");
+        break;
+    }
+    SDL_Color color_exp;
+    exp_sup->color_pixel(0,0, color_exp);
+    exp_sup->color_clave(color_exp);
+    
+    SrcE.x = 0;
+    SrcE.w = 240;
+    SrcE.h = 60;
+    DestE.x = 0;
+    DestE.w = 60;
+    DestE.h = 60;    
+    exp.desplazamiento_x = 60;
+    exp.desplazamiento_y = 0;
+
+    DestE.y = 0;
+    SrcE.y = 0;
+    exp.dimension_total = SrcE;
+    exp.imagen_inicial = DestE;
+
+    animaciones[0][i]->textura->cargar_textura(exp_sup, ventana);
+    animaciones[0][i]->animacion->cargar_sprite(exp);
+    animaciones[0][i]->animacion->establecer_fps(FPS_ANIMACION);
+    
+    SrcE.y = 60;
+    DestE.y = 60;
+    exp.dimension_total = SrcE;
+    exp.imagen_inicial = DestE;
+
+    animaciones[1][i]->textura->cargar_textura(exp_sup, ventana);
+
+    animaciones[1][i]->animacion->cargar_sprite(exp);
+    animaciones[1][i]->animacion->establecer_fps(FPS_ANIMACION);
+
+
+    SrcE.y = 120;
+    DestE.y = 120;
+    exp.dimension_total = SrcE;
+    exp.imagen_inicial = DestE;
+
+    animaciones[2][i]->textura->cargar_textura(exp_sup, ventana);
+
+    animaciones[2][i]->animacion->cargar_sprite(exp);
+    animaciones[2][i]->animacion->establecer_fps(FPS_ANIMACION);
+  }
+  
+  exp_sup->cargar(path + "estrella.png");
+  SDL_Color color_exp;
+  exp_sup->color_pixel(0,0, color_exp);
+  exp_sup->color_clave(color_exp);
+  
+  SrcE.x = 0;
+  SrcE.w = 355;
+  SrcE.h = 40;
+  DestE.x = 0;
+  DestE.w = 32;
+  DestE.h = 40;    
+  exp.desplazamiento_x = 32;
+  exp.desplazamiento_y = 0;
+
+  DestE.y = 0;
+  SrcE.y = 0;
+  exp.dimension_total = SrcE;
+  exp.imagen_inicial = DestE;
+
+  animaciones[cant_tipos - 1][0]->textura->cargar_textura(exp_sup, ventana);
+
+  animaciones[cant_tipos - 1][0]->animacion->cargar_sprite(exp);
+  animaciones[cant_tipos - 1][0]->animacion->establecer_fps(FPS_ANIMACION);
+  
+  delete exp_sup;
+}
+  
+//
+void Productos::animar(){
+  for (int x = 0; x < cant_tipos; x++){
+    for (int y = 0; y < 5; y++){
+      if (x != cant_tipos - 1 || y == 0){
+        animaciones[x][y]->animacion->animar();
+        if (animaciones[x][y]->animacion->fuera_del_sprite())
+          animaciones[x][y]->animacion->reiniciar();
+      }
+    }
+  }
+}
+
+//
+Animacion *Productos::ver_animacion(int tipo, int color){
+  if (tipo >= cant_tipos || tipo < 0 || color < 0 || color >= cant_colores || (tipo == cant_tipos -1 && color != 0))
+    return NULL;
+  return animaciones[tipo][color]->animacion;
+}
+
+//
+Textura *Productos::ver_textura(int tipo, int color){
+  if (tipo >= cant_tipos || tipo < 0 || color < 0 || color >= cant_colores || (tipo == cant_tipos -1 && color != 0))
+    return NULL;
+  return animaciones[tipo][color]->textura;
 }
