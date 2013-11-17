@@ -1,18 +1,7 @@
 #ifndef CELDA_H
 #define CELDA_H
 #include <cstdlib>
-
-#define ROJO 'r'
-#define AMARILLO 'y'
-#define VERDE 'g'
-#define AZUL 'b'
-#define VIOLETA 'v'
-#define VACIO 'n'
-#define BUTTON 'c'
-#define MINIBARH 'h'
-#define MINIBARV 'p'
-#define ESTRELLA 's'
-
+#include "Constantes.h"
 class Celda {
     public:
         Celda();

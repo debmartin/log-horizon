@@ -1,13 +1,10 @@
 #include "Tablero.h"
 
 
-#define FILA 0
-#define COLUMNA 1
-
-
-Tablero::Tablero(int tam, Lista<Dimension*>* cola_modif)
+Tablero::Tablero(int tam, Lista<Dimension*>* cola_borrados)
     : Matriz<Celda>(tam){
-    modificados = cola_modif;
+    borrados = cola_borrados;
+    modificados = new Lista<Dimension*>(true);
     mov_columna = new bool[tam];
 }
 
@@ -15,28 +12,58 @@ Tablero::~Tablero(){
     delete mov_columna;
 }
 
-int Tablero::intercambiar(Dimension& una, Dimension& otra){
-    if (! sonAdyacentes(una, otra)) return -2;
-
-    int res = Matriz::intercambiar(una, otra);
-    if (res != 0) return -1;
-    int cant = intentarJugada(una, otra);
-    if (cant == 0)
-        Matriz::intercambiar(una, otra);
-    return cant;
+//el intercambiar es provisorio
+bool Tablero::intercambiar(Dimension& una, Dimension& otra){
+    if (! sonAdyacentes(una, otra)) return false;
+//    if ((! hayMovimiento(una)) && (! hayMovimiento(otra)))
+//        return false;
+    Matriz::intercambiar(una, otra);
+    estabilizar(una, otra);
+    estabilizar();
+    return true;
 }
 
-bool Tablero::intentarJugada(Dimension& una, Dimension& otra){
-    if((*this)[una].esEstrella() || (*this)[otra].esEstrella()){
-        return buscarConfEspecial(una, otra);
+bool Tablero::contarPuntos(int largo_linea, bool conEstrella){
+    int puntaje = 0;
+    if (conEstrella) {
+        puntaje += PUNTAJE_ESTRELLA * largo_linea;
+    } else if (largo_linea < 3) {
+        return false;
+    } else {
+        puntaje += PUNTAJE_LINEA * (largo_linea -2) * largo_linea;
     }
-    int cant = 0;
-    cant += buscarConfEspecial(una, FILA);
-    cant += buscarConfEspecial(una, COLUMNA);
-    cant += buscarConfEspecial(otra, FILA);
-    cant += buscarConfEspecial(otra, COLUMNA);
+    return true;
+}
 
-    return cant;
+void Tablero::estabilizar(Dimension& una, Dimension& otra){
+    if((*this)[una].esEstrella() || (*this)[otra].esEstrella()){
+        int cant = this->explosionEstrella(una, otra);
+        contarPuntos(cant, true);
+    } else {
+        int orientacion = FILA;
+        bool ultimo = false;
+        Dimension actual(una);
+
+        while(!ultimo){
+            int cant = 0;
+            Dimension inicial(actual), final(actual);
+            cant += this->buscarConfEspecial(actual, orientacion, inicial, final);
+            if(cant >= MIN_LINEA){
+                contarPuntos(cant, false);
+                cant = this->borrarLinea(inicial, final) - cant;
+                contarPuntos(cant, false);
+                this->reemplazarOriginal(cant, actual, orientacion);
+            }
+            if(orientacion == FILA){
+                orientacion = COLUMNA;
+            } else if (actual == una) {
+                actual = otra;
+                orientacion = FILA;
+            } else {
+                ultimo = true;
+            }
+        }
+    }
 }
 
 int Tablero::borrarColumna(int col){
@@ -53,22 +80,21 @@ int Tablero::borrarFila(int fila){
 
 int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
     int cant = 0;
-    int max = dest.getFila();
+    int max = dest.x();
 
     for(int i=0; i <= max; i++){
-        Dimension actual(dest.getFila() -i, dest.getCol());
-        Dimension superior(origen.getFila() -i-1, origen.getCol());
-
+        Dimension actual(dest.x() -i, dest.y());
+        Dimension superior(origen.x() -i-1, origen.y());
         char tipo = (*this)[actual].getTipo();
 
         if (tipo == MINIBARH && !borrando){
-            Dimension principio(actual.getFila(), 0);
-            Dimension final(actual.getFila(), tamanio);
+            Dimension principio(actual.x(), 0);
+            Dimension final(actual.x(), tamanio);
             cant += borrarFila(principio, final, true);
         } else if (tipo == MINIBARV && !borrando) {
-            Dimension principio(0, actual.getCol());
+            Dimension principio(0, actual.y());
             cant += borrarColumna(principio, dest, true);
-            max = origen.getFila();
+            max = origen.x();
         } else {
             if (superior.esValida())
                 (*this)[actual] = (*this)[superior];
@@ -78,26 +104,24 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
             *modificados += new Dimension(actual);
         }
     }
-    mov_columna[dest.getCol()] = hayMovimientosCol(dest.getCol());
     return cant;
 }
 
 int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
-    int max = fin.getCol() - inicio.getCol(), cant = 0;
+    int max = fin.y() - inicio.y(), cant = 0;
     for(int i=0; i<max; i++){
-        Dimension actual(inicio.getFila(), inicio.getCol()+i);
-//        Dimension superior(inicio.getFila()-1, inicio.getCol()+i);
+        Dimension actual(inicio.x(), inicio.y()+i);
 
         char tipo = (*this)[actual].getTipo();
 
         if (tipo == MINIBARH && !borrando){
             cant += borrarColumna(actual, actual, true);
-            Dimension principio(actual.getFila(), 0);
+            Dimension principio(actual.x(), 0);
             cant += borrarFila(principio, inicio, true);
             max = tamanio;
         } else if (tipo == MINIBARV && !borrando) {
-            Dimension origen(-1, actual.getCol());
-            Dimension dest(tamanio-1, actual.getCol());
+            Dimension origen(-1, actual.y());
+            Dimension dest(tamanio-1, actual.y());
             cant += borrarColumna(dest, origen, true);
         } else {
             cant += borrarColumna(actual, actual, borrando);
@@ -108,9 +132,8 @@ int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
 
 int Tablero::borrarLinea(Dimension& inicio, Dimension& fin){
     int cant = 0;
-    std::cout << inicio.getFila() << "," << inicio.getCol();
-    std::cout << fin.getFila() << "," << fin.getCol();
-    if (inicio.getFila() == fin.getFila()){
+
+    if (inicio.x() == fin.x()){
         cant += borrarFila(inicio, fin, false);
     } else {
         cant += borrarColumna(fin, inicio, false);
@@ -118,49 +141,48 @@ int Tablero::borrarLinea(Dimension& inicio, Dimension& fin){
     return cant;
 }
 
-int Tablero::buscarConfEspecial(Dimension& pos, int orientacion){
-    int fila = pos.getFila(), col = pos.getCol();
-    int tam = tamanio, cant = 0;
-    char color_pos = (*this)[pos].getColor();
-
+int Tablero::buscarConfEspecial(Dimension& pos, int orientacion, Dimension& inicial, Dimension& final){
+    int fila = pos.x(), col = pos.y();
     int inicio = (orientacion == FILA) ? ((col-2 >= 0) ? col-2 : 0) : ((fila-2  >= 0) ? fila-2 : 0);
-    int fin = (orientacion == FILA) ? ((col+2 < tam) ? col+2 : tam-1) : ((fila+2  < tam) ? fila+2 : tam-1);
-    int i = inicio;
-    int& fila_n = (orientacion == FILA) ? i : fila;
-    int& col_n = (orientacion == FILA) ? col : i;
-    Dimension inicial(fila_n, col_n), final(fila_n, col_n);
+    int fin = (orientacion == FILA) ? ((col+2 < tamanio) ? col+2 : tamanio-1) : ((fila+2  < tamanio) ? fila+2 : tamanio-1);
+    int i = inicio-1, cant = 0;
+    int& fila_n = (orientacion == FILA) ? fila : i;
+    int& col_n = (orientacion == FILA) ? i : col;
 
-    for(; i<= fin; i++){
+    char color_pos = (*this)[pos].getColor();
+    bool final_marcado = false;
+    Dimension pos_ant(fila_n, col_n);
+    i++;
+    while(i <= fin){
         Dimension pos_actual(fila_n, col_n);
+
         if ((*this)[pos_actual].getColor() != color_pos){
-            if (cant >= 3){
-                i--;
-                Dimension aux(fila_n, col_n);
-                final = aux;
-                i++;
+            if (cant >= MIN_LINEA){
+                final = pos_ant;
+                final_marcado = true;
+
+            } else {
+                cant = 0;
             }
-            continue;
-        } else if (i == inicio){
             i++;
-            if ((*this)[fila_n][col_n].getColor() != color_pos){
-                continue;
-                i--;
-            }
-            i--;
+            continue;
         }
         if (cant == 0)
             inicial = pos_actual;
+
+        pos_ant = pos_actual;
         cant++;
+        i++;
     }
-    if(cant >= 3){
-        int res = borrarLinea(inicial, final);
-        reemplazarOriginal(cant, pos, orientacion);
-        return res;
+    if (! final_marcado){
+        i--;
+        Dimension aux(fila_n, col_n);
+        final = aux;
     }
-    return 0;
+    return cant;
 }
 
-int Tablero::buscarConfEspecial(Dimension& una, Dimension& otra){
+int Tablero::explosionEstrella(Dimension& una, Dimension& otra){
     Dimension pos_no_est = ((*this)[una].esEstrella()) ? otra : una;
     Celda& celda_no_est = (*this)[pos_no_est];
     char color_orig = celda_no_est.getColor();
@@ -168,11 +190,11 @@ int Tablero::buscarConfEspecial(Dimension& una, Dimension& otra){
     int cant = 1;
 
     if(tipo_orig == MINIBARH || tipo_orig == MINIBARV){
-        cant += borrarFila(pos_no_est.getFila());
-        cant += borrarColumna(pos_no_est.getCol());
+        cant += borrarFila(pos_no_est.x());
+        cant += borrarColumna(pos_no_est.y());
     } else if(tipo_orig == BUTTON) {
         Dimension pos_est = ((*this)[una].esEstrella()) ? una : otra;
-        Dimension superior(pos_est.getFila()-1, pos_est.getCol());
+        Dimension superior(pos_est.x()-1, pos_est.y());
         borrarColumna(pos_est, superior, true);
     }
     for(int i=0; i < tamanio; i++){
@@ -206,34 +228,91 @@ bool Tablero::reemplazarOriginal(int len_linea, Dimension& pos, int orientacion)
     }
     return true;
 }
+//provisoria
+bool enRango(Dimension& pos, int tam){
+    if(!pos.esValida()) return false;
+    return ((pos.x()<tam) && (pos.y() <tam));
+}
+bool Tablero::hayMovimiento(Dimension& pos){
+    if ((*this)[pos].esEstrella())
+        return true;
 
-bool Tablero::hayMovimientosCol(int col){
-    for(int i=0; i< tamanio-1; i++){
-        if ((*this)[i][col].esEstrella())
-            return true;
+    Dimension aux1(pos), aux2(pos);
 
-        char color_act = (*this)[i][col].getColor();
-        if ((color_act == (*this)[i+2][col].getColor()) == (*this)[i+1][col+1].getColor())
-            return true;
-        if (col < tamanio-2){
-            if ((color_act == (*this)[i][col+2].getColor()) == (*this)[i+1][col+1].getColor())
+    for(int i = pos.x()-1; i <= pos.x()+1; i+=2){
+        for(int j = pos.y()-1; j <= pos.y()+1; j+=2){
+            Dimension adyacente(i, j);
+            if(!enRango(adyacente, tamanio)) continue;
+            if(! Matriz::intercambiar(pos, adyacente))
+                continue;
+
+            int orientacion = FILA;
+            bool ultimo = false;
+
+            while(!ultimo){
+                int cant = buscarConfEspecial(pos, orientacion, aux1, aux2);
+                if(cant >= MIN_LINEA){
+                    Matriz::intercambiar(pos, adyacente);
+                    return true;
+                }
+                if(orientacion == FILA){
+                    orientacion = COLUMNA;
+                } else {
+                    ultimo = true;
+                }
+            }
+            Matriz::intercambiar(pos, adyacente);
+        }
+    }
+    return false;
+}
+
+bool Tablero::hayMovimientos(){
+    for(int i=0; i< tamanio; i++){
+        for(int j=0; i< tamanio; j++){
+            Dimension actual(i,j);
+            if (hayMovimiento(actual))
                 return true;
         }
     }
     return false;
 }
 
-void Tablero::verMovimientos(){
-    for(int i=0; i< tamanio-1; i++){
-        mov_columna[i] = hayMovimientosCol(i);
-    }
-}
+//void Tablero::verMovimientos(){
+//    for(int i=0; i< tamanio-1; i++){
+//        mov_columna[i] = hayMovimientosCol(i);
+//    }
+//}
+//
+//bool Tablero::hayMovimientos(){
+//    for(int i=0; i<tamanio; i++){
+//        if(mov_columna[i]) return true;
+//    }
+//    return false;
+//}
 
-bool Tablero::hayMovimientos(){
-    for(int i=0; i<tamanio; i++){
-        if(mov_columna[i]) return true;
+void Tablero::estabilizar(){
+    while(! modificados->esVacia()){
+        Dimension* pos = modificados->borrarPrimero();
+        *borrados += pos;
+        for(int i = pos->x()-1; i <= pos->x()+1; i+=2){
+            for(int j = pos->y()-1; j <= pos->y()+1; j+=2){
+                Dimension adyacente(i, j);
+                if(!enRango(adyacente, tamanio)) continue;
+
+                int orientacion = FILA;
+                bool ultimo = false;
+
+                while(!ultimo){
+                    estabilizar(*pos, adyacente);
+                    if(orientacion == FILA)
+                        orientacion = COLUMNA;
+                    else
+                        ultimo = true;
+                }
+            }
+        }
     }
-    return false;
 }
 
 void Tablero::imprimir(){

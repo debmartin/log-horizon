@@ -25,12 +25,13 @@ void Nivel::imprimirTablero(){
 }
 
 void Nivel::recibirJugada(Dimension& una, Dimension& otra, string& id_jugador){
-    int cant = tablero->intercambiar(una, otra);
-//    std::cout << cant;
-    bool con_estrella = (*tablero)[una].esEstrella() || (*tablero)[otra].esEstrella();
-    if (cant > 0)
-        jugadores->obtener(id_jugador).verPrimero()->contarPuntos(cant, con_estrella);
+    tablero->intercambiar(una, otra);
+//    bool con_estrella = (*tablero)[una].esEstrella() || (*tablero)[otra].esEstrella();
+//    if (cant > 0)
+//        jugadores->obtener(id_jugador).verPrimero()->contarPuntos(cant, con_estrella);
 }
+
+
 //
 //void Nivel::jugar(){
 //    while(tablero->hayMovimientos()){

@@ -37,3 +37,7 @@ bool sonAdyacentes(Dimension& una, Dimension& otra){
 int operator==(const Dimension& una, const Dimension& otra){
     return ((una.filas == otra.filas) && (una.cols == otra.cols));
 }
+
+int operator!=(const Dimension& una, const Dimension& otra){
+    return (! (una == otra));
+}

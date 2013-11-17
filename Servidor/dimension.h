@@ -7,10 +7,11 @@ class Dimension {
         Dimension(const Dimension& origen);
         virtual ~Dimension();
         bool esValida();
-        int getFila() { return filas; }
-        int getCol() { return cols; }
+        int x() { return filas; }
+        int y() { return cols; }
         Dimension& operator=(Dimension& otra);
         friend int operator==(const Dimension& una, const Dimension& otra);
+        friend int operator!=(const Dimension& una, const Dimension& otra);
         friend bool sonAdyacentesFila(Dimension& una, Dimension& otra);
         friend bool sonAdyacentesCol(Dimension& una, Dimension& otra);
         friend bool sonAdyacentes(Dimension& una, Dimension& otra);

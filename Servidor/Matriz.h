@@ -10,7 +10,7 @@ class Matriz{
         virtual ~Matriz();
         int getTamanio() { return tamanio; }
         U getCelda(int i, int j);
-        int intercambiar(Dimension& una, Dimension& otra);
+        bool intercambiar(Dimension& una, Dimension& otra);
         U* operator[](int i);
         U& operator[](Dimension& pos);
     protected:
@@ -39,20 +39,17 @@ Matriz<U>::~Matriz(){
 }
 
 template <class U>
-int Matriz<U>::intercambiar(Dimension& una, Dimension& otra){
-    int unaf = una.getFila(), unac = una.getCol();
-    int otraf = otra.getFila(), otrac = otra.getCol();
-
+bool Matriz<U>::intercambiar(Dimension& una, Dimension& otra){
     if ((! una.esValida()) || (! otra.esValida()))
-        return 1;
-    if (unaf >= tamanio || unac >= tamanio || otrac >= tamanio || otraf >= tamanio)
-        return 1;
+        return false;
+    if (una.x() >= tamanio || una.y() >= tamanio || otra.y() >= tamanio || otra.x() >= tamanio)
+        return false;
 
-    U aux = tabla[unaf][unac];
-    tabla[unaf][unac] = tabla[otraf][otrac];
-    tabla[otraf][otrac] = aux;
+    U aux = tabla[una.x()][una.y()];
+    tabla[una.x()][una.y()] = tabla[otra.x()][otra.y()];
+    tabla[otra.x()][otra.y()] = aux;
 
-    return 0;
+    return true;
 }
 
 template <class U>
@@ -71,11 +68,10 @@ U* Matriz<U>::operator[](int i){
 
 template <class U>
 U& Matriz<U>::operator[](Dimension& pos){
-    int fila = pos.getFila(), col = pos.getCol();
-    if ((col >= tamanio) || (fila >= tamanio))
+    if ((pos.y() >= tamanio) || (pos.x() >= tamanio))
         throw "Fuera de rango";
 
-    return tabla[fila][col];
+    return tabla[pos.x()][pos.y()];
 }
 
 

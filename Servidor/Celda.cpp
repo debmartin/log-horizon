@@ -27,9 +27,7 @@ Celda::~Celda(){
 
 void Celda::rellenar(){
     tipo = BUTTON;
-    std::cout << color;
     color = rand_color();
-    std::cout << color;
 }
 
 void Celda::rellenar(char cel_color, char cel_tipo){

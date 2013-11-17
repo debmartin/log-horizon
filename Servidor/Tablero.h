@@ -10,21 +10,25 @@ class Tablero : public Matriz<Celda>{
         Tablero(int tam, Lista<Dimension*>* cola_modif);
         virtual ~Tablero();
         void imprimir();
-        int intercambiar(Dimension& una, Dimension& otra);
+        bool intercambiar(Dimension& una, Dimension& otra);
+        int buscarConfEspecial(Dimension& pos, int orientacion, Dimension& inicial, Dimension& final);
+        int explosionEstrella(Dimension& una, Dimension& otra);
+        bool reemplazarOriginal(int len_linea, Dimension& pos, int orientacion);
+        int borrarLinea(Dimension& inicio, Dimension& fin);
     protected:
+        bool contarPuntos(int largo_linea, bool conEstrella);
         bool intentarJugada(Dimension& una, Dimension& otra);
         int borrarColumna(int col);
         int borrarFila(int fila);
         int borrarColumna(Dimension& dest, Dimension& origen, bool borrando);
         int borrarFila(Dimension& inicio, Dimension& fin, bool borrando);
-        int borrarLinea(Dimension& inicio, Dimension& fin);
-        int buscarConfEspecial(Dimension& pos, int orientacion);
-        int buscarConfEspecial(Dimension& una, Dimension& otra);
-        bool reemplazarOriginal(int len_linea, Dimension& pos, int orientacion);
-        bool hayMovimientosCol(int col);
+        void estabilizar();
+        void estabilizar(Dimension& una, Dimension& otra);
+        bool hayMovimiento(Dimension& pos);
         void verMovimientos();
         bool hayMovimientos();
     private:
+        Lista<Dimension*>* borrados;
         Lista<Dimension*>* modificados;
         bool* mov_columna;
 };

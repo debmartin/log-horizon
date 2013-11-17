@@ -15,6 +15,7 @@ class Nivel{
         void imprimirTablero();
         void recibirJugada(Dimension& una, Dimension& otra, std::string& id_jugador);
     protected:
+        bool intentarJugada(Dimension& una, Dimension& otra);
         //void recibirJugada();
     private:
         int puntaje_objetivo;
