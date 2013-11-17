@@ -23,11 +23,11 @@ Dimension& Dimension::operator=(Dimension& otra){
 }
 
 bool sonAdyacentesFila(Dimension& una, Dimension& otra){
-    return (una.filas == otra.filas && ((una.cols + otra.cols) % 2) == 1);
+    return (una.filas == otra.filas && ((una.cols +1 == otra.cols) || (otra.cols +1 == una.cols)));
 }
 
 bool sonAdyacentesCol(Dimension& una, Dimension& otra){
-    return (una.cols == otra.cols && ((una.filas + otra.filas) % 2) == 1);
+    return (una.cols == otra.cols && ((una.filas +1 == otra.filas) || (otra.filas +1 == una.filas)));
 }
 
 bool sonAdyacentes(Dimension& una, Dimension& otra){

@@ -15,8 +15,8 @@ Tablero::~Tablero(){
 //el intercambiar es provisorio
 bool Tablero::intercambiar(Dimension& una, Dimension& otra){
     if (! sonAdyacentes(una, otra)) return false;
-//    if ((! hayMovimiento(una)) && (! hayMovimiento(otra)))
-//        return false;
+    if ((! hayMovimiento(una)) && (! hayMovimiento(otra)))
+        return false;
     Matriz::intercambiar(una, otra);
     estabilizar(una, otra);
     estabilizar();
@@ -132,7 +132,8 @@ int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
 
 int Tablero::borrarLinea(Dimension& inicio, Dimension& fin){
     int cant = 0;
-
+    std::cout<<inicio.x()<<" "<<inicio.y()<<"\n";
+    std::cout<<fin.x()<<" "<<fin.y()<<"\n";
     if (inicio.x() == fin.x()){
         cant += borrarFila(inicio, fin, false);
     } else {
@@ -169,7 +170,6 @@ int Tablero::buscarConfEspecial(Dimension& pos, int orientacion, Dimension& inic
         }
         if (cant == 0)
             inicial = pos_actual;
-
         pos_ant = pos_actual;
         cant++;
         i++;
@@ -194,8 +194,7 @@ int Tablero::explosionEstrella(Dimension& una, Dimension& otra){
         cant += borrarColumna(pos_no_est.y());
     } else if(tipo_orig == BUTTON) {
         Dimension pos_est = ((*this)[una].esEstrella()) ? una : otra;
-        Dimension superior(pos_est.x()-1, pos_est.y());
-        borrarColumna(pos_est, superior, true);
+        borrarColumna(pos_est, pos_est, true);
     }
     for(int i=0; i < tamanio; i++){
         if (tipo_orig == ESTRELLA){
@@ -206,8 +205,7 @@ int Tablero::explosionEstrella(Dimension& una, Dimension& otra){
             Dimension pos_actual(j, i);
 
             if((*this)[pos_actual].getColor() == color_orig){
-                Dimension superior(j-1, i);
-                cant += borrarColumna(pos_actual, superior, true);
+                cant += borrarColumna(pos_actual, pos_actual, true);
             }
         }
     }
@@ -228,19 +226,21 @@ bool Tablero::reemplazarOriginal(int len_linea, Dimension& pos, int orientacion)
     }
     return true;
 }
+
 //provisoria
 bool enRango(Dimension& pos, int tam){
     if(!pos.esValida()) return false;
     return ((pos.x()<tam) && (pos.y() <tam));
 }
+
 bool Tablero::hayMovimiento(Dimension& pos){
     if ((*this)[pos].esEstrella())
         return true;
 
     Dimension aux1(pos), aux2(pos);
 
-    for(int i = pos.x()-1; i <= pos.x()+1; i+=2){
-        for(int j = pos.y()-1; j <= pos.y()+1; j+=2){
+    for(int i = pos.x()-1; i <= pos.x()+1; i++){
+        for(int j = (i==pos.x()) ? pos.y()-1 : pos.y(); (i==pos.x()) ? (j <= pos.y()+1) : (j == pos.y()); j+=2){
             Dimension adyacente(i, j);
             if(!enRango(adyacente, tamanio)) continue;
             if(! Matriz::intercambiar(pos, adyacente))
@@ -277,19 +277,6 @@ bool Tablero::hayMovimientos(){
     }
     return false;
 }
-
-//void Tablero::verMovimientos(){
-//    for(int i=0; i< tamanio-1; i++){
-//        mov_columna[i] = hayMovimientosCol(i);
-//    }
-//}
-//
-//bool Tablero::hayMovimientos(){
-//    for(int i=0; i<tamanio; i++){
-//        if(mov_columna[i]) return true;
-//    }
-//    return false;
-//}
 
 void Tablero::estabilizar(){
     while(! modificados->esVacia()){

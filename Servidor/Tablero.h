@@ -17,7 +17,6 @@ class Tablero : public Matriz<Celda>{
         int borrarLinea(Dimension& inicio, Dimension& fin);
     protected:
         bool contarPuntos(int largo_linea, bool conEstrella);
-        bool intentarJugada(Dimension& una, Dimension& otra);
         int borrarColumna(int col);
         int borrarFila(int fila);
         int borrarColumna(Dimension& dest, Dimension& origen, bool borrando);
@@ -25,7 +24,6 @@ class Tablero : public Matriz<Celda>{
         void estabilizar();
         void estabilizar(Dimension& una, Dimension& otra);
         bool hayMovimiento(Dimension& pos);
-        void verMovimientos();
         bool hayMovimientos();
     private:
         Lista<Dimension*>* borrados;
