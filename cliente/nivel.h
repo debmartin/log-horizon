@@ -64,6 +64,9 @@ class Nivel{
     //
     void explotar(coordenada_t &celda);
     
+    //
+    // metodo que realiza la accion de la cola
+    
 };
 
 #endif // NIVEL_H

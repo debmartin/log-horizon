@@ -36,7 +36,7 @@ Nivel::~Nivel(){
 void Nivel::inicializar_datos(const std::string &path, Ventana *ventana, 
                               int ancho, int alto){
   Superficie *fondo_sup = new Superficie;
-  fondo_sup->cargar(path + "imagenes/fondo1.png");
+  fondo_sup->cargar(path + "imagenes/fondo.png");
   fondo_sup->escalar(ancho,alto);
   
   Superficie *fondo_celda = new Superficie;
@@ -99,11 +99,18 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       coordenada_t coord;
       coord.x = i;
       coord.y = z;
-      int color = rand() % 5;
-      int tipo = rand() % 4;
-      Textura *textura = productos->ver_textura(tipo,color);
-      Animacion *animacion = productos->ver_animacion(tipo, color);
-      tablero->insertar(textura, animacion, coord); 
+      if (tablero->celda_existente(coord)){
+
+
+        // RECIBIR ESTOS DATOS DEL SERVIDOR
+        int color = rand() % 5;
+        int tipo = rand() % 4;
+
+
+        Textura *textura = productos->ver_textura(tipo,color);
+        Animacion *animacion = productos->ver_animacion(tipo, color);
+        tablero->insertar(textura, animacion, coord);
+      }
     }
   }
   
@@ -143,6 +150,8 @@ void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alt
       corriendo = Nivel::analizar_evento(evento);
     }
     
+    // realizar accion de la cola que verifica si la cola esta vacia
+    
     // Dibujado
     ventana->limpiar();
     Nivel::dibujar(ventana);
@@ -164,7 +173,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){ 
     return false;
     
-  }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){
+  }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){ // && cola_vacia && !recibiendo_datos
     if (evento.type == SDL_MOUSEBUTTONDOWN){
       coordenada_t celda;
       celda.x = (evento.button.x - POS_X) / ancho_celda;
@@ -175,11 +184,14 @@ bool Nivel::analizar_evento(SDL_Event &evento){
       celda.y < tablero->numero_filas())
       
       if (tablero->celda_existente(celda)){
-          Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
+        Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
         if(evento.button.button == SDL_BUTTON_LEFT){
           coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
             Nivel::intercambiar(celda, celda_adyacente);
+            
+            // ENVIAR MOVIMIENTO AL SERVIDOR, Y GUARDAR EL MOVIMIENTO REALIZADO
+          
           }else{
             tablero->seleccionar(seleccion, celda);
           }

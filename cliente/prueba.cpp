@@ -4,8 +4,8 @@
 #include "nivel.h"
 #include "socket.h"
 
-#define ANCHO 900
-#define ALTO 700
+#define ANCHO 800
+#define ALTO 600
 
 int main(void){
   SDL libreria = SDL(SDL_INIT_EVERYTHING);
