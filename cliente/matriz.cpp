@@ -126,7 +126,7 @@ void Matriz::definir_forma(char **estructura, coordenada_t &dimension, SDL_Rect 
     celdas[x] = new Celda*[filas];
     for (int y = 0; y < filas; y++){
       celdas[x][y] = NULL;
-      if (estructura[x][y] == 1){
+      if (estructura[x][y] == '1'){
         celdas[x][y] = new Celda;
       }
     }

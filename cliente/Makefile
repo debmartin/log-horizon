@@ -31,10 +31,18 @@ matriz.o: matriz.h matriz.cpp
 
 nivel.o: nivel.h nivel.cpp
 	$(CC) $(CFLAGS) -c nivel.cpp
+	
+explosion.o: explosion.h explosion.cpp
+	$(CC) $(CFLAGS) -c explosion.cpp
+	
+celdas_vacias.o: celdas_vacias.h celdas_vacias.cpp
+	$(CC) $(CFLAGS) -c celdas_vacias.cpp
 
+productos.o: productos.h productos.cpp
+	$(CC) $(CFLAGS) -c productos.cpp
 
-$(CEXE): ventana.o superficie.o animacion.o fps.o matriz.o nivel.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o matriz.o nivel.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o $(CEXE).cpp
+	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o $(CEXE).cpp -o $(CEXE)
 
 
 clean:

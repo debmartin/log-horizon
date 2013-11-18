@@ -14,7 +14,10 @@ int main(void){
   ventana->dimension_logica(ANCHO,ALTO);
   
   Nivel *nivel = new Nivel;
-  nivel->correr("imagenes/", ventana, ANCHO, ALTO);
+  
+  // FALTA PASARLE LOS SOCKETS
+  
+  nivel->correr("nivel1", ventana, ANCHO, ALTO);
   delete nivel;
   
   return 0;
