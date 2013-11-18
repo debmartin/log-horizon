@@ -9,10 +9,12 @@ class Jugador{
         virtual ~Jugador();
         int getPuntaje() { return puntaje; }
         bool contarPuntos(int largo_linea, bool conEstrella);
+        Jugada* obtenerJugada();
     protected:
     private:
         std::string* id;
         int puntaje;
+        Jugada* jugada_actual;
 };
 
 #endif // JUGADOR_H

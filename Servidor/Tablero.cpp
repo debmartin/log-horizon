@@ -2,57 +2,43 @@
 
 
 Tablero::Tablero(int tam, Lista<Dimension*>* cola_borrados)
-    : Matriz<Celda>(tam){
+    : Matriz<Celda>(tam), jugada_en_curso(NULL){
     borrados = cola_borrados;
     modificados = new Lista<Dimension*>(true);
-    mov_columna = new bool[tam];
 }
 
 Tablero::~Tablero(){
-    delete mov_columna;
+    delete modificados;
 }
 
-//el intercambiar es provisorio
-bool Tablero::intercambiar(Dimension& una, Dimension& otra){
-    if (! sonAdyacentes(una, otra)) return false;
+int Tablero::intercambiar(Jugada* nueva){
+    if(jugada_en_curso) return -1;
+    jugada_en_curso = nueva;
+    Dimension una(nueva->posicion1()), otra(nueva->posicion2());
+
+
+    if (! sonAdyacentes(una, otra)) return -1;
     if ((! hayMovimiento(una)) && (! hayMovimiento(otra)))
-        return false;
+        return -1;
+
     Matriz::intercambiar(una, otra);
-    estabilizar(una, otra);
-    estabilizar();
-    return true;
+    return estabilizar(una, otra);
 }
 
-bool Tablero::contarPuntos(int largo_linea, bool conEstrella){
-    int puntaje = 0;
-    if (conEstrella) {
-        puntaje += PUNTAJE_ESTRELLA * largo_linea;
-    } else if (largo_linea < 3) {
-        return false;
-    } else {
-        puntaje += PUNTAJE_LINEA * (largo_linea -2) * largo_linea;
-    }
-    return true;
-}
-
-void Tablero::estabilizar(Dimension& una, Dimension& otra){
+int Tablero::estabilizar(Dimension& una, Dimension& otra){
     if((*this)[una].esEstrella() || (*this)[otra].esEstrella()){
-        int cant = this->explosionEstrella(una, otra);
-        contarPuntos(cant, true);
+        return explosionEstrella(una, otra);
     } else {
         int orientacion = FILA;
         bool ultimo = false;
         Dimension actual(una);
 
         while(!ultimo){
-            int cant = 0;
-//            std::cout<<"entra";
             Dimension inicial(actual), final(actual);
-            cant += this->buscarConfEspecial(actual, orientacion, inicial, final);
+            int cant = this->buscarConfEspecial(actual, orientacion, inicial, final);
+
             if(cant >= MIN_LINEA){
-                contarPuntos(cant, false);
                 this->borrarLinea(inicial, final);
-                contarPuntos(cant, false);
                 this->reemplazarOriginal(cant, actual, orientacion);
             }
             if(orientacion == FILA){

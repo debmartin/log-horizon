@@ -24,17 +24,10 @@ void Nivel::imprimirTablero(){
     tablero->imprimir();
 }
 
-void Nivel::recibirJugada(Dimension& una, Dimension& otra, string& id_jugador){
-    tablero->intercambiar(una, otra);
-//    bool con_estrella = (*tablero)[una].esEstrella() || (*tablero)[otra].esEstrella();
-//    if (cant > 0)
-//        jugadores->obtener(id_jugador).verPrimero()->contarPuntos(cant, con_estrella);
+void Nivel::jugar(){
+    while(tablero->hayMovimientos()){
+        //Jugada* nueva_jugada = set_jugadores->obtenerJugada();
+        tablero->intercambiar(nueva_jugada);
+        tablero->estabilizar();
+    }
 }
-
-
-//
-//void Nivel::jugar(){
-//    while(tablero->hayMovimientos()){
-//        recibirJugada();
-//    }
-//}
