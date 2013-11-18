@@ -2,6 +2,7 @@
 
 #include "SDL/SDL.h"
 #include "nivel.h"
+#include "socket.h"
 
 #define ANCHO 800
 #define ALTO 600

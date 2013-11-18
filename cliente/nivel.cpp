@@ -45,15 +45,21 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   
   // LO SIGUIENTE LO DEBE RECIBIR DEL SERVIDOR
   
-  
-  
+  std::ifstream archivo_estructura(path + "/estructura.dat", std::ifstream::in);
+  std::string linea;
   coordenada_t dimension;
-  dimension.x = CANT_CELDAS_X;
-  dimension.y = CANT_CELDAS_Y;
+  std::getline(archivo_estructura, linea);
+  dimension.x = atoi(linea.c_str());
+  std::getline(archivo_estructura, linea);
+  dimension.y = atoi(linea.c_str());;
   char **estructura = new char*[dimension.x];
+  char caracter;
   for (int i = 0; i < dimension.x; i++){
     estructura[i] = new char[dimension.y];
     for (int z = 0; z < dimension.y; z++){
+      caracter = archivo_estructura.get();
+      if (caracter != '1' || caracter != '0')
+        caracter = archivo_estructura.get();
       estructura[i][z] = '1';
     }
   }
