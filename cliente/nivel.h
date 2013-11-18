@@ -7,6 +7,7 @@
 #include "explosion.h"
 #include "celdas_vacias.h"
 #include "productos.h"
+#include "socket.h"
 
 
 class Nivel{
@@ -63,10 +64,6 @@ class Nivel{
     //
     void explotar(coordenada_t &celda);
     
-    //
-    //void explotar_segmento(coordenada_t &origen, coordenada_t &destino);
-    
-    //void secuencia_prueba();
 };
 
 #endif // NIVEL_H

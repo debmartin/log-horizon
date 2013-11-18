@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "SDL/SDL.h"
 #include "SDL/fps.h"
@@ -35,39 +36,39 @@ Nivel::~Nivel(){
 void Nivel::inicializar_datos(const std::string &path, Ventana *ventana, 
                               int ancho, int alto){
   Superficie *fondo_sup = new Superficie;
-  fondo_sup->cargar(path + "/imagenes/fondo1.png");
+  fondo_sup->cargar(path + "imagenes/fondo1.png");
   fondo_sup->escalar(ancho,alto);
   
   Superficie *fondo_celda = new Superficie;
-  fondo_celda->cargar(path + "/imagenes/celda_fondo.png");
+  fondo_celda->cargar(path + "imagenes/celda_fondo.png");
   
+  // DEFINIMOS LA MATRIZ
   tablero = new Matriz;
-  
-  // LO SIGUIENTE LO DEBE RECIBIR DEL SERVIDOR
-  
-  std::ifstream archivo_estructura(path + "/estructura.dat", std::ifstream::in);
+  std::string direccion_archivo = path + "estructura.dat";
+  std::ifstream archivo_estructura(direccion_archivo.c_str(), std::ifstream::in);
   std::string linea;
+  
   coordenada_t dimension;
   std::getline(archivo_estructura, linea);
   dimension.x = atoi(linea.c_str());
   std::getline(archivo_estructura, linea);
-  dimension.y = atoi(linea.c_str());;
+  dimension.y = atoi(linea.c_str());
+  
   char **estructura = new char*[dimension.x];
   char caracter;
   for (int i = 0; i < dimension.x; i++){
     estructura[i] = new char[dimension.y];
     for (int z = 0; z < dimension.y; z++){
       caracter = archivo_estructura.get();
-      if (caracter != '1' || caracter != '0')
+      if (caracter == '\n')
         caracter = archivo_estructura.get();
-      estructura[i][z] = '1';
+      estructura[i][z] = caracter;
     }
   }
   
-  // HASTA ACA
-  
-  ancho_celda = (ancho - POS_X * 2) / tablero->cantidad_columnas();
-  alto_celda = (alto - POS_Y * 2) / tablero->cantidad_filas();
+  archivo_estructura.close();
+  ancho_celda = (ancho - POS_X * 2) / dimension.x;
+  alto_celda = (alto - POS_Y * 2) / dimension.y;
   
   SDL_Rect origen;
   origen.x = POS_X;
@@ -77,6 +78,13 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   
   tablero->definir_forma(estructura, dimension, origen);
   tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup);
+  
+  for (int i = 0; i < dimension.x; i++){
+    delete[] estructura[i];
+  }
+  delete[] estructura;
+  
+  
   
   fondo = new Textura;
   fondo->cargar_textura(fondo_sup, ventana);
@@ -95,7 +103,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       int tipo = rand() % 4;
       Textura *textura = productos->ver_textura(tipo,color);
       Animacion *animacion = productos->ver_animacion(tipo, color);
-      tablero->insertar(testura, animacion, coord); 
+      tablero->insertar(textura, animacion, coord); 
     }
   }
   
@@ -109,7 +117,8 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   // CELDAS VACIAS
   celdas_vacias->inicializar(tablero->numero_columnas());
   
-  sonido = Mix_LoadWAV("sonidos/sound.wav");   // FALTA DEFINIR CLASE SONIDO
+  std::string direccion = path + "sonidos/sound.wav";
+  sonido = Mix_LoadWAV(direccion.c_str());   // FALTA DEFINIR CLASE SONIDO
 }
 
 //
@@ -162,11 +171,11 @@ bool Nivel::analizar_evento(SDL_Event &evento){
       celda.y = (evento.button.y - POS_Y) / alto_celda;
       if (evento.button.x - POS_X >= 0 && 
       evento.button.y - POS_Y >= 0 && 
-      celda.x < tablero->cantidad_columnas() && 
-      celda.y < tablero->cantidad_filas()){
-            
-        Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
-        
+      celda.x < tablero->numero_columnas() && 
+      celda.y < tablero->numero_filas())
+      
+      if (tablero->celda_existente(celda)){
+          Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
         if(evento.button.button == SDL_BUTTON_LEFT){
           coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
@@ -175,7 +184,6 @@ bool Nivel::analizar_evento(SDL_Event &evento){
             tablero->seleccionar(seleccion, celda);
           }
         }else if(evento.button.button == SDL_BUTTON_RIGHT){
-          //Nivel::secuencia_prueba();
           tablero->quitar_seleccion();
           explotar(celda);
         }
@@ -234,37 +242,3 @@ void Nivel::explotar(coordenada_t &celda){
   explosion->explotar(celda, tablero);
   celdas_vacias->agregar(celda);
 }
-
-/*
-//
-void Nivel::explotar_segmento(coordenada_t &origen, coordenada_t &destino){
-  int desp_x = destino.x - origen.x;
-  if (desp_x != 0) desp_x = desp_x / abs(desp_x);
-  
-  int desp_y = destino.y - origen.y;
-  if (desp_y != 0) desp_y = desp_y / abs(desp_y);
-  
-  coordenada_t actual = origen;
-  Nivel::explotar(actual);
-  while (actual.x != destino.x || actual.y != destino.y){
-    actual.x += desp_x;
-    actual.y += desp_y;
-    Nivel::explotar(actual);
-  }
-}
-
-
-void Nivel::secuencia_prueba(){
-  coordenada_t inicio;
-  inicio.x = 0;
-  inicio.y = 0;
-  coordenada_t fin;
-  fin.x = 5;
-  fin.y = 5;
-  Nivel::explotar_segmento(inicio,fin);
-  inicio.y = 1;
-  fin.x = 0;
-  fin.y = 5;
-  Nivel::explotar_segmento(inicio,fin);
-}
-*/

@@ -4,8 +4,8 @@
 #include "nivel.h"
 #include "socket.h"
 
-#define ANCHO 800
-#define ALTO 600
+#define ANCHO 900
+#define ALTO 700
 
 int main(void){
   SDL libreria = SDL(SDL_INIT_EVERYTHING);
@@ -18,7 +18,7 @@ int main(void){
   
   // FALTA PASARLE LOS SOCKETS
   
-  nivel->correr("nivel1", ventana, ANCHO, ALTO);
+  nivel->correr("nivel1/", ventana, ANCHO, ALTO);
   delete nivel;
   
   return 0;

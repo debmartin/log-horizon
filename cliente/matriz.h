@@ -99,6 +99,9 @@ class Matriz{
     //
     int numero_columnas(){return columnas;}
     
+    //
+    bool celda_existente(coordenada_t &celda);
+    
   private:
     Celda ***celdas;
     int filas;
