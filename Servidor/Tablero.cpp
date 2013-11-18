@@ -336,6 +336,7 @@ bool Tablero::estabilizar(){
             }
         }
     }
+    jugada_en_curso = NULL;
     return true;
 }
 
