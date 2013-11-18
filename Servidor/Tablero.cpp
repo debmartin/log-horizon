@@ -11,51 +11,57 @@ Tablero::~Tablero(){
     delete modificados;
 }
 
-int Tablero::intercambiar(Jugada* nueva){
-    if(jugada_en_curso) return -1;
+bool Tablero::intercambiar(Jugada* nueva){
+    if(jugada_en_curso) return false;
     jugada_en_curso = nueva;
-    Dimension una(nueva->posicion1()), otra(nueva->posicion2());
+    Dimension pos1(nueva->posicion1()), pos2(nueva->posicion2());
 
 
-    if (! sonAdyacentes(una, otra)) return -1;
-    if ((! hayMovimiento(una)) && (! hayMovimiento(otra)))
-        return -1;
+    if (! sonAdyacentes(pos1, pos2)) return false;
+    if ((! hayMovimiento(pos1)) && (! hayMovimiento(pos2)))
+        return false;
 
-    Matriz::intercambiar(una, otra);
-    return estabilizar(una, otra);
+    Matriz::intercambiar(pos1, pos2);
+    estabilizarJugada();
+    return true;
 }
 
-int Tablero::estabilizar(Dimension& una, Dimension& otra){
-    if((*this)[una].esEstrella() || (*this)[otra].esEstrella()){
-        return explosionEstrella(una, otra);
-    } else {
-        int orientacion = FILA;
-        bool ultimo = false;
-        Dimension actual(una);
+void Tablero::estabilizar(Dimension& pos1, Dimension& pos2, bool por_caida){
+    int orientacion = FILA;
+    bool ultimo = false;
+    Dimension actual(pos1);
 
-        while(!ultimo){
-            Dimension inicial(actual), final(actual);
-            int cant = this->buscarConfEspecial(actual, orientacion, inicial, final);
+    while(!ultimo){
+        Dimension inicial(actual), final(actual);
+        int cant = buscarConfEspecial(actual, orientacion, inicial, final);
 
-            if(cant >= MIN_LINEA){
-                this->borrarLinea(inicial, final);
-                this->reemplazarOriginal(cant, actual, orientacion);
-            }
-            if(orientacion == FILA){
-                orientacion = COLUMNA;
-            } else if (actual == una) {
-                actual = otra;
-                orientacion = FILA;
-            } else {
-                ultimo = true;
-            }
+        if(cant >= MIN_LINEA){
+            borrarLinea(inicial, final, por_caida);
+            reemplazarOriginal(cant, actual, orientacion);
+        }
+        if(orientacion == FILA){
+            orientacion = COLUMNA;
+        } else if (actual == pos1) {
+            actual = pos2;
+            orientacion = FILA;
+        } else {
+            ultimo = true;
         }
     }
 }
 
+void Tablero::estabilizarJugada(){
+    Dimension pos1(jugada_en_curso->posicion1()), pos2(jugada_en_curso->posicion2());
+    if((*this)[pos1].esEstrella() || (*this)[pos2].esEstrella()){
+        explosionEstrella();
+        return;
+    }
+    estabilizar(pos1, pos2, false);
+}
+
 int Tablero::borrarColumna(int col){
     Dimension dest(tamanio-1, col);
-    Dimension origen(-1, col);
+    Dimension origen(0, col);
     return borrarColumna(dest, origen, true);
 }
 
@@ -68,23 +74,19 @@ int Tablero::borrarFila(int fila){
 int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
     int cant = 0;
     int max = dest.x();
+    bool hay_barv = false;
 
     for(int i=0; i <= max; i++){
         Dimension actual(dest.x() -i, dest.y());
         Dimension superior(origen.x() -i-1, origen.y());
         char tipo = (*this)[actual].getTipo();
-        Celda salida = (*this)[actual];
-            std::cout << '(' << salida.getColor() << ',' << salida.getTipo() << ')';
-                std::cout<<actual.x()<<" "<<actual.y()<<"\n";
-//    std::cout<<fin.x()<<" "<<su.y()<<"\n
+
         if (tipo == MINIBARH && !borrando){
             Dimension principio(actual.x(), 0);
-            Dimension final(actual.x(), tamanio);
+            Dimension final(actual.x(), tamanio-1);
             cant += borrarFila(principio, final, true);
         } else if (tipo == MINIBARV && !borrando) {
-            Dimension principio(0, actual.y());
-            cant += borrarColumna(principio, dest, true);
-            max = origen.x();
+            hay_barv = true;
         } else {
             if (superior.esValida())
                 (*this)[actual] = (*this)[superior];
@@ -93,6 +95,11 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
             cant++;
             *modificados += new Dimension(actual);
         }
+    }
+    if(hay_barv){
+        Dimension principio(tamanio-1, origen.y());
+        Dimension fin(tamanio - dest.x() + origen.x(), dest.y());
+        cant += borrarColumna(principio, fin, true);
     }
     return cant;
 }
@@ -107,8 +114,10 @@ int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
         if (tipo == MINIBARH && !borrando){
             cant += borrarColumna(actual, actual, true);
             Dimension principio(actual.x(), 0);
-            cant += borrarFila(principio, inicio, true);
-            max = tamanio;
+            Dimension fin(actual.x(), inicio.y() -1);
+            if (principio != inicio)
+                cant += borrarFila(principio, fin, true);
+            max = tamanio-1;
         } else if (tipo == MINIBARV && !borrando) {
             Dimension origen(-1, actual.y());
             Dimension dest(tamanio-1, actual.y());
@@ -120,16 +129,14 @@ int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
     return cant;
 }
 
-int Tablero::borrarLinea(Dimension& inicio, Dimension& fin){
+void Tablero::borrarLinea(Dimension& inicio, Dimension& fin, bool por_caida){
     int cant = 0;
-    std::cout<<inicio.x()<<" "<<inicio.y()<<"\n";
-    std::cout<<fin.x()<<" "<<fin.y()<<"\n";
     if (inicio.x() == fin.x()){
         cant += borrarFila(inicio, fin, false);
     } else {
         cant += borrarColumna(fin, inicio, false);
     }
-    return cant;
+    jugada_en_curso->sumarPuntos(cant, false, por_caida);
 }
 
 int Tablero::buscarConfEspecial(Dimension& pos, int orientacion, Dimension& inicial, Dimension& final){
@@ -172,8 +179,9 @@ int Tablero::buscarConfEspecial(Dimension& pos, int orientacion, Dimension& inic
     return cant;
 }
 
-int Tablero::explosionEstrella(Dimension& una, Dimension& otra){
-    Dimension pos_no_est = ((*this)[una].esEstrella()) ? otra : una;
+void Tablero::explosionEstrella(){
+    Dimension pos1(jugada_en_curso->posicion1()), pos2(jugada_en_curso->posicion2());
+    Dimension pos_no_est = ((*this)[pos1].esEstrella()) ? pos2 : pos1;
     Celda& celda_no_est = (*this)[pos_no_est];
     char color_orig = celda_no_est.getColor();
     char tipo_orig = celda_no_est.getTipo();
@@ -183,7 +191,7 @@ int Tablero::explosionEstrella(Dimension& una, Dimension& otra){
         cant += borrarFila(pos_no_est.x());
         cant += borrarColumna(pos_no_est.y());
     } else if(tipo_orig == BUTTON) {
-        Dimension pos_est = ((*this)[una].esEstrella()) ? una : otra;
+        Dimension pos_est = ((*this)[pos1].esEstrella()) ? pos1 : pos2;
         borrarColumna(pos_est, pos_est, true);
     }
     for(int i=0; i < tamanio; i++){
@@ -199,7 +207,7 @@ int Tablero::explosionEstrella(Dimension& una, Dimension& otra){
             }
         }
     }
-    return cant;
+    jugada_en_curso->sumarPuntos(cant, true);
 }
 
 bool Tablero::reemplazarOriginal(int len_linea, Dimension& pos, int orientacion){
@@ -217,7 +225,6 @@ bool Tablero::reemplazarOriginal(int len_linea, Dimension& pos, int orientacion)
     return true;
 }
 
-//provisoria
 bool enRango(Dimension& pos, int tam){
     if(!pos.esValida()) return false;
     return ((pos.x()<tam) && (pos.y() <tam));
@@ -268,20 +275,22 @@ bool Tablero::hayMovimientos(){
     return false;
 }
 
-void Tablero::estabilizar(){
+bool Tablero::estabilizar(){
+    if(! jugada_en_curso) return false;
+
     while(! modificados->esVacia()){
         Dimension* pos = modificados->borrarPrimero();
         *borrados += pos;
         for(int i = pos->x()-1; i <= pos->x()+1; i++){
             for(int j = (i==pos->x()) ? pos->y()-1 : pos->y(); (i==pos->x()) ? (j <= pos->y()+1) : (j == pos->y()); j+=2){
                 Dimension adyacente(i, j);
-                if(!enRango(adyacente, tamanio)) continue;
+                if(! enRango(adyacente, tamanio)) continue;
 
                 int orientacion = FILA;
                 bool ultimo = false;
 
                 while(!ultimo){
-                    estabilizar(*pos, adyacente);
+                    estabilizar(*pos, adyacente, true);
                     if(orientacion == FILA)
                         orientacion = COLUMNA;
                     else
@@ -290,6 +299,7 @@ void Tablero::estabilizar(){
             }
         }
     }
+    return true;
 }
 
 void Tablero::imprimir(){

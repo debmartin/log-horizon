@@ -11,11 +11,9 @@ class Nivel{
         Nivel();
         virtual ~Nivel();
         void agregarJugador(std::string& nombre);
-        //void Nivel::jugar();
         void imprimirTablero();
-        void recibirJugada(Dimension& una, Dimension& otra, std::string& id_jugador);
+        void jugar();
     protected:
-        //void recibirJugada();
     private:
         int puntaje_objetivo;
         int puntaje_max;

@@ -4,6 +4,7 @@
 #include "Matriz.h"
 #include "Celda.h"
 #include "Lista.h"
+#include "Jugada.h"
 
 class Tablero : public Matriz<Celda>{
     public:
@@ -11,18 +12,19 @@ class Tablero : public Matriz<Celda>{
         virtual ~Tablero();
         void imprimir();
         bool intercambiar(Jugada* nueva_jugada);
-        void estabilizar();
+        bool estabilizar();
         bool hayMovimientos();
     protected:
-        int borrarLinea(Dimension& inicio, Dimension& fin);
+        void borrarLinea(Dimension& inicio, Dimension& fin, bool por_caida);
         int borrarColumna(int col);
         int borrarFila(int fila);
         int borrarColumna(Dimension& dest, Dimension& origen, bool borrando);
         int borrarFila(Dimension& inicio, Dimension& fin, bool borrando);
-        void estabilizar(Dimension& una, Dimension& otra);
+        void estabilizarJugada();
+        void estabilizar(Dimension& pos1, Dimension& pos2, bool por_caida);
         bool hayMovimiento(Dimension& pos);
         int buscarConfEspecial(Dimension& pos, int orientacion, Dimension& inicial, Dimension& final);
-        int explosionEstrella(Dimension& una, Dimension& otra);
+        void explosionEstrella();
         bool reemplazarOriginal(int len_linea, Dimension& pos, int orientacion);
     private:
         Lista<Dimension*>* borrados;

@@ -25,9 +25,9 @@ void Nivel::imprimirTablero(){
 }
 
 void Nivel::jugar(){
-    while(tablero->hayMovimientos()){
-        //Jugada* nueva_jugada = set_jugadores->obtenerJugada();
-        tablero->intercambiar(nueva_jugada);
-        tablero->estabilizar();
-    }
+//    while(tablero->hayMovimientos()){
+//        Jugada* nueva_jugada = set_jugadores->obtenerJugada();
+//        tablero->intercambiar(nueva_jugada);
+//        tablero->estabilizar();
+//    }
 }

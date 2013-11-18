@@ -2,13 +2,14 @@
 #define JUGADOR_H
 
 #include <string>
+#include "Jugada.h"
 
 class Jugador{
     public:
         Jugador(std::string& nombre);
         virtual ~Jugador();
         int getPuntaje() { return puntaje; }
-        bool contarPuntos(int largo_linea, bool conEstrella);
+        bool sumarPuntos();
         Jugada* obtenerJugada();
     protected:
     private:
