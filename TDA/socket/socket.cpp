@@ -16,7 +16,10 @@ Socket::Socket()throw(SocketError){
 
 // Destructor de la clase
 Socket::~Socket(){
-  if (socketid != -1) close(socketid);
+  if (socketid != -1){
+    shutdown(socketid,2);
+    close(socketid);
+  }
 }
 
 // Impide que el socket pueda enviar y recibir datos.
