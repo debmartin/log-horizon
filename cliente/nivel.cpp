@@ -197,7 +197,9 @@ bool Nivel::analizar_evento(SDL_Event &evento){
           }
         }else if(evento.button.button == SDL_BUTTON_RIGHT){
           tablero->quitar_seleccion();
-          explotar(celda);
+          int color = rand() % 5;
+          int tipo = rand() % 4;
+          Nivel::explotar(celda, tipo, color);
         }
       }
     }
@@ -221,13 +223,10 @@ void Nivel::actualizar_animaciones(){
   
   // actualizar celdas vacias
   if (!tablero->esta_ocupada() && !explosion->explosion_en_curso() && celdas_vacias->existentes()){
-    coordenada_t celda;
     for (int i = 0; i < tablero->numero_columnas(); i++){
       if (!celdas_vacias->esta_vacia(i)){
-        celda = celdas_vacias->borrar_proxima(i);
-        int color = rand() % 5;
-        int tipo = rand() % 4;
-        Nivel::apilar(tipo,color,celda);
+        reemplazo_t reemplazo = celdas_vacias->borrar_proxima(i);
+        Nivel::apilar(reemplazo.tipo,reemplazo.color,reemplazo.celda);
       }
     }
   }
@@ -250,7 +249,7 @@ void Nivel::apilar(int tipo, int color, coordenada_t &celda){
 }
 
 //
-void Nivel::explotar(coordenada_t &celda){
+void Nivel::explotar(coordenada_t &celda, int tipo, int color){
   explosion->explotar(celda, tablero);
-  celdas_vacias->agregar(celda);
+  celdas_vacias->agregar(celda, tipo, color);
 }

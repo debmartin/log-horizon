@@ -62,7 +62,7 @@ class Nivel{
     void apilar(int tipo, int color, coordenada_t &celda);
     
     //
-    void explotar(coordenada_t &celda);
+    void explotar(coordenada_t &celda, int tipo, int color);
     
     //
     // metodo que realiza la accion de la cola

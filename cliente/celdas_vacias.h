@@ -24,19 +24,19 @@ class CeldasVacias{
     void inicializar(int cantidad_columnas);
     
     //
-    void agregar(coordenada_t &celda);
+    void agregar(coordenada_t &celda, int tipo, int color);
     
     //
     bool esta_vacia(int columna);
 
     //
-    coordenada_t borrar_proxima(int columna)throw(ListaVacia, ColumnaInvalida);
+    reemplazo_t borrar_proxima(int columna)throw(ListaVacia, ColumnaInvalida);
     
     //
     bool existentes();
 
   private:
-    Lista<coordenada_t> **celdas_vacias;
+    Lista<reemplazo_t> **celdas_vacias;
     int columnas;  
     int contador;
 };
