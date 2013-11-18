@@ -16,10 +16,9 @@ class Tablero : public Matriz<Celda>{
         bool hayMovimientos();
     protected:
         void borrarLinea(Dimension& inicio, Dimension& fin, bool por_caida);
-        int borrarColumna(int col);
-        int borrarFila(int fila);
-        int borrarColumna(Dimension& dest, Dimension& origen, bool borrando);
-        int borrarFila(Dimension& inicio, Dimension& fin, bool borrando);
+        int borrarSegmentosCol(Dimension& dest, Dimension& origen, bool actual_inclusive = true);
+        int borrarColumna(Dimension& dest, Dimension& origen);
+        int borrarFila(Dimension& inicio, Dimension& fin);
         void estabilizarJugada();
         void estabilizar(Dimension& pos1, Dimension& pos2, bool por_caida);
         bool hayMovimiento(Dimension& pos);

@@ -59,36 +59,57 @@ void Tablero::estabilizarJugada(){
     estabilizar(pos1, pos2, false);
 }
 
-int Tablero::borrarColumna(int col){
-    Dimension dest(tamanio-1, col);
-    Dimension origen(0, col);
-    return borrarColumna(dest, origen, true);
+int Tablero::borrarSegmentosCol(Dimension& dest, Dimension& origen, bool actual_inclusive){
+    bool en_segmento = false, contar_segmento = true;
+    int cant = 0;
+    Dimension primero(dest), ultimo(origen), no_vacia(dest);
+
+    for (int i = dest.y(); i <= origen.y(); i++){
+        Dimension actual(origen.x(), i);
+
+        if(! contar_segmento) continue;
+
+        if(actual == dest && !actual_inclusive)
+            contar_segmento = false;
+
+        if((*this)[actual].esVacia() && en_segmento) {
+            ultimo = no_vacia;
+            en_segmento = false;
+            contar_segmento = true;
+            cant += borrarColumna(primero, ultimo);
+        } else if (! (*this)[actual].esVacia()) {
+            no_vacia = actual;
+            if (! en_segmento){
+                primero = actual;
+                en_segmento = true;
+            }
+        }
+    }
+    return cant;
 }
 
-int Tablero::borrarFila(int fila){
-    Dimension inicio(fila, 0);
-    Dimension fin(fila, tamanio-1);
-    return borrarFila(inicio, fin, true);
-}
+int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
+    if(! dest.esValida() || ! origen.esValida()) return 0;
 
-int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
     int cant = 0;
     int max = dest.x();
-    bool hay_barv = false;
+    bool hay_barv = false, termino_segmento = false;
 
     for(int i=0; i <= max; i++){
         Dimension actual(dest.x() -i, dest.y());
         Dimension superior(origen.x() -i-1, origen.y());
         char tipo = (*this)[actual].getTipo();
 
-        if (tipo == MINIBARH && !borrando){
+        if (tipo == MINIBARH){
             Dimension principio(actual.x(), 0);
             Dimension final(actual.x(), tamanio-1);
-            cant += borrarFila(principio, final, true);
-        } else if (tipo == MINIBARV && !borrando) {
+            cant += borrarFila(principio, final);
+        } else if (tipo == MINIBARV) {
             hay_barv = true;
         } else {
-            if (superior.esValida())
+            if((*this)[superior].esVacia())
+                termino_segmento = true;
+            if (superior.esValida() && ! termino_segmento)
                 (*this)[actual] = (*this)[superior];
             else
                 (*this)[actual].rellenar();
@@ -98,32 +119,38 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen, bool borrando){
     }
     if(hay_barv){
         Dimension principio(tamanio-1, origen.y());
-        Dimension fin(tamanio - dest.x() + origen.x(), dest.y());
-        cant += borrarColumna(principio, fin, true);
+        Dimension fin(tamanio - dest.x() + origen.x() -1, dest.y());
+        cant += borrarSegmentosCol(principio, fin);
+
+        Dimension primero(0, dest.y());
+        Dimension ultimo(tamanio-1, dest.y());
+        cant += borrarSegmentosCol(primero, ultimo, false);
     }
     return cant;
 }
 
-int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
+int Tablero::borrarFila(Dimension& inicio, Dimension& fin){
     int max = fin.y() - inicio.y(), cant = 0;
     for(int i=0; i<=max; i++){
         Dimension actual(inicio.x(), inicio.y()+i);
 
         char tipo = (*this)[actual].getTipo();
 
-        if (tipo == MINIBARH && !borrando){
-            cant += borrarColumna(actual, actual, true);
+        if (tipo == MINIBARH){
+            cant += borrarColumna(actual, actual);
             Dimension principio(actual.x(), 0);
             Dimension fin(actual.x(), inicio.y() -1);
             if (principio != inicio)
-                cant += borrarFila(principio, fin, true);
+                cant += borrarFila(principio, fin);
             max = tamanio-1;
-        } else if (tipo == MINIBARV && !borrando) {
+        } else if (tipo == MINIBARV) {
             Dimension origen(-1, actual.y());
             Dimension dest(tamanio-1, actual.y());
-            cant += borrarColumna(dest, origen, true);
+            cant += borrarSegmentosCol(dest, origen);
+        } else if (tipo == VACIO) {
+            continue;
         } else {
-            cant += borrarColumna(actual, actual, borrando);
+            cant += borrarColumna(actual, actual);
         }
     }
     return cant;
@@ -132,9 +159,9 @@ int Tablero::borrarFila(Dimension& inicio, Dimension& fin, bool borrando){
 void Tablero::borrarLinea(Dimension& inicio, Dimension& fin, bool por_caida){
     int cant = 0;
     if (inicio.x() == fin.x()){
-        cant += borrarFila(inicio, fin, false);
+        cant += borrarFila(inicio, fin);
     } else {
-        cant += borrarColumna(fin, inicio, false);
+        cant += borrarColumna(fin, inicio);
     }
     jugada_en_curso->sumarPuntos(cant, false, por_caida);
 }
@@ -187,23 +214,33 @@ void Tablero::explosionEstrella(){
     char tipo_orig = celda_no_est.getTipo();
     int cant = 1;
 
-    if(tipo_orig == MINIBARH || tipo_orig == MINIBARV){
-        cant += borrarFila(pos_no_est.x());
-        cant += borrarColumna(pos_no_est.y());
-    } else if(tipo_orig == BUTTON) {
+    if(tipo_orig == BUTTON) {
         Dimension pos_est = ((*this)[pos1].esEstrella()) ? pos1 : pos2;
-        borrarColumna(pos_est, pos_est, true);
+        borrarColumna(pos_est, pos_est);
     }
+
     for(int i=0; i < tamanio; i++){
         if (tipo_orig == ESTRELLA){
-            cant += borrarColumna(i);
+            Dimension inicio(tamanio-1, i);
+            Dimension fin(0, i);
+            cant += borrarSegmentosCol(inicio, fin);
             continue;
         }
         for(int j=0; j < tamanio; j++){
             Dimension pos_actual(j, i);
 
-            if((*this)[pos_actual].getColor() == color_orig){
-                cant += borrarColumna(pos_actual, pos_actual, true);
+            if((*this)[pos_actual].getColor() == color_orig) {
+                if(tipo_orig == MINIBARH || tipo_orig == MINIBARV){
+                    Dimension inicio1(pos_no_est.x(), 0);
+                    Dimension fin1(pos_no_est.x(), tamanio-1);
+                    cant += borrarFila(inicio1, fin1) -1;
+
+                    Dimension inicio2(tamanio-1, pos_no_est.y());
+                    Dimension fin2(0, pos_no_est.y());
+                    cant += borrarSegmentosCol(inicio2, fin2);
+                } else {
+                    cant += borrarColumna(pos_actual, pos_actual);
+                }
             }
         }
     }
