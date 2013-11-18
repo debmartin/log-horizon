@@ -1,9 +1,8 @@
 #include "Tablero.h"
 
 
-Tablero::Tablero(int tam, Lista<Dimension*>* cola_borrados)
+Tablero::Tablero(int tam)
     : Matriz<Celda>(tam), jugada_en_curso(NULL){
-    borrados = cola_borrados;
     modificados = new Lista<Dimension*>(true);
 }
 
@@ -317,7 +316,8 @@ bool Tablero::estabilizar(){
 
     while(! modificados->esVacia()){
         Dimension* pos = modificados->borrarPrimero();
-        *borrados += pos;
+        jugada_en_curso->agregarBorrado(pos);
+
         for(int i = pos->x()-1; i <= pos->x()+1; i++){
             for(int j = (i==pos->x()) ? pos->y()-1 : pos->y(); (i==pos->x()) ? (j <= pos->y()+1) : (j == pos->y()); j+=2){
                 Dimension adyacente(i, j);

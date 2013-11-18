@@ -4,8 +4,7 @@ using std::string;
 
 Nivel::Nivel() :
     puntaje_objetivo(300), puntaje_max(0){
-    modificados = new Lista<Dimension*>(true);
-    tablero = new Tablero(7, modificados);
+    tablero = new Tablero(7);
     jugadores = new Hash<Jugador*>(true);
 }
 

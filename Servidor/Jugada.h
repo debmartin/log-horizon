@@ -3,6 +3,7 @@
 
 #include "dimension.h"
 #include "Constantes.h"
+#include "Lista.h"
 
 class Jugada {
     public:
@@ -12,11 +13,14 @@ class Jugada {
         int verPuntos();
         Dimension posicion1();
         Dimension posicion2();
+        void agregarBorrado(Dimension* pos);
+        Dimension* obtenerProxBorrado();
     protected:
     private:
         int puntos;
         Dimension* pos1;
         Dimension* pos2;
+        Lista<Dimension*>* borrados;
 };
 
 #endif // JUGADA_H

@@ -8,7 +8,7 @@
 
 class Tablero : public Matriz<Celda>{
     public:
-        Tablero(int tam, Lista<Dimension*>* cola_modif);
+        Tablero(int tam);
         virtual ~Tablero();
         void imprimir();
         bool intercambiar(Jugada* nueva_jugada);
@@ -26,7 +26,6 @@ class Tablero : public Matriz<Celda>{
         void explosionEstrella();
         bool reemplazarOriginal(int len_linea, Dimension& pos, int orientacion);
     private:
-        Lista<Dimension*>* borrados;
         Lista<Dimension*>* modificados;
         Jugada* jugada_en_curso;
 };
