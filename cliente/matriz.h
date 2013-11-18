@@ -24,7 +24,7 @@ class Celda{
     void asignar_posicion(SDL_Rect &rect);
     
     //
-    bool intercambiar(Celda* otra_celda);
+    bool intercambiar(Celda* otra_celda, int salto);
     
     //
     bool dibujar(Ventana* ventana);
@@ -33,7 +33,7 @@ class Celda{
     void quitar_textura();
     
     //
-    void mover(SDL_Rect &destino);
+    void mover(SDL_Rect &destino, int salto);
     
     //
     void asignar_animacion(Textura *tex, Animacion *anim);

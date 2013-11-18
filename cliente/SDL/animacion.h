@@ -70,7 +70,7 @@ class AnimacionMovil{
     void posicion_actual(SDL_Rect &pos);
     
     //
-    void mover(SDL_Rect &destino);
+    void mover(SDL_Rect &destino, int salto);
     
     //
     SDL_Rect ver_posicion_actual();
@@ -95,6 +95,7 @@ class AnimacionMovil{
     Animacion *animacion;
     SDL_Rect pos_actual;
     SDL_Rect pos_destino;
+    int distancia;
 };
 
 #endif // ANIMACION_H

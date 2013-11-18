@@ -10,10 +10,8 @@
 #define LARGO 15
 
 #define POS_X 100 // posicion en x de la matriz
-#define POS_Y 50 // posicion de y en la matriz
-#define LARGO_CELDA_X 50
-#define LARGO_CELDA_Y 40
-#define CANT_CELDAS_X 12
+#define POS_Y 100 // posicion de y en la matriz
+#define CANT_CELDAS_X 15
 #define CANT_CELDAS_Y 10
 #define FPS_ANIMACION 8.0f
 #define FPS_EXPLOSION 15.0f
@@ -41,14 +39,13 @@ Nivel::~Nivel(){
 }
 
 //
-void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
+void Nivel::inicializar_datos(const std::string &path, Ventana *ventana, int ancho, int alto){
   Superficie *fondo_sup = new Superficie;
   fondo_sup->cargar(path + "fondo1.png");
-  fondo_sup->escalar(840,525);
+  fondo_sup->escalar(ancho,alto);
   
   Superficie *fondo_celda = new Superficie;
   fondo_celda->cargar("imagenes/celda_fondo.png");
-  
   
   tablero = new Matriz;
   
@@ -64,20 +61,16 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
     }
   }
   
-  estructura[1][2] = 0;
-  estructura[3][4] = 0;
-  estructura[5][2] = 0;
-  estructura[7][4] = 0;
-  estructura[9][2] = 0;
-  estructura[11][4] = 0;
-  
   // HASTA ACA
+  
+  ancho_celda = (ancho - POS_X * 2) / CANT_CELDAS_X;
+  alto_celda = (alto - POS_Y * 2) / CANT_CELDAS_Y;
   
   SDL_Rect origen;
   origen.x = POS_X;
   origen.y = POS_Y;
-  origen.h = LARGO_CELDA_Y;
-  origen.w = LARGO_CELDA_X;
+  origen.h = alto_celda;
+  origen.w = ancho_celda;
   
   tablero->definir_forma(estructura, dimension, origen);
   tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup);
@@ -97,7 +90,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
       coord.y = z;
       int color = rand() % 5;
       int tipo = rand() % 4;
-      if (tipo == 3) color = 0;
       tablero->insertar(productos->ver_textura(tipo,color), productos->ver_animacion(tipo,color),coord); 
     }
   }
@@ -116,8 +108,8 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana){
 }
 
 //
-void Nivel::correr(const std::string &path, Ventana* ventana){
-  Nivel::inicializar_datos(path, ventana);
+void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alto){
+  Nivel::inicializar_datos(path, ventana, ancho, alto);
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -131,7 +123,7 @@ void Nivel::correr(const std::string &path, Ventana* ventana){
     Nivel::dibujar(ventana);
     Nivel::actualizar_animaciones();
     
-    if (SDL_GetTicks() - tiempo_actual < 2000){
+    if (SDL_GetTicks() - tiempo_actual < 1000){
       delay = Nivel::calcular_delay(frames);
     }
     ventana->presentar(delay);
@@ -146,8 +138,8 @@ bool Nivel::analizar_evento(SDL_Event &evento){
   }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){
     if (evento.type == SDL_MOUSEBUTTONDOWN){
       coordenada_t celda;
-      celda.x = (evento.button.x - POS_X) / LARGO_CELDA_X;
-      celda.y = (evento.button.y - POS_Y) / LARGO_CELDA_Y;
+      celda.x = (evento.button.x - POS_X) / ancho_celda;
+      celda.y = (evento.button.y - POS_Y) / alto_celda;
       if (evento.button.x - POS_X >= 0 && 
       evento.button.y - POS_Y >= 0 && 
       celda.x < CANT_CELDAS_X && 
@@ -195,7 +187,6 @@ void Nivel::actualizar_animaciones(){
         celda = celdas_vacias->borrar_proxima(i);
         int color = rand() % 5;
         int tipo = rand() % 4;
-        if (tipo == 3) color = 0;
         Nivel::apilar(tipo,color,celda);
       }
     }
@@ -205,7 +196,7 @@ void Nivel::actualizar_animaciones(){
 //
 int Nivel::calcular_delay(FPS &frames){
   frames.actualizar();
-  return (1000/60.0f) * (frames.ver_fps() / 60.0f);
+  return (1000/60.0f) * (frames.ver_fps()/60.0f);
 }
 
 //
@@ -407,10 +398,10 @@ void Explosion::animar(){
 
 //
 Productos::Productos(){
-  cant_tipos = 4;
+  cant_tipos = 3;
   cant_colores = 5;
   animaciones = new animacion_t**[cant_tipos];
-  for (int i = 0; i < cant_tipos - 1; i++){
+  for (int i = 0; i < cant_tipos; i++){
     animaciones[i] = new animacion_t*[cant_colores];
     for (int w = 0; w < cant_colores; w++){
       animaciones[i][w] = new animacion_t;
@@ -418,19 +409,17 @@ Productos::Productos(){
       animaciones[i][w]->animacion = new Animacion;
     }
   }
-  animaciones[cant_tipos-1] = new animacion_t*;
-  animaciones[cant_tipos-1][0] = new animacion_t;
-  animaciones[cant_tipos-1][0]->textura = new Textura;
-  animaciones[cant_tipos-1][0]->animacion = new Animacion;
+  estrella = new animacion_t;
+  estrella->textura = new Textura;
+  estrella->animacion = new Animacion;
 }
 
 //
 Productos::~Productos(){
-  delete animaciones[cant_tipos -1][0]->animacion;
-  delete animaciones[cant_tipos -1][0]->textura;
-  delete animaciones[cant_tipos -1][0];
-  delete animaciones[cant_tipos-1];
-  for (int i = 0; i < cant_tipos - 1; i++){
+  delete estrella->textura;
+  delete estrella->animacion;
+  delete estrella;
+  for (int i = 0; i < cant_tipos; i++){
     for (int w = 0; w < cant_colores; w++){
       delete animaciones[i][w]->animacion;
       delete animaciones[i][w]->textura;
@@ -493,7 +482,6 @@ void Productos::cargar_animaciones(const std::string &path, Ventana *ventana){
     exp.imagen_inicial = DestE;
 
     animaciones[1][i]->textura->cargar_textura(exp_sup, ventana);
-
     animaciones[1][i]->animacion->cargar_sprite(exp);
     animaciones[1][i]->animacion->establecer_fps(FPS_ANIMACION);
 
@@ -504,7 +492,6 @@ void Productos::cargar_animaciones(const std::string &path, Ventana *ventana){
     exp.imagen_inicial = DestE;
 
     animaciones[2][i]->textura->cargar_textura(exp_sup, ventana);
-
     animaciones[2][i]->animacion->cargar_sprite(exp);
     animaciones[2][i]->animacion->establecer_fps(FPS_ANIMACION);
   }
@@ -528,37 +515,40 @@ void Productos::cargar_animaciones(const std::string &path, Ventana *ventana){
   exp.dimension_total = SrcE;
   exp.imagen_inicial = DestE;
 
-  animaciones[cant_tipos - 1][0]->textura->cargar_textura(exp_sup, ventana);
-
-  animaciones[cant_tipos - 1][0]->animacion->cargar_sprite(exp);
-  animaciones[cant_tipos - 1][0]->animacion->establecer_fps(FPS_ANIMACION);
+  estrella->textura->cargar_textura(exp_sup, ventana);
+  estrella->animacion->cargar_sprite(exp);
+  estrella->animacion->establecer_fps(FPS_ANIMACION);
   
   delete exp_sup;
 }
   
 //
 void Productos::animar(){
+  estrella->animacion->animar();
+  if (estrella->animacion->fuera_del_sprite())
+    estrella->animacion->reiniciar();
+  
   for (int x = 0; x < cant_tipos; x++){
-    for (int y = 0; y < 5; y++){
-      if (x != cant_tipos - 1 || y == 0){
-        animaciones[x][y]->animacion->animar();
-        if (animaciones[x][y]->animacion->fuera_del_sprite())
-          animaciones[x][y]->animacion->reiniciar();
-      }
+    for (int y = 0; y < cant_colores; y++){
+      animaciones[x][y]->animacion->animar();
+      if (animaciones[x][y]->animacion->fuera_del_sprite())
+        animaciones[x][y]->animacion->reiniciar();
     }
-  }
+  }  
 }
 
 //
 Animacion *Productos::ver_animacion(int tipo, int color){
-  if (tipo >= cant_tipos || tipo < 0 || color < 0 || color >= cant_colores || (tipo == cant_tipos -1 && color != 0))
+  if (tipo > cant_tipos || tipo < 0 || color < 0 || color >= cant_colores)
     return NULL;
+  if (tipo == cant_tipos) return estrella->animacion;
   return animaciones[tipo][color]->animacion;
 }
 
 //
 Textura *Productos::ver_textura(int tipo, int color){
-  if (tipo >= cant_tipos || tipo < 0 || color < 0 || color >= cant_colores || (tipo == cant_tipos -1 && color != 0))
+  if (tipo > cant_tipos || tipo < 0 || color < 0 || color >= cant_colores)
     return NULL;
+  if (tipo == cant_tipos) return estrella->textura;
   return animaciones[tipo][color]->textura;
 }

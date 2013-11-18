@@ -3,6 +3,7 @@
 #include "matriz.h"
 #include "SDL/SDL.h"
 
+#define FRACCION 10
 
 /* ********************************************************************
  *                                CELDA
@@ -40,7 +41,7 @@ void Celda::asignar_posicion(SDL_Rect &rect){
 }
 
 //
-bool Celda::intercambiar(Celda* otra_celda){
+bool Celda::intercambiar(Celda* otra_celda, int salto){
   if (!otra_celda) return false;
   
   AnimacionMovil* temp = otra_celda->animacion;
@@ -48,8 +49,8 @@ bool Celda::intercambiar(Celda* otra_celda){
   SDL_Rect origen = animacion->ver_posicion_destino();
   SDL_Rect destino = temp->ver_posicion_destino();
   
-  if (animacion) animacion->mover(destino);
-  if (temp) temp->mover(origen);
+  if (animacion) animacion->mover(destino, salto);
+  if (temp) temp->mover(origen, salto);
   
   otra_celda->animacion = animacion;
   animacion = temp;
@@ -72,8 +73,8 @@ void Celda::quitar_textura(){
   animacion->quitar_textura();
 }
 
-void Celda::mover(SDL_Rect &destino){
-  animacion->mover(destino);
+void Celda::mover(SDL_Rect &destino, int salto){
+  animacion->mover(destino, salto);
 }
 
 bool Celda::movimientos_pendientes(){
@@ -170,10 +171,10 @@ void Matriz::quitar_seleccion(){
 
 //
 bool Matriz::intercambiar(coordenada_t &celda1, coordenada_t &celda2){
-  Celda *primer_celda = celdas[celda1.x][celda1.y];
+  Celda *primera_celda = celdas[celda1.x][celda1.y];
   Celda *segunda_celda = celdas[celda2.x][celda2.y];
-  if (!primer_celda || !segunda_celda) return false;
-  bool exito = primer_celda->intercambiar(segunda_celda);
+  if (!primera_celda || !segunda_celda) return false;
+  bool exito = primera_celda->intercambiar(segunda_celda, primer_celda.w / FRACCION);
   if (exito && celda_seleccionada){
     delete celda_seleccionada;
     celda_seleccionada = NULL;
@@ -199,7 +200,7 @@ bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
       if (anterior < 0)
         anterior = primer_fila;
       if (celdas[celda.x][anterior])
-        celdas[celda.x][i]->intercambiar(celdas[celda.x][anterior]);
+        celdas[celda.x][i]->intercambiar(celdas[celda.x][anterior], primer_celda.w / FRACCION);
     }
   }
   
@@ -216,7 +217,7 @@ bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
   
   celdas[celda.x][primer_fila]->asignar_animacion(tex, anim);
   celdas[celda.x][primer_fila]->asignar_posicion(origen);
-  celdas[celda.x][primer_fila]->mover(destino);
+  celdas[celda.x][primer_fila]->mover(destino, primer_celda.w / FRACCION);
   return true;
 }
 

@@ -112,6 +112,7 @@ AnimacionMovil::AnimacionMovil(){
   pos_destino.y = 0;
   pos_destino.h = 0;
   pos_destino.w = 0;
+  distancia = 1;
   animacion = NULL;
   textura = NULL;
 }
@@ -129,8 +130,10 @@ void AnimacionMovil::posicion_actual(SDL_Rect &pos){
 }
 
 //
-void AnimacionMovil::mover(SDL_Rect &destino){
+void AnimacionMovil::mover(SDL_Rect &destino, int salto){
   pos_destino = destino;
+  distancia = 1;
+  if (salto != 0) distancia = salto;
 }
 
 //
@@ -154,11 +157,19 @@ bool AnimacionMovil::movimientos_pendientes(){
 bool AnimacionMovil::dibujar(Ventana *ventana){
   if (!animacion->dibujar(textura, pos_actual, ventana)) return false;
   
-  int distancia = pos_destino.x - pos_actual.x;
-  if (distancia != 0) pos_actual.x += distancia / abs(distancia);
+  int direccion = pos_destino.x - pos_actual.x;
+  if (abs(direccion) < abs(distancia)){
+    pos_actual.x = pos_destino.x;
+  }else if (direccion != 0){
+    pos_actual.x += distancia * (direccion / abs(direccion));
+  }
   
-  distancia = pos_destino.y - pos_actual.y;
-  if (distancia != 0) pos_actual.y += distancia / abs(distancia);
+  direccion = pos_destino.y - pos_actual.y;
+  if (abs(direccion) < abs(distancia)){
+    pos_actual.y = pos_destino.y;
+  }else if (direccion != 0){
+    pos_actual.y += distancia * (direccion / abs(direccion));
+  }
   
   return true;
 }

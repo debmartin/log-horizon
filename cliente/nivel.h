@@ -118,6 +118,7 @@ class Productos{
       
   private:
     animacion_t ***animaciones;
+    animacion_t *estrella;
     int cant_tipos;
     int cant_colores;
 };
@@ -136,10 +137,10 @@ class Nivel{
     ~Nivel();
     
     //
-    void correr(const std::string &path, Ventana *ventana);
+    void correr(const std::string &path, Ventana *ventana, int ancho, int alto);
   
     //
-    void inicializar_datos(const std::string &path, Ventana *ventana);
+    void inicializar_datos(const std::string &path, Ventana *ventana, int ancho, int alto);
     
     //
     void dibujar(Ventana *ventana);
@@ -155,9 +156,11 @@ class Nivel{
     Matriz *tablero;
     Explosion *explosion;
     CeldasVacias *celdas_vacias;
-    
     Textura *fondo;
     Textura *seleccion;
+    int ancho_celda;
+    int alto_celda;   
+    
     Mix_Chunk *sonido;
     
   protected:
