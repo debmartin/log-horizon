@@ -28,14 +28,14 @@ Matriz<U>::Matriz(Dimension& tam){
     tamanio = new Dimension(tam);
     tabla = new U*[tam.x()];
     for(int i=0; i < tam.x(); i++){
-        tabla[i] = new U[tam.y()];
+      tabla[i] = new U[tam.y()];
     }
 }
 
 template <class U>
 Matriz<U>::~Matriz(){
     for(int i=0; i < tamanio->x(); i++){
-        delete tabla[i];
+      delete[] tabla[i];
     }
     delete tabla;
     delete tamanio;
@@ -73,7 +73,6 @@ template <class U>
 U& Matriz<U>::operator[](Dimension& pos){
     if ((pos.y() >= tamanio->y()) || (pos.x() >= tamanio->x()))
         throw FueraDeRango();
-
     return tabla[pos.x()][pos.y()];
 }
 

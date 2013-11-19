@@ -41,7 +41,6 @@ void Tablero::estabilizar(Dimension& pos1, Dimension& pos2, bool por_caida){
     while(!ultimo){
         Dimension inicial(actual), final(actual);
         int cant = buscarConfEspecial(actual, orientacion, inicial, final);
-
         if(cant >= MIN_LINEA){
             borrarLinea(inicial, final, por_caida);
             reemplazarOriginal(cant, actual, orientacion);
@@ -101,7 +100,6 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
     int cant = 0;
     int max = dest.x();
     bool hay_barv = false, termino_segmento = false;
-
     for(int i=0; i <= max; i++){
         Dimension actual(dest.x() -i, dest.y());
         Dimension superior(origen.x() -i-1, origen.y());
@@ -114,7 +112,7 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
         } else if (tipo == MINIBARV) {
             hay_barv = true;
         } else {
-            if((*this)[superior].esVacia())
+            if(superior.esValida() && (*this)[superior].esVacia())
                 termino_segmento = true;
             if (superior.esValida() && ! termino_segmento)
                 (*this)[actual] = (*this)[superior];
@@ -139,10 +137,11 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
 int Tablero::borrarFila(Dimension& inicio, Dimension& fin){
     int max = fin.y() - inicio.y(), cant = 0;
     for(int i=0; i<=max; i++){
+        
         Dimension actual(inicio.x(), inicio.y()+i);
 
         char tipo = (*this)[actual].getTipo();
-
+        
         if (tipo == MINIBARH){
             cant += borrarColumna(actual, actual);
             Dimension principio(actual.x(), 0);
@@ -321,9 +320,9 @@ bool Tablero::hayMovimientos(){
 
 bool Tablero::estabilizar(){
     if(! jugada_en_curso) return false;
-
     while(! modificados->esVacia()){
         Dimension* pos = modificados->borrarPrimero();
+        
         jugada_en_curso->agregarBorrado(pos);
 
         for(int i = pos->x()-1; i <= pos->x()+1; i++){
