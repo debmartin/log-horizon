@@ -1,13 +1,13 @@
 #include <iostream>
 #include "celdas_vacias.h"
 
-//
+// Constructor de clase
 CeldasVacias::CeldasVacias(){
   celdas_vacias = NULL;
   contador = 0;
 }
 
-//
+// Destructor de clase
 CeldasVacias::~CeldasVacias(){
   if (celdas_vacias){
     for (int i = 0; i < columnas; i++){
@@ -17,7 +17,7 @@ CeldasVacias::~CeldasVacias(){
   }
 }
 
-//
+// Inicializa la estructura, con los datos ingresados.
 void CeldasVacias::inicializar(int cantidad_columnas){
   columnas = cantidad_columnas;
   celdas_vacias = new Lista<reemplazo_t>*[columnas];
@@ -25,7 +25,8 @@ void CeldasVacias::inicializar(int cantidad_columnas){
     celdas_vacias[i] = new Lista<reemplazo_t>;
 }
 
-//
+// Agrega una coordenada que indica una celda vacia en el tablero,
+// y el tipo y color de la nueva pieza a ser apilada en la columna
 void CeldasVacias::agregar(coordenada_t &celda, int tipo, int color){
   reemplazo_t reemplazo;
   reemplazo.celda = celda;
@@ -49,14 +50,15 @@ void CeldasVacias::agregar(coordenada_t &celda, int tipo, int color){
   contador++;
 }
 
-//
+// Devuelve true si no hay celdas vacias en la columna ingresada
 bool CeldasVacias::esta_vacia(int columna){
   if (columna < 0 || columna >= columnas) return false;
   Lista<reemplazo_t> *lista = celdas_vacias[columna];
   return lista->esta_vacia();
 }
 
-//
+// Elimina la proxima celda vacia correspondiente a la columna ingresada.
+// La proxima celda seria la de menor subindice
 reemplazo_t CeldasVacias::borrar_proxima(int columna)throw(ListaVacia, ColumnaInvalida){
   if (columna < 0 || columna >= columnas) throw ColumnaInvalida();
   Lista<reemplazo_t> *lista = celdas_vacias[columna];
@@ -64,7 +66,8 @@ reemplazo_t CeldasVacias::borrar_proxima(int columna)throw(ListaVacia, ColumnaIn
   return lista->borrar_primero();
 }
 
-//
+// Devuelve true si hay celdas vacias en el tablero, caso contrario
+// retorna false
 bool CeldasVacias::existentes(){
   return contador != 0;
 }

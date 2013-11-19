@@ -3,7 +3,7 @@
 
 #define FPS_ANIMACION 8.0f
 
-//
+// Constructor de clase
 Productos::Productos(){
   cant_tipos = 3;
   cant_colores = 5;
@@ -21,7 +21,7 @@ Productos::Productos(){
   estrella->animacion = new Animacion;
 }
 
-//
+// Destructor de clase
 Productos::~Productos(){
   delete estrella->textura;
   delete estrella->animacion;
@@ -37,7 +37,12 @@ Productos::~Productos(){
   delete[] animaciones;
 }
 
-//
+// Carga Todos los productos de cada tipo y color en la carpeta del nivel
+// ingresado. Los archivos abiertos son: rojo.png, amarillo.png, verde.png,
+// azul.png, violeta.png y estrella.png
+// Pre: todos los archivos deben existir.
+// Post: Se Crearon todas las animaciones correspondientes a cada tipo
+//       y color de producto.
 void Productos::cargar_animaciones(const std::string &path, Ventana *ventana){
   SpritePos_t exp;
   SDL_Rect SrcE;
@@ -129,7 +134,7 @@ void Productos::cargar_animaciones(const std::string &path, Ventana *ventana){
   delete exp_sup;
 }
   
-//
+// Actualiza todas las animaciones almacenadas.
 void Productos::animar(){
   estrella->animacion->animar();
   if (estrella->animacion->fuera_del_sprite())
@@ -144,7 +149,8 @@ void Productos::animar(){
   }  
 }
 
-//
+// Devuelve la animacion correspondiente al tipo y color ingresado.
+// en caso de no existir una animacion de dicho tipo o color, devuelve NULL
 Animacion *Productos::ver_animacion(int tipo, int color){
   if (tipo > cant_tipos || tipo < 0 || color < 0 || color >= cant_colores)
     return NULL;
@@ -152,7 +158,8 @@ Animacion *Productos::ver_animacion(int tipo, int color){
   return animaciones[tipo][color]->animacion;
 }
 
-//
+// Devuelve la textura correspondiente al tipo y color ingresado
+// en caso de no existir una textura de dicho tipo o color, devuelve NULL
 Textura *Productos::ver_textura(int tipo, int color){
   if (tipo > cant_tipos || tipo < 0 || color < 0 || color >= cant_colores)
     return NULL;

@@ -9,38 +9,42 @@
  *                                CELDA
  * ********************************************************************/
 
-//
+// Constructor de clase
 Celda::Celda(){
   animacion = new AnimacionMovil;
   seleccion = NULL;
 }
 
-//
+// Destructor de clase
 Celda::~Celda(){
   delete animacion;
 }
 
-//
+// asigna una animacion y textura a la celda, que sera dibujada
+// al aplicarse el metodo dibujar de la celda
 void Celda::asignar_animacion(Textura *tex, Animacion *anim){
   animacion->asignar_animacion(anim, tex);
 }
 
-//
+// Indica a la celda que esta seleccionada, las celdas seleccionadas
+// dibujaran una textura de seleccion, ademas de la animacion.
 void Celda::seleccionar(Textura *tex){
   seleccion = tex;
 }
 
-//
+// Indica a la cenda que no esta seleccionada, para asi dejar
+// de dibujar la textura de seleccion
 void Celda::quitar_seleccion(){
   seleccion = NULL;
 }
 
-//
+// Asigna la posicion en la ventana en la que estara la celda.
 void Celda::asignar_posicion(SDL_Rect &rect){
   animacion->posicion_actual(rect);
 }
 
-//
+// Intercambia el contenido de las celdas, utilizando los metodos
+// mover de sus respectivas animaciones
 bool Celda::intercambiar(Celda* otra_celda, int salto){
   if (!otra_celda) return false;
   
@@ -59,7 +63,7 @@ bool Celda::intercambiar(Celda* otra_celda, int salto){
   return true;
 }
 
-//
+// Dibuja la celda en la ventana, en la ubicacion preestablecida
 bool Celda::dibujar(Ventana* ventana){
   if (seleccion){
     SDL_Rect pos_actual = animacion->ver_posicion_actual();
@@ -68,20 +72,24 @@ bool Celda::dibujar(Ventana* ventana){
   return animacion->dibujar(ventana);
 }
 
-//
+// Quita la textura de la celda, para asi dibujarla vacia
 void Celda::quitar_textura(){
   animacion->quitar_textura();
 }
 
+ // Mueve el contenido de la celda a la ubicacion destino ingresada
 void Celda::mover(SDL_Rect &destino, int salto){
   animacion->mover(destino, salto);
 }
 
+// Devuelve true si la animacion de la celda aun no llego a destino
+// caso contrario retorna false
 bool Celda::movimientos_pendientes(){
   return animacion->movimientos_pendientes();
 }
 
-//
+// Devuelve true si la celda esta seleccionada, caso contrario retorna
+// false
 bool Celda::seleccionada(){
   return (seleccion != NULL);
 }
@@ -90,7 +98,7 @@ bool Celda::seleccionada(){
  *                            MATRIZ
  * ********************************************************************/
 
-//
+// Constructor de clase
 Matriz::Matriz(){
   celdas = NULL;
   filas = 0;
@@ -103,7 +111,7 @@ Matriz::Matriz(){
   celda_seleccionada = NULL;
 }
 
-//
+// Destructor de clase
 Matriz::~Matriz(){
   if (celdas){
     for (int x = 0; x < columnas; x++){
@@ -116,7 +124,11 @@ Matriz::~Matriz(){
   }
 }
 
-//
+// Define la forma de la matriz, se tomaran como celdas los puntos
+// en donde el parametro estructura contenga '1' y huecos para otro
+// caracter.
+// Recibe la cantidad de celdas y columnas en el parametro dimension.
+// Y el formato de la celda correspondiente a los subindices 0,0
 void Matriz::definir_forma(char **estructura, coordenada_t &dimension, SDL_Rect &celda){
   primer_celda = celda;
   columnas = dimension.x;
@@ -133,7 +145,8 @@ void Matriz::definir_forma(char **estructura, coordenada_t &dimension, SDL_Rect 
   }
 }
 
-//
+// Inserta la Animacion con su correspondiente textura en la celda
+// con la coordenada ingresada por parametro
 void Matriz::insertar(Textura *tex, Animacion *anim, coordenada_t &celda){
   if (!celdas[celda.x][celda.y]) return;
   SDL_Rect destino;
@@ -145,7 +158,8 @@ void Matriz::insertar(Textura *tex, Animacion *anim, coordenada_t &celda){
   celdas[celda.x][celda.y]->asignar_posicion(destino);
 }
 
-//
+// Indica a la celda cuya ubicacion es recibida por parametro
+// que esta seleccionada
 void Matriz::seleccionar(Textura *tex, coordenada_t &celda){
   if (celda.x < 0 || celda.x > columnas || celda.y < 0 || celda.y > filas) return;
   
@@ -161,7 +175,7 @@ void Matriz::seleccionar(Textura *tex, coordenada_t &celda){
   }
 }
 
-//
+// Quita la seleccion a la selda previamente seleccionada.
 void Matriz::quitar_seleccion(){
   if (!celda_seleccionada) return;
   celdas[celda_seleccionada->x][celda_seleccionada->y]->quitar_seleccion();
@@ -169,7 +183,9 @@ void Matriz::quitar_seleccion(){
   celda_seleccionada = NULL;
 }
 
-//
+// Intercambia el contenido entre las celdas de coordenadas ingresadas
+// por parametro, originando un movimiento de las animaciones
+// de las celdas, hasta llegar a su destino.
 bool Matriz::intercambiar(coordenada_t &celda1, coordenada_t &celda2){
   Celda *primera_celda = celdas[celda1.x][celda1.y];
   Celda *segunda_celda = celdas[celda2.x][celda2.y];
@@ -182,7 +198,8 @@ bool Matriz::intercambiar(coordenada_t &celda1, coordenada_t &celda2){
   return exito;
 }
 
-//
+// Apila la animacion en la columna ingresada, corriendo
+// todas las animaciones de la columna hasta la fila ingresada.
 bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
   if (!celdas[celda.x][celda.y]) return false;
   celdas[celda.x][celda.y]->quitar_textura();
@@ -221,7 +238,8 @@ bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
   return true;
 }
 
-//
+// Dibuja en el espacio de cada celda, la superficie fondo celda
+// sobre la superficie fondo
 bool Matriz::dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Superficie *fondo){
   if (!celdas) return false;
   
@@ -243,7 +261,7 @@ bool Matriz::dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Supe
   return true;
 }
 
-//
+// Dibuja la matriz en la ventana ingresada
 bool Matriz::dibujar(Ventana *ventana){
   if (!celdas || !ventana) return false;
   
@@ -267,12 +285,15 @@ bool Matriz::dibujar(Ventana *ventana){
   return true;
 }
 
-//
+// Devuelve true si se encuentran animaciones en movimiento, caso
+// contrario retorna false
 bool Matriz::esta_ocupada(){
   return ocupada;
 }
 
-//
+// devuelve true si alguna celda adyacente a la celda ingresada por parametro
+// esta seleccionada, de ser así, ingresa sus coordenadas en el parametro
+// celda_adyacente. Caso contrario retorna false.
 bool Matriz::adyacente_seleccionado(coordenada_t &celda, coordenada_t &celda_adyacente){
   if (!celda_seleccionada || celda.x < 0 || celda.x > columnas || celda.y < 0 || celda.y > filas) return false;
   if (celda.x + 1 == celda_seleccionada->x && celda.y == celda_seleccionada->y){
@@ -298,7 +319,8 @@ bool Matriz::adyacente_seleccionado(coordenada_t &celda, coordenada_t &celda_ady
   return false;
 }
 
-//
+// devuelve true si existe la celda de coordenadas ingresadas
+// por parametro, caso contrario retorna false
 bool Matriz::celda_existente(coordenada_t &celda){
   if (celda.x < 0 || celda.x > columnas || celda.y < 0 || celda.y > filas) return false;
   return celdas[celda.x][celda.y] != NULL;

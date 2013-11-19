@@ -3,20 +3,20 @@
 
 #define FPS_EXPLOSION 15.0f
 
-//
+// Constructor de clase
 Explosion::Explosion(){
   animacion = NULL;
   textura = NULL;
   en_curso = false;
 }
 
-//
+// Destructor de clase
 Explosion::~Explosion(){
   if (textura) delete textura;
   if (animacion) delete animacion;
 }
 
-//
+// Carga la animacion a ser ejecutada
 void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
   SpritePos_t exp;
   SDL_Rect SrcE;
@@ -49,24 +49,25 @@ void Explosion::cargar_animacion(const std::string &path, Ventana *ventana){
   animacion->establecer_fps(FPS_EXPLOSION);
 }
 
-//
+    // Inserta la animacion asignada anteriormente, en la matriz en
+    // la posicion ingresada por parametro
 void Explosion::explotar(coordenada_t &celda, Matriz* tablero){
   animacion->reiniciar();
   en_curso = true;
   tablero->insertar(textura, animacion, celda);
 }
 
-//
+// Devuelve true si se esta realizando una explosion en el tablero
 bool Explosion::explosion_en_curso(){
   return en_curso;
 }
 
-//
+// Devuelve true si la explosion finalizo
 bool Explosion::finalizada(){
   return animacion->fuera_del_sprite();
 }
 
-//
+// Actualiza la animacion de la explosion
 void Explosion::animar(){
   if (animacion->fuera_del_sprite()){
     en_curso = false;

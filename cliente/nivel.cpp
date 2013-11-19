@@ -304,7 +304,7 @@ void Nivel::actualizar_receptor(){
         origen.y = primero.valor2;
         destino.x = segundo.valor1;
         destino.y = segundo.valor2;
-        if (Nivel::validar_coordenada(origen) && Nivel::validar_coordenada(destino))
+        if (tablero->celda_existente(origen) && tablero->celda_existente(destino)) //      Nivel::validar_coordenada(origen) && Nivel::validar_coordenada(destino))
           Nivel::intercambiar(origen, destino);
         break;
       case EXPLOTAR:

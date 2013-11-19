@@ -5,22 +5,17 @@
  
 class FPS { 
   public:
-    //
+    // Constructor de clase
     FPS();
     
-    //
+    // Actualiza la cantidad de frames contados en el ultimo segundo
     void actualizar();
 
-    //
+    // Devuelve la cantidad de frames en el ultimo segundo
     int ver_fps();
-
-    //
-    float ver_factor_velocidad();
 
   private:
     unsigned int OldTime;
-    unsigned int LastTime;
-    float SpeedFactor;
     unsigned int NumFrames;
     unsigned int Frames;
 };
