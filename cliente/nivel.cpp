@@ -223,12 +223,11 @@ bool Nivel::analizar_evento(SDL_Event &evento){
       celda.y < tablero->numero_filas())
       
       if (tablero->celda_existente(celda)){
-        Mix_PlayChannel(-1, sonido, 0); // FALTA DEFINIR CLASE SONIDO
         if(evento.button.button == SDL_BUTTON_LEFT){
           coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
             Nivel::intercambiar(celda, celda_adyacente);
-           // Nivel::enviar_movimiento(celda, celda_adyacente);
+            Nivel::enviar_movimiento(celda, celda_adyacente);
           }else{
             tablero->seleccionar(seleccion, celda);
           }
@@ -278,6 +277,7 @@ int Nivel::calcular_delay(FPS &frames){
 //
 void Nivel::intercambiar(coordenada_t &origen, coordenada_t &destino){
   tablero->intercambiar(origen, destino);
+  Mix_PlayChannel(-1, sonido, 0);
 }
 
 //
@@ -289,6 +289,7 @@ void Nivel::apilar(int tipo, int color, coordenada_t &celda){
 void Nivel::explotar(coordenada_t &celda, int tipo, int color){
   explosion->explotar(celda, tablero);
   celdas_vacias->agregar(celda, tipo, color);
+  Mix_PlayChannel(-1, sonido, 0);
 }
 
 //
@@ -304,8 +305,9 @@ void Nivel::actualizar_receptor(){
         origen.y = primero.valor2;
         destino.x = segundo.valor1;
         destino.y = segundo.valor2;
-        if (tablero->celda_existente(origen) && tablero->celda_existente(destino)) //      Nivel::validar_coordenada(origen) && Nivel::validar_coordenada(destino))
+        if (tablero->celda_existente(origen) && tablero->celda_existente(destino)){
           Nivel::intercambiar(origen, destino);
+        }
         break;
       case EXPLOTAR:
         tablero->quitar_seleccion();
