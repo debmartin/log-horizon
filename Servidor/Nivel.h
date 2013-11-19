@@ -8,7 +8,7 @@
 
 class Nivel{
     public:
-        Nivel();
+        Nivel(Dimension& tam, char** estructura, int max_puntos);
         virtual ~Nivel();
         void agregarJugador(std::string& nombre);
         void imprimirTablero();
@@ -19,7 +19,8 @@ class Nivel{
         int puntaje_max;
         Lista<Dimension*>* modificados;
         Tablero* tablero;
-        Hash<Jugador*>* jugadores;
+//        Hash<Jugador*>* jugadores;
+        Jugador* jugador;
 };
 
 #endif // NIVEL_H

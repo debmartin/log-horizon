@@ -11,6 +11,7 @@ class Jugador{
         int getPuntaje() { return puntaje; }
         bool sumarPuntos();
         Jugada* obtenerJugada();
+        void terminarJugada();
     protected:
     private:
         std::string* id;

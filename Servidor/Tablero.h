@@ -8,7 +8,7 @@
 
 class Tablero : public Matriz<Celda>{
     public:
-        Tablero(int tam);
+        Tablero(Dimension& tam, char** estructura);
         virtual ~Tablero();
         void imprimir();
         bool intercambiar(Jugada* nueva_jugada);

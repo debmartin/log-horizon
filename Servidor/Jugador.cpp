@@ -10,15 +10,20 @@ Jugador::~Jugador(){
     delete id;
 }
 
-//Jugada* Jugador::obtenerJugada(){
-//    Jugada* nueva_jugada = new Jugada(pos1, pos2);
-//    jugada_actual = nueva_jugada;
-//    return nueva_jugada;
-//}
+Jugada* Jugador::obtenerJugada(){
+    Jugada* nueva_jugada = new Jugada(pos1, pos2);
+    jugada_actual = nueva_jugada;
+    return nueva_jugada;
+}
 
 bool Jugador::sumarPuntos(){
     if (! jugada_actual)
      return false;
     puntaje += jugada_actual->verPuntos();
     return true;
+}
+
+void Jugador::terminarJugada(){
+    delete jugada_actual;
+    jugada_actual = NULL;
 }

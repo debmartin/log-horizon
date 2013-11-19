@@ -7,15 +7,15 @@
 template <class U>
 class Matriz{
     public:
-        Matriz(int tam);
+        Matriz(Dimension& tam);
         virtual ~Matriz();
-        int getTamanio() { return tamanio; }
+        Dimension getTamanio() { return *tamanio; }
         U getCelda(int i, int j);
         bool intercambiar(Dimension& una, Dimension& otra);
         U* operator[](int i);
         U& operator[](Dimension& pos);
     protected:
-        int tamanio;
+        Dimension* tamanio;
     private:
         U** tabla;
 };
@@ -24,26 +24,28 @@ class Matriz{
 
 
 template <class U>
-Matriz<U>::Matriz(int tam) : tamanio(tam){
-    tabla = new U*[tam];
-    for(int i=0; i<tam; i++){
-        tabla[i] = new U[tam];
+Matriz<U>::Matriz(Dimension& tam){
+    tamanio = new Dimension(tam);
+    tabla = new U*[tam.x()];
+    for(int i=0; i < tam.x(); i++){
+        tabla[i] = new U[tam.y()];
     }
 }
 
 template <class U>
 Matriz<U>::~Matriz(){
-    for(int i=0; i<tamanio; i++){
+    for(int i=0; i < tamanio->x(); i++){
         delete tabla[i];
     }
     delete tabla;
+    delete tamanio;
 }
 
 template <class U>
 bool Matriz<U>::intercambiar(Dimension& una, Dimension& otra){
     if ((! una.esValida()) || (! otra.esValida()))
         return false;
-    if (una.x() >= tamanio || una.y() >= tamanio || otra.y() >= tamanio || otra.x() >= tamanio)
+    if (una.x() >= tamanio->x() || una.y() >= tamanio->y() || otra.y() >= tamanio->y() || otra.x() >= tamanio->x())
         return false;
 
     U aux = tabla[una.x()][una.y()];
@@ -55,21 +57,21 @@ bool Matriz<U>::intercambiar(Dimension& una, Dimension& otra){
 
 template <class U>
 U Matriz<U>::getCelda(int i, int j){
-    if ((i >= tamanio) || (j >= tamanio)) throw FueraDeRango();
+    if ((i >= tamanio->x()) || (j >= tamanio->y())) throw FueraDeRango();
 
     return tabla[i][j];
 }
 
 template <class U>
 U* Matriz<U>::operator[](int i){
-    if (i >= tamanio) throw FueraDeRango();
+    if (i >= tamanio->x()) throw FueraDeRango();
 
     return tabla[i];
 }
 
 template <class U>
 U& Matriz<U>::operator[](Dimension& pos){
-    if ((pos.y() >= tamanio) || (pos.x() >= tamanio))
+    if ((pos.y() >= tamanio->y()) || (pos.x() >= tamanio->x()))
         throw FueraDeRango();
 
     return tabla[pos.x()][pos.y()];
