@@ -1,6 +1,9 @@
 #include "Celda.h"
-#include <iostream>
+#include <ctime>
+
 char rand_color(){
+    srand(time(NULL));
+
     switch (rand() % 5) {
         case 0:
             return ROJO;

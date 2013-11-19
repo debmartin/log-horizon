@@ -2,6 +2,7 @@
 #define MATRIZ_H
 #include "dimension.h"
 #include <iostream>
+#include "FueraDeRango.h"
 
 template <class U>
 class Matriz{
@@ -54,14 +55,14 @@ bool Matriz<U>::intercambiar(Dimension& una, Dimension& otra){
 
 template <class U>
 U Matriz<U>::getCelda(int i, int j){
-    if ((i >= tamanio) || (j >= tamanio)) throw "Fuera de rango";
+    if ((i >= tamanio) || (j >= tamanio)) throw FueraDeRango();
 
     return tabla[i][j];
 }
 
 template <class U>
 U* Matriz<U>::operator[](int i){
-    if (i >= tamanio) throw "Fuera de rango";
+    if (i >= tamanio) throw FueraDeRango();
 
     return tabla[i];
 }
@@ -69,7 +70,7 @@ U* Matriz<U>::operator[](int i){
 template <class U>
 U& Matriz<U>::operator[](Dimension& pos){
     if ((pos.y() >= tamanio) || (pos.x() >= tamanio))
-        throw "Fuera de rango";
+        throw FueraDeRango();
 
     return tabla[pos.x()][pos.y()];
 }

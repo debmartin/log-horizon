@@ -3,7 +3,7 @@
 Jugada::Jugada(Dimension& principio, Dimension& fin) : puntos(0){
     pos1 = new Dimension(principio);
     pos2 = new Dimension(fin);
-    borrados = new Lista<Dimension*>(true);
+    borrados = new Cola<Dimension*>(true);
 }
 
 Jugada::~Jugada(){
@@ -40,5 +40,5 @@ void Jugada::agregarBorrado(Dimension* pos){
 }
 
 Dimension* Jugada::obtenerProxBorrado(){
-    return borrados->borrarPrimero();
+    return borrados->desencolar();
 }

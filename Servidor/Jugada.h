@@ -3,7 +3,7 @@
 
 #include "dimension.h"
 #include "Constantes.h"
-#include "Lista.h"
+#include "Cola.h"
 
 class Jugada {
     public:
@@ -20,7 +20,7 @@ class Jugada {
         int puntos;
         Dimension* pos1;
         Dimension* pos2;
-        Lista<Dimension*>* borrados;
+        Cola<Dimension*>* borrados;
 };
 
 #endif // JUGADA_H

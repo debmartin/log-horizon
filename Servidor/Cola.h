@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "FueraDeRango.h"
 
 template <class T>
 class NodoCola {
@@ -30,7 +31,7 @@ class Cola {
         ~Cola();
         bool esVacia();
         void encolar(const U& valor);
-        U& desencolar();
+        U desencolar();
         U verPrimero();
         Cola<U>& operator+=(const U& dato);
         Cola<U>& operator+=(const Cola<U>& otra);
@@ -60,7 +61,7 @@ Cola<U>::Cola(bool destruir) :
 template <class U>
 Cola<U>::~Cola(){
 	while (! esVacia()) {
-		U& dato = desencolar();
+		U dato = desencolar();
 		if (destruirDato)
             delete dato;
 	}
@@ -85,15 +86,15 @@ void Cola<U>::encolar(const U& valor){
 
 template <class U>
 U Cola<U>::verPrimero(){
-	if (esVacia()) return NULL;
+	if (esVacia()) throw FueraDeRango();
 	return nodoPrim->dato;
 }
 
 template <class U>
-U& Cola<U>::desencolar(){
-	if (esVacia()) return NULL;
+U Cola<U>::desencolar(){
+	if (esVacia()) throw FueraDeRango();
 
-	U& dato = verPrimero();
+	U dato = verPrimero();
 	NodoCola<U>* nodoIn = nodoPrim;
 	nodoPrim = nodoPrim->nodoSig;
 	delete nodoIn;

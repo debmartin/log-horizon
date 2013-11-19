@@ -2,8 +2,8 @@
 #define LISTA_H
 
 #include <iostream>
+#include "FueraDeRango.h"
 
-enum errorLista {POSICION_INVALIDA};
 
 template <class> class Lista;
 template <class> class ListaIter;
@@ -69,7 +69,7 @@ class Lista {
          * Pre: la lista fue creada.
          * Post: se elimina el dato que se encontraba en la posición actual y
          * lo devuelve.
-         * Si la lista es vacía, lanza una excepcion de tipo POSICION_INVALIDA.
+         * Si la lista es vacía, lanza una excepcion de tipo FueraDeRango.
          */
         U borrarPrimero();
         /* Elimina el elemento de la posición actual.
@@ -77,12 +77,12 @@ class Lista {
          * Post: Se elimina el dato que se encontraba en la posición actual
          * indicada por el iterador y se lo devuelve.
          * Si el iterador está al final de la lista, lanza una excepcion de tipo
-         * POSICION_INVALIDA.*/
+         * FueraDeRango.*/
         U borrar(ListaIter<U>* iter);
         /* Devuelve el primer dato.
          * Pre: La lista fue creada.
          * Post: Si la lista es vacía lanza una excepcion de tipo
-         * POSICION_INVALIDA. */
+         * FueraDeRango. */
         U verPrimero();
         /* Define si se deben destruir los datos junto con la lista.
          * Pre: La lista fue creada.*/
@@ -120,7 +120,7 @@ class ListaIter {
         /* El iterador avanza una posición en la lista.
          * Pre: el iterador fue creado.
          * Post: se avanzó la posición actual en el iterador. Si estaba al
-         * final de la lista, lanza una excepcion de tipo POSICION_INVALIDA.*/
+         * final de la lista, lanza una excepcion de tipo FueraDeRango.*/
         bool avanzar();
         /* Devuelve el elemento actual del iterador.
          * Pre: el iterador fue creado.*/
@@ -203,7 +203,7 @@ void Lista<U>::insertarUltimo(const U& dato){
 
 template <class U>
 U Lista<U>::borrarPrimero(){
-    if (esVacia()) throw POSICION_INVALIDA;
+    if (esVacia()) throw FueraDeRango();
 
     NodoLista<U>* aux = primero;
     U valor = aux->dato;
@@ -234,7 +234,7 @@ void Lista<U>::insertar(ListaIter<U>* iter, U& dato){
 
 template <class U>
 U Lista<U>::borrar(ListaIter<U>* iter){
-    if (iter->alFinal()) throw POSICION_INVALIDA;
+    if (iter->alFinal()) throw FueraDeRango();
 
     NodoLista<U>* aux = iter->actual;
     U valor = aux->dato;
@@ -300,7 +300,7 @@ bool ListaIter<W>::avanzar(){
 
 template <class W>
 W ListaIter<W>::verActual(){
-    if (this->alFinal()) throw POSICION_INVALIDA;
+    if (this->alFinal()) throw FueraDeRango();
     return actual->dato;
 }
 
