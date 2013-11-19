@@ -17,8 +17,10 @@ Nivel::Nivel(){
   explosion = new Explosion;
   celdas_vacias = new CeldasVacias;
   productos = new Productos;
+  receptor = new ReceptorResultados;
+  celdas_a_explotar = new Lista<reemplazo_t>;
   socket_enviar = NULL;
-  socket_recibir = NULL;
+  
 }
 
 //
@@ -30,11 +32,20 @@ Nivel::~Nivel(){
   delete explosion;
   delete celdas_vacias;
   delete productos;
+  delete receptor;
+  delete celdas_a_explotar;
 }
 
 //
 void Nivel::inicializar_datos(const std::string &path, Ventana *ventana, 
-                              int ancho, int alto){
+                              int ancho, int alto, Socket* enviar, Socket* recibir){
+                                
+  // SOCKETS
+  receptor->agregar_socket(recibir);
+  receptor->correr();
+  socket_enviar = enviar;
+  
+  // FONDOS
   Superficie *fondo_sup = new Superficie;
   fondo_sup->cargar(path + "imagenes/fondo.png");
   fondo_sup->escalar(ancho,alto);
@@ -129,15 +140,11 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
 }
 
 //
-void Nivel::asignar_sockets(Socket* enviar, Socket* recibir){
-  socket_recibir = recibir;
-  socket_enviar = enviar;
-}
-
-//
-void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alto){
+void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir){
   // Inicializacion
-  Nivel::inicializar_datos(path, ventana, ancho, alto);
+
+  Nivel::inicializar_datos(path, ventana, ancho, alto, enviar, recibir);
+
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -149,23 +156,22 @@ void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alt
     while (SDL_PollEvent(&evento)){
       corriendo = Nivel::analizar_evento(evento);
     }
-    
-    // realizar accion de la cola que verifica si la cola esta vacia
-    
+    // realizamos resultados recibidos por el servidor
+    Nivel::actualizar_receptor();
     // Dibujado
     ventana->limpiar();
     Nivel::dibujar(ventana);
-    
     // Actualizacion
     Nivel::actualizar_animaciones();
-    
+    // actualizamos los fps
     if (SDL_GetTicks() - tiempo_actual < 1000){
       delay = Nivel::calcular_delay(frames);
     }
-    
     // Presentar en ventana
     ventana->presentar(delay);
   }
+  receptor->finalizar();
+  receptor->join();
 }
 
 //
@@ -173,7 +179,8 @@ bool Nivel::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){ 
     return false;
     
-  }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso()){ // && cola_vacia && !recibiendo_datos
+  }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso() && 
+            receptor->cola_vacia() && !receptor->recibiendo_datos()){
     if (evento.type == SDL_MOUSEBUTTONDOWN){
       coordenada_t celda;
       celda.x = (evento.button.x - POS_X) / ancho_celda;
@@ -189,9 +196,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
           coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
             Nivel::intercambiar(celda, celda_adyacente);
-            
-            // ENVIAR MOVIMIENTO AL SERVIDOR, Y GUARDAR EL MOVIMIENTO REALIZADO
-          
+//          Nivel::enviar_movimiento(celda, celda_adyacente);
           }else{
             tablero->seleccionar(seleccion, celda);
           }
@@ -252,4 +257,57 @@ void Nivel::apilar(int tipo, int color, coordenada_t &celda){
 void Nivel::explotar(coordenada_t &celda, int tipo, int color){
   explosion->explotar(celda, tablero);
   celdas_vacias->agregar(celda, tipo, color);
+}
+
+//
+void Nivel::actualizar_receptor(){
+  if (!receptor->cola_vacia()){
+    dato_t primero;
+    dato_t segundo;
+    char tipo;
+    tipo = receptor->borrar_siguiente(primero, segundo);
+    switch(tipo){
+      case 0:
+        coordenada_t origen, destino;
+        origen.x = primero.valor1;
+        origen.y = primero.valor2;
+        destino.x = segundo.valor1;
+        destino.y = segundo.valor2;
+        Nivel::intercambiar(origen, destino);
+        break;
+      case 1:
+        tablero->quitar_seleccion();
+        int tipo = segundo.valor1;
+        int color = segundo.valor2;
+        coordenada_t celda;
+        celda.x = primero.valor1;
+        celda.y = primero.valor2;
+        reemplazo_t datos;
+        datos.tipo = tipo;
+        datos.color = color;
+        datos.celda = celda;
+        celdas_a_explotar->insertar_ultimo(datos);
+        break;
+    }
+    if (tipo != 1 && !celdas_a_explotar->esta_vacia()){
+      reemplazo_t datos;
+      do{
+        datos = celdas_a_explotar->borrar_primero();
+        Nivel::explotar(datos.celda, datos.tipo, datos.color);
+      }while (!celdas_a_explotar->esta_vacia());
+    }
+  }
+}
+
+void Nivel::enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente){
+  resultado_t movimiento;
+  dato_t primero, segundo;
+  primero.valor1 = celda.x;
+  primero.valor2 = celda.y;
+  segundo.valor1 = celda_adyacente.x;
+  segundo.valor2 = celda_adyacente.y;
+  movimiento.tipo = 0;
+  movimiento.primero = primero;
+  movimiento.segundo = segundo;
+ // socket_enviar->enviar(&movimiento , sizeof(resultado_t));
 }

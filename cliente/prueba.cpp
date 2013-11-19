@@ -8,6 +8,14 @@
 #define ALTO 600
 
 int main(void){
+  //Socket *socket_emisor = new Socket;
+  Socket *socket_receptor = new Socket;
+  socket_receptor->asignar_direccion(8010, "127.0.0.1");
+  if (socket_receptor->conectar() == -1){
+    delete socket_receptor;
+    return 1;
+  }
+  
   SDL libreria = SDL(SDL_INIT_EVERYTHING);
   libreria.habilitar_sonido(44100, MIX_DEFAULT_FORMAT, 2, 4096);
   Ventana *ventana = new Ventana;
@@ -16,10 +24,9 @@ int main(void){
   
   Nivel *nivel = new Nivel;
   
-  // FALTA PASARLE LOS SOCKETS
-  
-  nivel->correr("nivel1/", ventana, ANCHO, ALTO);
+  nivel->correr("nivel1/", ventana, ANCHO, ALTO, NULL, socket_receptor);
   delete nivel;
+  delete socket_receptor;
   
   return 0;
 }

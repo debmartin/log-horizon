@@ -8,6 +8,7 @@
 #include "celdas_vacias.h"
 #include "productos.h"
 #include "socket.h"
+#include "receptor_resultados.h"
 
 
 class Nivel{
@@ -19,13 +20,10 @@ class Nivel{
     ~Nivel();
     
     //
-    void asignar_sockets(Socket* enviar, Socket* recibir);
-    
-    //
-    void correr(const std::string &path, Ventana *ventana, int ancho, int alto);
+    void correr(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir);
   
     //
-    void inicializar_datos(const std::string &path, Ventana *ventana, int ancho, int alto);
+    void inicializar_datos(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir);
     
     //
     void dibujar(Ventana *ventana);
@@ -45,9 +43,9 @@ class Nivel{
     Textura *seleccion;
     int ancho_celda;
     int alto_celda;
-    
+    ReceptorResultados *receptor;
     Socket *socket_enviar;
-    Socket *socket_recibir;
+    Lista<reemplazo_t> *celdas_a_explotar;
     
     Mix_Chunk *sonido;
     
@@ -65,7 +63,10 @@ class Nivel{
     void explotar(coordenada_t &celda, int tipo, int color);
     
     //
-    // metodo que realiza la accion de la cola
+    void actualizar_receptor();
+    
+    //
+    void enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente);
     
 };
 

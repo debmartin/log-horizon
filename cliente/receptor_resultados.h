@@ -28,9 +28,6 @@ class ReceptorResultados : public Thread{
     void agregar_socket(Socket *nuevo_socket);
     
     //
-    void agregar_mutex(Mutex *nuevo_mutex);
-
-    //
     void funcion_a_correr();
   
     //
@@ -41,6 +38,9 @@ class ReceptorResultados : public Thread{
     
     //
     char borrar_siguiente(dato_t &primer_dato, dato_t &segundo_dato);
+    
+    //
+    char ver_siguiente();
     
     //
     void finalizar();
