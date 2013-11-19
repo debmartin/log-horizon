@@ -4,36 +4,36 @@
 #include <math.h>
 #include <arpa/inet.h>
 
-#include "cola_resultados.h"
+#include "receptor_resultados.h"
 
 #define PUNTAJE 3
 
 // Constructor de la clase.
-ColaResultados::ColaResultados(){
+ReceptorResultados::ReceptorResultados(){
   cola = new Lista<resultado_t>;
-  recibiendo_datos = false;
+  recibiendo = false;
   seguir = true;
   socket = NULL;
   mutex = NULL;
 }
 
 // Destructor de la clase
-ColaResultados::~ColaResultados(){
+ReceptorResultados::~ReceptorResultados(){
   delete cola;
 }
 
 //
-void ColaResultados::agregar_socket(Socket *nuevo_socket){
+void ReceptorResultados::agregar_socket(Socket *nuevo_socket){
   socket = nuevo_socket;
 }
 
 //
-void ColaResultados::agregar_mutex(Mutex *nuevo_mutex){
+void ReceptorResultados::agregar_mutex(Mutex *nuevo_mutex){
   mutex = nuevo_mutex;
 }
 
 //
-void ColaResultados::funcion_a_correr(){
+void ReceptorResultados::funcion_a_correr(){
   if (!socket || !mutex) return;
   mutex->bloquear();
   while (seguir){
@@ -42,26 +42,26 @@ void ColaResultados::funcion_a_correr(){
     socket->recibir(&actual , sizeof(resultado_t));
     
     mutex->bloquear();
-    recibiendo_datos = true;
+    recibiendo = true;
     cola->insertar_ultimo(actual);
-    if (actual.tipo == PUNTAJE) recibiendo_datos = false;
+    if (actual.tipo == PUNTAJE) recibiendo = false;
   }
 }
 
 //
-bool ColaResultados::recibiendo_datos(){
+bool ReceptorResultados::recibiendo_datos(){
   mutex->bloquear();
-  return recibiendo_datos;
+  return recibiendo;
   mutex->desbloquear();
 }
 
 //
-bool ColaResultados::cola_vacia(){
-  return lista->esta_vacia();
+bool ReceptorResultados::cola_vacia(){
+  return cola->esta_vacia();
 }
 
 //
-char ColaResultados::borrar_siguiente(dato_t &primer_dato, dato_t &segundo_dato){
+char ReceptorResultados::borrar_siguiente(dato_t &primer_dato, dato_t &segundo_dato){
   mutex->bloquear();
   resultado_t aux = cola->borrar_primero();
   mutex->desbloquear();
@@ -71,7 +71,7 @@ char ColaResultados::borrar_siguiente(dato_t &primer_dato, dato_t &segundo_dato)
 }
 
 //
-void ColaResultados::finalizar(){
+void ReceptorResultados::finalizar(){
   mutex->bloquear();
   seguir = false;
   mutex->desbloquear();

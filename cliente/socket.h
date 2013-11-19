@@ -15,7 +15,7 @@ class Socket{
     virtual ~Socket();
     
     // Asigna una direccion ip y un puerto al socket, ingresados por parametro.
-    void asignar_direccion(const int puerto, const char *op);
+    void asignar_direccion(const int puerto, const char *ip);
     
     // Asigna una direccion ip y un puerto al socket, ingresados por parametro.
     void asignar_direccion(const int puerto, in_addr_t ip = INADDR_ANY);

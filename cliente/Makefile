@@ -1,7 +1,7 @@
 #Compilador
 CC = g++
 #Opciones usadas para compilar
-CFLAGS = -Wall -pedantic -std=c++98 -g -lSDL2 -lSDL2_mixer -lSDL2_image
+CFLAGS = -Wall -pedantic -std=c++98 -g -lSDL2 -lSDL2_mixer -lSDL2_image -pthread
 #Nombre del programa principal
 CEXE = prueba
 
@@ -40,9 +40,18 @@ celdas_vacias.o: celdas_vacias.h celdas_vacias.cpp
 
 productos.o: productos.h productos.cpp
 	$(CC) $(CFLAGS) -c productos.cpp
+	
+receptor_resultados.o: receptor_resultados.h receptor_resultados.cpp
+	$(CC) $(CFLAGS) -c receptor_resultados.cpp
 
-$(CEXE): ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o $(CEXE).cpp -o $(CEXE)
+socket.o: socket.h socket.cpp
+	$(CC) $(CFLAGS) -c socket.cpp
+	
+thread.o: thread.h thread.cpp
+	$(CC) $(CFLAGS) -c thread.cpp
+
+$(CEXE): ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
+	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
 
 
 clean:

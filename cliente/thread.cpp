@@ -1,4 +1,4 @@
-#include "server-thread.h"
+#include "thread.h"
 #include <pthread.h>
 
 // Deja al hilo principal a la espera, hasta que el thread 

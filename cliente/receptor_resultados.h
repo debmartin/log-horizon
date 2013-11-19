@@ -47,7 +47,7 @@ class ReceptorResultados : public Thread{
     
   private:
     Lista<resultado_t> *cola;
-    bool recibiendo_datos;
+    bool recibiendo;
     Socket *socket;
     Mutex *mutex;
     bool seguir;
