@@ -53,6 +53,10 @@ thread.o: thread.h thread.cpp
 $(CEXE): ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
 	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
 
+prueba_enviar: receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp
+	$(CC) $(CFLAGS) receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp -o prueba_enviar
+
+
 
 clean:
 	-rm *.o
