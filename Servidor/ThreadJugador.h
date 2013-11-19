@@ -7,13 +7,12 @@
 
 class ThreadJugador : public Thread {
     public:
-        ThreadJugador(Jugador* nuevo_jugador);
+        ThreadJugador(EmisorResultados* emisor);
         virtual ~ThreadJugador();
     protected:
         virtual void funcion_a_correr();
     private:
-        Jugador* jugador;
-        Mutex* procesando_mutex;
+        EmisorResultados* emisor_res;
 };
 
 #endif // THREADJUGADOR_H

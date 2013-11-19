@@ -1,18 +1,12 @@
 #include "ThreadJugador.h"
 
-#define MILISEGUNDOS 6
-
-ThreadJugador::ThreadJugador(Jugador* nuevo) :
-    Thread(), jugador(nuevo) {
-    procesando_mutex = new Mutex();
+ThreadJugador::ThreadJugador(EmisorResultados* emisor) :
+    Thread(), emisor_res(emisor) {
 }
 
 ThreadJugador::~ThreadJugador(){
 }
 
 void ThreadJugador::funcion_a_correr(){
-//    while(true){
-//
-//        usleep(MILISEGUNDOS * 1000);
-//    }
+    emisor_res->funcion_a_correr();
 }

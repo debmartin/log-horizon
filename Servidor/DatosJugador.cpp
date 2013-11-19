@@ -1,4 +1,4 @@
-#include "DatosJugador.h"
+#include "Jugador.h"
 
 #define ENVIAR 0
 #define RECIBIR 1
@@ -26,7 +26,7 @@ DatosJugador::~DatosJugador(){
 
 void DatosJugador::crearJugador(string& nombre){
     jugador = new Jugador(nombre, sockets->enviar_cli, sockets->recibir_cli);
-    thread = new ThreadJugador(jugador);
+    thread = new ThreadJugador(jugador->emisor);
 }
 
 int DatosJugador::prepararSocket(int tipo, int puerto){
@@ -52,4 +52,55 @@ int DatosJugador::prepararSocketEnviar(){
 int DatosJugador::prepararSocketRecibir(){
     if(sockets) return 5;
     return prepararSocket(RECIBIR, puerto_recibir);
+}
+
+int DatosJugador::getPuntaje(){
+    return jugador->getPuntaje();
+}
+
+bool DatosJugador::sumarPuntos(){
+    return jugador->sumarPuntos();
+}
+
+Jugada* DatosJugador::obtenerJugada(){
+    return jugador->obtenerJugada();
+}
+
+bool DatosJugador::terminarJugada(){
+    return jugador->terminarJugada();
+}
+
+bool DatosJugador::recibirPar(){
+    return jugador->recibirPar();
+}
+
+bool DatosJugador::encolarBorrados(Tablero* tablero){
+    return jugador->enviarBorrados(tablero);
+}
+
+void DatosJugador::enviarBorrados(){
+    thread->correr();
+}
+
+void DatosJugador::cerrarJugador(){
+    thread->join();
+    Socket* sock_actual;
+
+    for(int i=0; i<4; i++){
+        switch (i){
+            case 0:
+                sock_actual = sockets->enviar;
+                break;
+            case 1:
+                sock_actual = sockets->enviar_cli;
+                break;
+            case 2:
+                sock_actual = sockets->recibir;
+                break;
+            case 3:
+                sock_actual = sockets->recibir_cli;
+        }
+        sock_actual->cerrar_enviar_recibir();
+        delete sock_actual;
+    }
 }

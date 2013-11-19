@@ -18,9 +18,19 @@ typedef struct parCoordenadas{
     char extra;
 } par_t;
 
+typedef struct socks{
+    Socket* enviar;
+    Socket* enviar_cli;
+    Socket* recibir;
+    Socket* recibir_cli;
+} sockets_jugador_t;
+
+class DatosJugador;
 
 class Jugador{
     public:
+        friend class DatosJugador;
+
         Jugador(std::string& nombre, Socket* enviar, Socket* recibir);
         virtual ~Jugador();
         int getPuntaje() { return puntaje; }
@@ -39,4 +49,27 @@ class Jugador{
         Mutex* mutex;
 };
 
+class DatosJugador{
+    public:
+        DatosJugador(int enviar, int recibir);
+        ~DatosJugador();
+        void crearJugador(std::string& nombre);
+        int prepararSocket(int tipo, int puerto);
+        int prepararSocketEnviar();
+        int prepararSocketRecibir();
+        int getPuntaje();
+        bool sumarPuntos();
+        Jugada* obtenerJugada();
+        bool terminarJugada();
+        bool recibirPar();
+        bool encolarBorrados(Tablero* tablero);
+        void enviarBorrados();
+        void cerrarJugador();
+    private:
+        int puerto_enviar;
+        int puerto_recibir;
+        Jugador* jugador;
+        ThreadJugador* thread;
+        sockets_jugador_t* sockets;
+};
 #endif // JUGADOR_H
