@@ -17,15 +17,11 @@ Jugador.o: Jugador.h Jugador.cpp
 	$(CC) $(CFLAGS) -c Jugador.cpp
 
 
-Matriz.o: Matriz.h Matriz.cpp
-	$(CC) $(CFLAGS) -c Matriz.cpp
-
-
 dimension.o: dimension.h dimension.cpp
 	$(CC) $(CFLAGS) -c dimension.cpp
 
 
-FueraDeRango.o: FueraDeRango.h mFueraDeRango.cpp
+FueraDeRango.o: FueraDeRango.h FueraDeRango.cpp
 	$(CC) $(CFLAGS) -c FueraDeRango.cpp
 
 
@@ -38,8 +34,23 @@ Nivel.o: Nivel.h Nivel.cpp
 Tablero.o: Tablero.h Tablero.cpp
 	$(CC) $(CFLAGS) -c Tablero.cpp
 
-$(CEXE): Celda.o Jugador.o Matriz.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o $(CEXE).cpp
-	$(CC) $(CFLAGS) Celda.o Jugador.o Matriz.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o $(CEXE).cpp -o $(CEXE)
+DatosJugador.o: DatosJugador.h DatosJugador.cpp
+	$(CC) $(CFLAGS) -c DatosJugador.cpp
+
+emisor_resultados.o: emisor_resultados.h emisor_resultados.cpp
+	$(CC) $(CFLAGS) -c emisor_resultados.cpp
+	
+thread.o: thread.h thread.cpp
+	$(CC) $(CFLAGS) -c thread.cpp
+	
+socket.o: socket.h socket.cpp
+	$(CC) $(CFLAGS) -c socket.cpp
+
+ThreadJugador.o: ThreadJugador.h ThreadJugador.cpp
+	$(CC) $(CFLAGS) -c ThreadJugador.cpp
+
+$(CEXE): Celda.o Jugador.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o emisor_resultados.o thread.o DatosJugador.o socket.o ThreadJugador.o $(CEXE).cpp
+	$(CC) $(CFLAGS) Celda.o Jugador.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o emisor_resultados.o thread.o DatosJugador.o socket.o ThreadJugador.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o
