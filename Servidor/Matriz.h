@@ -31,7 +31,7 @@ Matriz<U>::Matriz(Dimension& tam){
         tabla[i] = new U[tam.y()];
     }
 }
-
+/*
 template <class U>
 Matriz<U>::~Matriz(){
     for(int i=0; i < tamanio->x(); i++){
@@ -40,7 +40,7 @@ Matriz<U>::~Matriz(){
     delete tabla;
     delete tamanio;
 }
-
+*/
 template <class U>
 bool Matriz<U>::intercambiar(Dimension& una, Dimension& otra){
     if ((! una.esValida()) || (! otra.esValida()))
