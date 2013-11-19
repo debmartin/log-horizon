@@ -15,6 +15,7 @@ class Jugada {
         Dimension posicion2();
         void agregarBorrado(Dimension* pos);
         Dimension* obtenerProxBorrado();
+        bool sinBorrados();
     protected:
     private:
         int puntos;

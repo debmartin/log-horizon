@@ -5,6 +5,8 @@
 #include "Hash.h"
 #include "Jugador.h"
 #include <string>
+#include "DatosJugador.h"
+
 
 class Nivel{
     public:
@@ -14,13 +16,12 @@ class Nivel{
         void imprimirTablero();
         void jugar();
     protected:
+
     private:
         int puntaje_objetivo;
         int puntaje_max;
-        Lista<Dimension*>* modificados;
         Tablero* tablero;
-//        Hash<Jugador*>* jugadores;
-        Jugador* jugador;
+        DatosJugador* datos_jug;
 };
 
 #endif // NIVEL_H

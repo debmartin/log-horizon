@@ -42,3 +42,7 @@ void Jugada::agregarBorrado(Dimension* pos){
 Dimension* Jugada::obtenerProxBorrado(){
     return borrados->desencolar();
 }
+
+bool Jugada::sinBorrados(){
+    return borrados->esVacia();
+}
