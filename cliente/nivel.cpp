@@ -8,6 +8,11 @@
 #define POS_X 100 // posicion en x de la matriz
 #define POS_Y 100 // posicion de y en la matriz
 
+#define MOVER 0
+#define EXPLOTAR 1
+#define INSERTAR 2
+#define PUNTAJE -1
+
 //
 Nivel::Nivel(){
   fondo = NULL;
@@ -105,6 +110,32 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   // ANIMACIONES
   productos->cargar_animaciones(path,ventana);
   
+  /*
+  // RECIBIMOS LOS PRODUCTOS DE LA MATRIZ
+  dato_t primero;
+  dato_t segundo;
+  char accion;
+  bool continuar = true;
+  while (continuar){
+    if (!receptor->cola_vacia()){
+      accion = receptor->ver_siguiente();
+      if (accion == INSERTAR){
+        receptor->borrar_siguiente(primero, segundo);
+        coordenada_t celda;
+        celda.x = primero.valor1;
+        celda.y = primero.valor2;
+        int tipo = segundo.valor1;
+        int color = segundo.valor2;
+        Nivel::insertar(celda, tipo, color);
+      }else{
+        continuar = false;
+      }
+    }
+    ventana->presentar(10);
+  }
+  */
+  
+  // RECIBIR ESTOS DATOS DEL SERVIDOR
   for (int i = 0; i < dimension.x; i++){
     for (int z = 0; z < dimension.y; z++){
       coordenada_t coord;
@@ -113,7 +144,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       if (tablero->celda_existente(coord)){
 
 
-        // RECIBIR ESTOS DATOS DEL SERVIDOR
+        
         int color = rand() % 5;
         int tipo = rand() % 4;
 
@@ -124,6 +155,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       }
     }
   }
+  
   
   // TEXTURA DE SELECCION
   seleccion = new Textura;
@@ -196,7 +228,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
           coordenada_t celda_adyacente;
           if (tablero->adyacente_seleccionado(celda, celda_adyacente)){
             Nivel::intercambiar(celda, celda_adyacente);
-//          Nivel::enviar_movimiento(celda, celda_adyacente);
+           // Nivel::enviar_movimiento(celda, celda_adyacente);
           }else{
             tablero->seleccionar(seleccion, celda);
           }
@@ -264,32 +296,34 @@ void Nivel::actualizar_receptor(){
   if (!receptor->cola_vacia()){
     dato_t primero;
     dato_t segundo;
-    char tipo;
-    tipo = receptor->borrar_siguiente(primero, segundo);
+    char tipo = receptor->borrar_siguiente(primero, segundo);
     switch(tipo){
-      case 0:
+      case MOVER:
         coordenada_t origen, destino;
         origen.x = primero.valor1;
         origen.y = primero.valor2;
         destino.x = segundo.valor1;
         destino.y = segundo.valor2;
-        Nivel::intercambiar(origen, destino);
+        if (Nivel::validar_coordenada(origen) && Nivel::validar_coordenada(destino))
+          Nivel::intercambiar(origen, destino);
         break;
-      case 1:
+      case EXPLOTAR:
         tablero->quitar_seleccion();
         int tipo = segundo.valor1;
         int color = segundo.valor2;
         coordenada_t celda;
         celda.x = primero.valor1;
         celda.y = primero.valor2;
-        reemplazo_t datos;
-        datos.tipo = tipo;
-        datos.color = color;
-        datos.celda = celda;
-        celdas_a_explotar->insertar_ultimo(datos);
+        if (Nivel::validar_coordenada(celda) && tipo >= 0 && tipo < 3 && color >= 0 && color < 5){
+          reemplazo_t datos;
+          datos.tipo = tipo;
+          datos.color = color;
+          datos.celda = celda;
+          celdas_a_explotar->insertar_ultimo(datos);
+        }
         break;
     }
-    if (tipo != 1 && !celdas_a_explotar->esta_vacia()){
+    if (tipo != EXPLOTAR && !celdas_a_explotar->esta_vacia()){
       reemplazo_t datos;
       do{
         datos = celdas_a_explotar->borrar_primero();
@@ -306,8 +340,19 @@ void Nivel::enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente
   primero.valor2 = celda.y;
   segundo.valor1 = celda_adyacente.x;
   segundo.valor2 = celda_adyacente.y;
-  movimiento.tipo = 0;
+  movimiento.tipo = MOVER;
   movimiento.primero = primero;
   movimiento.segundo = segundo;
- // socket_enviar->enviar(&movimiento , sizeof(resultado_t));
+  socket_enviar->enviar(&movimiento , sizeof(resultado_t));
+}
+
+bool Nivel::validar_coordenada(coordenada_t &origen){
+  return (origen.x >= 0 && origen.x < tablero->numero_columnas() && origen.y >= 0 && origen.y < tablero->numero_filas());
+}
+
+//
+void Nivel::insertar(coordenada_t &celda, int tipo, int color){
+  Textura *textura = productos->ver_textura(tipo,color);
+  Animacion *animacion = productos->ver_animacion(tipo, color);
+  tablero->insertar(textura, animacion, celda);
 }

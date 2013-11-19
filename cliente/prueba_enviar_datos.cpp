@@ -14,6 +14,14 @@ int main(void){
   Socket *cliente = new Socket;
   if (socket->aceptar(*cliente) == -1) return 4;
   
+/*  Socket *socket_receptor = new Socket;
+  socket_receptor->asignar_direccion(8011, "127.0.0.1");
+  if (socket_receptor->reusar() == -1) return 1;
+  if (socket_receptor->asociar() == -1) return 2;
+  if (socket_receptor->escuchar() == -1) return 3;
+  Socket *cliente_receptor = new Socket;
+  if (socket_receptor->aceptar(*cliente_receptor) == -1) return 4;
+*/  
   resultado_t resultado;
   dato_t dato1, dato2;
   std::string linea;
@@ -27,6 +35,13 @@ int main(void){
     resultado.primero = dato1;
     resultado.segundo = dato2;
     if (cliente->enviar(&resultado, sizeof(resultado_t)) == -1) return 5;
-  }
+/*    cliente_receptor->recibir(&resultado, sizeof(resultado_t));
+    int a = resultado.tipo;
+    int b = resultado.primero.valor1;
+    int c = resultado.primero.valor2;
+    int d = resultado.segundo.valor1;
+    int e = resultado.segundo.valor2;
+    std::cout << a << " " << b << " " << c << " " << d << " " << e << std::endl;
+*/  }
   return 0;
 }

@@ -68,6 +68,12 @@ class Nivel{
     //
     void enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente);
     
+    //
+    bool validar_coordenada(coordenada_t &origen);
+    
+    //
+    void insertar(coordenada_t &celda, int tipo, int color);
+    
 };
 
 #endif // NIVEL_H
