@@ -1,3 +1,0 @@
-#ifndef DATOSJUGADOR_H
-#define DATOSJUGADOR_H
-#endif // DATOSJUGADOR_H
