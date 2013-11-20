@@ -3,7 +3,7 @@
 
 #include "thread.h"
 #include <unistd.h>
-#include "Jugador.h"
+#include "emisor_resultados.h"
 
 class ThreadJugador : public Thread {
     public:

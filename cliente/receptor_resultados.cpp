@@ -6,7 +6,7 @@
 
 #include "receptor_resultados.h"
 
-#define PUNTAJE 5
+#define PUNTAJE 2
 
 // Constructor de la clase.
 ReceptorResultados::ReceptorResultados(){

@@ -6,6 +6,7 @@
 #include "socket.h"
 #include "emisor_resultados.h"
 #include "Tablero.h"
+#include "ThreadJugador.h"
 
 typedef struct coordenadas{
     char columna;

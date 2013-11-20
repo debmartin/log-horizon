@@ -54,6 +54,7 @@ int main(void){
   std::string linea;
   while(true){
     std::getline(std::cin, linea);
+    if (linea[0] == 'q') return 0;
     resultado.tipo = linea[0] - '0';
     dato1.valor1 =  linea[1] - '0';
     dato1.valor2 = linea[2] - '0';

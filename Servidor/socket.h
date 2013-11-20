@@ -2,7 +2,7 @@
 #define SOCKET_H
 
 #include <arpa/inet.h>
-
+#include <iostream>
 
 class SocketError : public std::exception{};
 
