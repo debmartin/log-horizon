@@ -26,50 +26,32 @@ typedef struct socks{
     Socket* recibir_cli;
 } sockets_jugador_t;
 
-class DatosJugador;
 
 class Jugador{
     public:
-        friend class DatosJugador;
-
-        Jugador(std::string& nombre, Socket* enviar, Socket* recibir);
+        Jugador(std::string& nombre, int enviar, int recibir);
         virtual ~Jugador();
+        void iniciar();
         int getPuntaje() { return puntaje; }
         bool sumarPuntos();
         Jugada* obtenerJugada();
         bool terminarJugada();
         bool recibirPar();
-        bool enviarBorrados(Tablero* tablero);
-    protected:
-    private:
-        std::string* id;
-        int puntaje;
-        Jugada* jugada_actual;
-        Socket* socket_recepcion;
-        EmisorResultados* emisor;
-        Mutex* mutex;
-};
-
-class DatosJugador{
-    public:
-        DatosJugador(int enviar, int recibir);
-        ~DatosJugador();
-        void crearJugador(std::string& nombre);
-        int prepararSocket(int tipo, int puerto);
-        int prepararSocketEnviar();
-        int prepararSocketRecibir();
-        int getPuntaje();
-        bool sumarPuntos();
-        Jugada* obtenerJugada();
-        bool terminarJugada();
-        bool recibirPar();
         bool encolarBorrados(Tablero* tablero);
+        int prepararSocketRecibir();
+        int prepararSocketEnviar();
         void enviarBorrados();
         void cerrarJugador();
+    protected:
+        int prepararSocket(int tipo, int puerto);
     private:
         int puerto_enviar;
         int puerto_recibir;
-        Jugador* jugador;
+        std::string* id;
+        int puntaje;
+        Jugada* jugada_actual;
+        EmisorResultados* emisor;
+        Mutex* mutex;
         ThreadJugador* thread;
         sockets_jugador_t* sockets;
 };
