@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "animacion.h"
-#include "ventana.h"
-#include "superficie.h"
+#include "../ventana/ventana.h"
+#include "../superficie/superficie.h"
 
 /* ********************************************************************
  *                              ANIMACION

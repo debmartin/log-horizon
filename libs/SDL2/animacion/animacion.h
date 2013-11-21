@@ -2,8 +2,8 @@
 #define ANIMACION_H
 
 #include <SDL2/SDL.h>
-#include "ventana.h"
-#include "superficie.h"
+#include "../ventana/ventana.h"
+#include "../superficie/superficie.h"
 
 typedef struct SpritePos{
   SDL_Rect dimension_total;

@@ -7,11 +7,11 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "ventana.h"
-#include "superficie.h"
-#include "animacion.h"
-#include "fps.h"
-#include "texto.h"
+#include "ventana/ventana.h"
+#include "superficie/superficie.h"
+#include "animacion/animacion.h"
+#include "fps/fps.h"
+#include "texto/texto.h"
 
 class SDL {
   public:

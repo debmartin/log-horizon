@@ -2,7 +2,7 @@
 #define VENTANA_H
 
 #include <SDL2/SDL.h>
-#include "superficie.h"
+#include "../superficie/superficie.h"
 
 class Textura;
  

@@ -1,5 +1,6 @@
-#include "fps.h"
 #include <iostream>
+
+#include "fps.h"
  
 // Constructor de clase
 FPS::FPS(){
