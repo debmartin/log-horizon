@@ -31,6 +31,20 @@ void Nivel::imprimirTablero(){
     tablero->imprimir();
 }
 
+void Nivel::enviarTablero(){
+    Dimension tam = tablero->getTamanio();
+    for(int i=0; i<tam.x(); i++){
+        for(int j=0; j<tam.y(); j++){
+            celda_t celda;
+            celda.col = j;
+            celda.fila = i;
+            celda.tipo = (*tablero)[i][j].getTipo();
+            celda.color = (*tablero)[i][j].getColor();
+            jugador->enviarCelda(celda);
+        }
+    }
+}
+
 void Nivel::jugar(){
     while(tablero->hayMovimientos() && (puntaje_max < puntaje_objetivo)){
         tablero->imprimir();
@@ -44,6 +58,7 @@ void Nivel::jugar(){
         jugador->encolarBorrados(tablero);
         jugador->terminarJugada();
     }
+    jugador->enviarPuntaje();
 }
 
 void Nivel::cerrarJugador(){

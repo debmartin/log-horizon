@@ -2,12 +2,15 @@
 
 #define LEN_MSJ 5
 
-#define BORRAR '1'
 #define MOVER '0'
+#define BORRAR '1'
+#define INSERTAR '2'
+#define TERMINAR '3'
 
 #define ENVIAR 0
 #define RECIBIR 1
 
+#define LARGO_VECTOR 4
 #define IP "127.0.0.1"
 
 using std::string;
@@ -46,6 +49,13 @@ bool Jugador::sumarPuntos(){
     return true;
 }
 
+void Jugador::enviarCelda(celda_t& celda){
+    msj_celda_t mensaje;
+    mensaje.tipo = INSERTAR;
+    mensaje.celda = celda;
+    sockets->enviar_cli->enviar(&mensaje, sizeof(mensaje));
+}
+
 bool Jugador::terminarJugada(){
     if(! jugada_actual->sinBorrados())
         return false;
@@ -79,6 +89,7 @@ bool Jugador::encolarBorrados(Tablero* tablero){
 
         emisor->encolar_dato(BORRAR, dato1, dato2);
     }
+    enviarPuntaje();
     return true;
 }
 
@@ -133,4 +144,25 @@ int Jugador::prepararSocketRecibir(){
 
 void Jugador::enviarBorrados(){
     emisor->correr();
+}
+
+void Jugador::enviarPuntaje(){
+    std::stringstream ss;
+    ss << jugada_actual->verPuntos();
+    string puntos(ss.str());
+
+    msj_puntos_t msj;
+    msj.tipo = TERMINAR;
+    char vector[] = {msj.indice1, msj.indice2, msj.indice3, msj.indice4};
+    int len = puntos.length(), contador = len-1;
+
+    for(int i=LARGO_VECTOR-1; i<=0; i--){
+        if(contador >= 0)
+            vector[i] = '0';
+        else
+            vector[i] = puntos[contador];
+        contador--;
+    }
+
+    sockets->enviar_cli->enviar(&msj, sizeof(msj));
 }

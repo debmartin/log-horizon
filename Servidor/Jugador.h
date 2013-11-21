@@ -2,6 +2,7 @@
 #define JUGADOR_H
 
 #include <string>
+#include <sstream>
 #include "Jugada.h"
 #include "socket.h"
 #include "emisor_resultados.h"
@@ -25,6 +26,27 @@ typedef struct socks{
     Socket* recibir_cli;
 } sockets_jugador_t;
 
+typedef struct celda_tablero{
+    char col;
+    char fila;
+    char tipo;
+    char color;
+} celda_t;
+
+typedef struct msj_celda{
+    char tipo;
+    celda_t celda;
+} msj_celda_t;
+
+typedef struct msj_puntos{
+    char tipo;
+    char indice1;
+    char indice2;
+    char indice3;
+    char indice4;
+} msj_puntos_t;
+
+
 
 class Jugador{
     public:
@@ -40,6 +62,8 @@ class Jugador{
         int prepararSocketEnviar();
         void enviarBorrados();
         void cerrarJugador();
+        void enviarPuntaje();
+        void enviarCelda(celda_t& celda);
     protected:
         int prepararSocket(int tipo, int puerto);
         bool recibirPar();

@@ -10,6 +10,7 @@ class Tablero : public Matriz<Celda>{
     public:
         Tablero(Dimension& tam, char** estructura);
         virtual ~Tablero();
+        Dimension getTamanio() { return *tamanio; }
         void imprimir();
         bool intercambiar(Jugada* nueva_jugada);
         bool estabilizar();

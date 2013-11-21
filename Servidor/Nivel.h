@@ -14,6 +14,7 @@ class Nivel{
         void imprimirTablero();
         void jugar();
         void cerrarJugador();
+        void enviarTablero();
     protected:
     private:
         int puntaje_objetivo;
