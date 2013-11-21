@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "SDL/SDL.h"
-#include "SDL/fps.h"
+#include "../libs/SDL2/SDL.h"
 #include "nivel.h"
 
 #define POS_X 100 // posicion en x de la matriz
@@ -281,7 +280,7 @@ void Nivel::apilar(int tipo, int color, coordenada_t &celda){
 
 //
 void Nivel::explotar(coordenada_t &celda, int tipo, int color){
-  if (!tablero->celda_existente()) return;
+  if (!tablero->celda_existente(celda)) return;
   explosion->explotar(celda, tablero);
   celdas_vacias->agregar(celda, tipo, color);
   Mix_PlayChannel(-1, sonido, 0);

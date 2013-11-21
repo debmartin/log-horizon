@@ -1,7 +1,7 @@
 #ifndef NIVEL_H
 #define NIVEL_H
 
-#include "SDL/SDL.h"
+#include "../libs/SDL2/SDL.h"
 #include "matriz.h"
 #include "lista.h"
 #include "explosion.h"

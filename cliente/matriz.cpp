@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "matriz.h"
-#include "SDL/SDL.h"
+#include "../libs/SDL2/SDL.h"
 
 #define FRACCION 10
 

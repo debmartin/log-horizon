@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "SDL/SDL.h"
+#include "../libs/SDL2/SDL.h"
 #include "nivel.h"
 #include "socket.h"
 

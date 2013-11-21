@@ -9,23 +9,23 @@ CEXE = prueba
 all: $(CEXE)
 
 
-ventana.o: SDL/ventana.h SDL/ventana.cpp
-	$(CC) $(CFLAGS) -c SDL/ventana.cpp
+ventana.o: ../libs/SDL2/ventana/ventana.h ../libs/SDL2/ventana/ventana.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/ventana/ventana.cpp
 
 
-animacion.o: SDL/animacion.h SDL/animacion.cpp
-	$(CC) $(CFLAGS) -c SDL/animacion.cpp
+animacion.o: ../libs/SDL2/animacion/animacion.h ../libs/SDL2/animacion/animacion.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/animacion/animacion.cpp
 
 
-superficie.o: SDL/superficie.h SDL/superficie.cpp
-	$(CC) $(CFLAGS) -c SDL/superficie.cpp
+superficie.o: ../libs/SDL2/superficie/superficie.h ../libs/SDL2/superficie/superficie.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/superficie/superficie.cpp
 
 
-fps.o: SDL/fps.h SDL/fps.cpp
-	$(CC) $(CFLAGS) -c SDL/fps.cpp
+fps.o: ../libs/SDL2/fps/fps.h ../libs/SDL2/fps/fps.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/fps/fps.cpp
 	
-texto.o: SDL/texto.h SDL/texto.cpp
-	$(CC) $(CFLAGS) -c SDL/texto.cpp
+texto.o: ../libs/SDL2/texto/texto.h ../libs/SDL2/texto/texto.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/texto/texto.cpp
 
 
 matriz.o: matriz.h matriz.cpp

@@ -1,7 +1,7 @@
 #ifndef EXPLOSION_H
 #define EXPLOSION_H
 
-#include "SDL/SDL.h"
+#include "../libs/SDL2/SDL.h"
 #include "matriz.h"
 
 class Explosion{

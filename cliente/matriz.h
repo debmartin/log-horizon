@@ -1,7 +1,7 @@
 #ifndef MATRIZ_H
 #define MATRIZ_H
 
-#include "SDL/SDL.h"
+#include "../libs/SDL2/SDL.h"
 
 class Celda{
   public:
