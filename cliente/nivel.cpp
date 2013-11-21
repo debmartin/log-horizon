@@ -98,9 +98,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   for (int i = 0; i < dimension.x; i++){
     delete[] estructura[i];
   }
-  delete[] estructura;
-  
-  
+  delete[] estructura;  
   
   fondo = new Textura;
   fondo->cargar_textura(fondo_sup, ventana);
@@ -142,12 +140,9 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       coord.x = i;
       coord.y = z;
       if (tablero->celda_existente(coord)){
-
-
         
         int color = rand() % 5;
         int tipo = rand() % 4;
-
 
         Textura *textura = productos->ver_textura(tipo,color);
         Animacion *animacion = productos->ver_animacion(tipo, color);
@@ -155,7 +150,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       }
     }
   }
-  
   
   // TEXTURA DE SELECCION
   seleccion = new Textura;
@@ -287,6 +281,7 @@ void Nivel::apilar(int tipo, int color, coordenada_t &celda){
 
 //
 void Nivel::explotar(coordenada_t &celda, int tipo, int color){
+  if (!tablero->celda_existente()) return;
   explosion->explotar(celda, tablero);
   celdas_vacias->agregar(celda, tipo, color);
   Mix_PlayChannel(-1, sonido, 0);

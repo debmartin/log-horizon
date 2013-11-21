@@ -1,7 +1,7 @@
 #Compilador
 CC = g++
 #Opciones usadas para compilar
-CFLAGS = -Wall -pedantic -std=c++98 -g -lSDL2 -lSDL2_mixer -lSDL2_image -pthread
+CFLAGS = -Wall -pedantic -std=c++98 -g `sdl2-config --libs` -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -pthread
 #Nombre del programa principal
 CEXE = prueba
 
@@ -23,6 +23,9 @@ superficie.o: SDL/superficie.h SDL/superficie.cpp
 
 fps.o: SDL/fps.h SDL/fps.cpp
 	$(CC) $(CFLAGS) -c SDL/fps.cpp
+	
+texto.o: SDL/texto.h SDL/texto.cpp
+	$(CC) $(CFLAGS) -c SDL/texto.cpp
 
 
 matriz.o: matriz.h matriz.cpp
@@ -50,8 +53,8 @@ socket.o: socket.h socket.cpp
 thread.o: thread.h thread.cpp
 	$(CC) $(CFLAGS) -c thread.cpp
 
-$(CEXE): ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
+	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
 
 prueba_enviar: receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp
 	$(CC) $(CFLAGS) receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp -o prueba_enviar
