@@ -37,14 +37,14 @@ void EmisorResultados::agregar_mutex(Mutex *nuevo_mutex){
 void EmisorResultados::funcion_a_correr(){
   if (!socket || !mutex) return;
   mutex->bloquear();
-  while (seguir){
+  while (seguir && !cola->esta_vacia()){
     if (!cola->esta_vacia()){
-      
+
       resultado_t actual = cola->borrar_primero();
-      
+
       mutex->desbloquear();
       int a = actual.tipo;
-      
+
       socket->enviar(&actual , sizeof(resultado_t));
       std::cout << "se enviara resultado del tipo " << a << std::endl;
     }
