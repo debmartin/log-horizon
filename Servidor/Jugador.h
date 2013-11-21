@@ -6,7 +6,6 @@
 #include "socket.h"
 #include "emisor_resultados.h"
 #include "Tablero.h"
-#include "ThreadJugador.h"
 
 typedef struct coordenadas{
     char columna;
@@ -36,7 +35,6 @@ class Jugador{
         bool sumarPuntos();
         Jugada* obtenerJugada();
         bool terminarJugada();
-        bool recibirPar();
         bool encolarBorrados(Tablero* tablero);
         int prepararSocketRecibir();
         int prepararSocketEnviar();
@@ -44,6 +42,7 @@ class Jugador{
         void cerrarJugador();
     protected:
         int prepararSocket(int tipo, int puerto);
+        bool recibirPar();
     private:
         int puerto_enviar;
         int puerto_recibir;
@@ -52,7 +51,6 @@ class Jugador{
         Jugada* jugada_actual;
         EmisorResultados* emisor;
         Mutex* mutex;
-        ThreadJugador* thread;
         sockets_jugador_t* sockets;
 };
 #endif // JUGADOR_H

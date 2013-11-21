@@ -327,26 +327,23 @@ bool Tablero::estabilizar(){
 
         jugada_en_curso->agregarBorrado(pos);
 
-//        for(int i = pos->x()-1; i <= pos->x()+1; i++){
-//            for(int j = (i==pos->x()) ? pos->y()-1 : pos->y(); (i==pos->x()) ? (j <= pos->y()+1) : (j == pos->y()); j+=2){
         Dimension ady1(pos->x()-1, pos->y()), ady2(pos->x()+1, pos->y());
         Dimension ady3(pos->x(), pos->y()-1), ady4(pos->x(), pos->y()+1);
         Dimension vector[] = {ady1, ady2, ady3, ady4};
         for(int i=0; i<4; i++){
-                Dimension adyacente(vector[i]);
-                if(! enRango(adyacente, *tamanio)) continue;
+            Dimension adyacente(vector[i]);
+            if(! enRango(adyacente, *tamanio)) continue;
 
-                int orientacion = FILA;
-                bool ultimo = false;
+            int orientacion = FILA;
+            bool ultimo = false;
 
-                while(!ultimo){
-                    estabilizar(*pos, adyacente, true);
-                    if(orientacion == FILA)
-                        orientacion = COLUMNA;
-                    else
-                        ultimo = true;
-                }
-//            }
+            while(!ultimo){
+                estabilizar(*pos, adyacente, true);
+                if(orientacion == FILA)
+                    orientacion = COLUMNA;
+                else
+                    ultimo = true;
+            }
         }
     }
     jugada_en_curso = NULL;

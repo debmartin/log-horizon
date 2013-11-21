@@ -13,8 +13,8 @@ class Nivel{
         void agregarJugador(std::string& nombre);
         void imprimirTablero();
         void jugar();
+        void cerrarJugador();
     protected:
-
     private:
         int puntaje_objetivo;
         int puntaje_max;

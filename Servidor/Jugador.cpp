@@ -25,7 +25,6 @@ Jugador::Jugador(string& nombre, int enviar, int recibir) :
     emisor = new EmisorResultados();
     mutex = new Mutex();
     emisor->agregar_mutex(mutex);
-    thread = new ThreadJugador(emisor);
 }
 
 Jugador::~Jugador(){
@@ -84,7 +83,7 @@ bool Jugador::encolarBorrados(Tablero* tablero){
 }
 
 void Jugador::cerrarJugador(){
-    thread->join();
+    emisor->join();
     Socket* sock_actual;
 
     for(int i=0; i<4; i++){
@@ -104,6 +103,7 @@ void Jugador::cerrarJugador(){
         sock_actual->cerrar_enviar_recibir();
         delete sock_actual;
     }
+    emisor->finalizar();
 }
 
 int Jugador::prepararSocket(int tipo, int puerto){
@@ -132,5 +132,5 @@ int Jugador::prepararSocketRecibir(){
 }
 
 void Jugador::enviarBorrados(){
-    thread->correr();
+    emisor->correr();
 }

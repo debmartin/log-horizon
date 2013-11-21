@@ -33,6 +33,7 @@ void Nivel::imprimirTablero(){
 
 void Nivel::jugar(){
     while(tablero->hayMovimientos() && (puntaje_max < puntaje_objetivo)){
+        tablero->imprimir();
         Jugada* nueva_jugada = jugador->obtenerJugada();
         tablero->intercambiar(nueva_jugada);
         tablero->estabilizar();
@@ -43,4 +44,8 @@ void Nivel::jugar(){
         jugador->encolarBorrados(tablero);
         jugador->terminarJugada();
     }
+}
+
+void Nivel::cerrarJugador(){
+    jugador->cerrarJugador();
 }
