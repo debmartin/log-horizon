@@ -77,7 +77,10 @@ class Textura{
     // Pre: la ventana debe existir
     // Post: se dibujo la textura en la ventana.
     bool dibujar(Ventana *ventana);
-          
+    
+    // Setea el nivel alpha de la textura
+    bool establecer_alpha(Uint8 alpha);
+    
   private:
     SDL_Texture *tex;
 };

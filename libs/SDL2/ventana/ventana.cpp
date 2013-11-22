@@ -129,3 +129,8 @@ bool Textura::dibujar(SDL_Rect &destino, Ventana *ventana){
 bool Textura::dibujar(Ventana *ventana){
   return SDL_RenderCopy(ventana->ver_renderer(), tex, NULL, NULL) == 0;
 }
+
+// Setea el nivel alpha de la textura
+bool Textura::establecer_alpha(Uint8 alpha){
+  return SDL_SetTextureAlphaMod(tex, alpha) == 0;
+}
