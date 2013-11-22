@@ -15,16 +15,22 @@ class TextBox{
     ~TextBox();
     
     //
-    bool asignar_fuente(std::string &path, int font_size);
+    bool asignar_fuente(std::string &path, int font_size, unsigned int dist_y);
     
     //
     bool asignar_color(Uint8 r, Uint8 g, Uint8 b, Uint8 alpha);
     
     //
-    void asignar_fondo(SDL_Rect &seleccion, Textura *fondo);
+    void asignar_fondo(SDL_Rect &seleccion, Superficie *fondo, Ventana *ventana);
     
     //
-    void asignar_fondo(Textura *fondo);
+    void asignar_fondo(Superficie *fondo, Ventana *ventana);
+    
+    //
+    void asignar_fondo(const std::string &path, Ventana *ventana);
+    
+    //
+    void alpha_fondo(Uint8 alpha);
     
     //
     void analizar_evento(SDL_Event &evento);
@@ -48,4 +54,5 @@ class TextBox{
     Texto *dibujador_texto;
     Textura *texto;
     bool modificacion;
+    unsigned int distancia_borde;
 };

@@ -79,7 +79,7 @@ Textura::~Textura(){
 // Pre: el archivo debe existir.
 // Post: se cargo la textura con el contenido del archivo y se la asocio
 //       a la ventana ingresada
-bool Textura::cargar_textura(const std::string archivo, Ventana *ventana){
+bool Textura::cargar_textura(const std::string &archivo, Ventana *ventana){
   if (!ventana) return false;
   if (tex){
     SDL_DestroyTexture(tex);

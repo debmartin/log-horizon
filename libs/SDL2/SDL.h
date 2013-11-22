@@ -13,6 +13,7 @@
 #include "fps/fps.h"
 #include "texto/texto.h"
 #include "text_box/text_box.h"
+#include "boton/boton.h"
 
 class SDL {
   public:

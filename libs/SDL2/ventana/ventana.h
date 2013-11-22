@@ -52,7 +52,7 @@ class Textura{
     // Pre: el archivo debe existir.
     // Post: se cargo la textura con el contenido del archivo y se la asocio
     //       a la ventana ingresada
-    bool cargar_textura(const std::string archivo, Ventana *ventana);
+    bool cargar_textura(const std::string &archivo, Ventana *ventana);
     
     // Crea la textura en base al contenido de la superficie ingresada
     // Pre: la superficie debe existir.
