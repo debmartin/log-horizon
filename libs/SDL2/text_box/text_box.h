@@ -24,6 +24,9 @@ class TextBox{
     bool asignar_color(Uint8 r, Uint8 g, Uint8 b, Uint8 alpha);
     
     //
+    void asignar_destino(SDL_Rect &dest);
+    
+    //
     void asignar_fondo(SDL_Rect &seleccion, Superficie *fondo, Ventana *ventana);
     
     //
@@ -39,7 +42,13 @@ class TextBox{
     void analizar_evento(SDL_Event &evento);
     
     //
-    bool dibujar(unsigned int cantidad_caracteres, SDL_Rect &destino, Ventana *ventana);
+    bool dibujar(unsigned int cantidad_caracteres, Ventana *ventana);
+    
+    //
+    void ocultar_texto();
+    
+    //
+    void desocultar_texto();
     
     //
     void activar();
@@ -58,6 +67,8 @@ class TextBox{
     Textura *texto;
     bool modificacion;
     unsigned int distancia_borde;
+    SDL_Rect *destino;
+    bool oculto;
 };
 
 #endif // TEXT_BOX_H

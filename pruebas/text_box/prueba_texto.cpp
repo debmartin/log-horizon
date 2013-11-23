@@ -24,24 +24,15 @@ int main(void){
   destino.y = 0;
   destino.w = 400;
   destino.h = 200;
+  text.asignar_destino(destino);
   while (seguir){
     while (SDL_PollEvent(&evento)){
       if (evento.type == SDL_QUIT)
         seguir = false;
-      if (evento.type == SDL_MOUSEBUTTONDOWN){
-        if (evento.button.x >= destino.x && 
-          evento.button.x <= destino.x + destino.w &&
-          evento.button.y >= destino.y &&
-          evento.button.y <= destino.y + destino.h){
-        text.activar();
-        }else{
-          text.desactivar();
-        }
-      }
       text.analizar_evento(evento);
     }
     ventana.limpiar();
-    text.dibujar(20, destino, &ventana);
+    text.dibujar(20, &ventana);
     ventana.presentar(20);
   }
   return 0;
