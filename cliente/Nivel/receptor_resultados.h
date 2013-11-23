@@ -1,9 +1,9 @@
 #ifndef RECEPTOR_RESULTADOS_H
 #define RECEPTOR_RESULTADOS_H
 
-#include "socket.h"
-#include "thread.h"
-#include "lista.h"
+#include "../../libs/TDA/socket/socket.h"
+#include "../../libs/TDA/thread/thread.h"
+#include "../../libs/TDA/lista/lista.h"
 
 typedef struct dato{
   char valor1;

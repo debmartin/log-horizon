@@ -1,13 +1,13 @@
 #ifndef NIVEL_H
 #define NIVEL_H
 
-#include "../libs/SDL2/SDL.h"
+#include "../../libs/SDL2/SDL.h"
 #include "matriz.h"
-#include "lista.h"
+#include "../../libs/TDA/lista/lista.h"
 #include "explosion.h"
 #include "celdas_vacias.h"
 #include "productos.h"
-#include "socket.h"
+#include "../../libs/TDA/socket/socket.h"
 #include "receptor_resultados.h"
 
 

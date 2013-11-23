@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "../../libs/SDL2/SDL.h"
-#include "nivel.h"
+#include "../../cliente/Nivel/nivel.h"
 #include "../../libs/TDA/socket/socket.h"
 
 #define ANCHO 800

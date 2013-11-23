@@ -1,7 +1,7 @@
 #ifndef PRODUCTOS_H
 #define PRODUCTOS_H
 
-#include "../libs/SDL2/SDL.h"
+#include "../../libs/SDL2/SDL.h"
 #include "matriz.h"
 
 typedef struct animacion_textura{

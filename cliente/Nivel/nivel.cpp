@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "../libs/SDL2/SDL.h"
+#include "../../libs/SDL2/SDL.h"
 #include "nivel.h"
 
 #define POS_X 100 // posicion en x de la matriz

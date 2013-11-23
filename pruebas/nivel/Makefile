@@ -6,7 +6,7 @@ CFLAGS = -Wall -pedantic -std=c++98 -g `sdl2-config --libs` -lSDL2 -lSDL2_image 
 CEXE = prueba
 
 
-all: $(CEXE)
+all: prueba_enviar $(CEXE) 
 
 
 ventana.o: ../../libs/SDL2/ventana/ventana.h ../../libs/SDL2/ventana/ventana.cpp
@@ -30,23 +30,23 @@ texto.o: ../../libs/SDL2/texto/texto.h ../../libs/SDL2/texto/texto.cpp
 	$(CC) $(CFLAGS) -c ../../libs/SDL2/texto/texto.cpp
 
 
-matriz.o: matriz.h matriz.cpp
-	$(CC) $(CFLAGS) -c matriz.cpp
+matriz.o: ../../cliente/Nivel/matriz.h ../../cliente/Nivel/matriz.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/matriz.cpp
 
-nivel.o: nivel.h nivel.cpp
-	$(CC) $(CFLAGS) -c nivel.cpp
+nivel.o: ../../cliente/Nivel/nivel.h ../../cliente/Nivel/nivel.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/nivel.cpp
 	
-explosion.o: explosion.h explosion.cpp
-	$(CC) $(CFLAGS) -c explosion.cpp
+explosion.o: ../../cliente/Nivel/explosion.h ../../cliente/Nivel/explosion.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/explosion.cpp
 	
-celdas_vacias.o: celdas_vacias.h celdas_vacias.cpp
-	$(CC) $(CFLAGS) -c celdas_vacias.cpp
+celdas_vacias.o: ../../cliente/Nivel/celdas_vacias.h ../../cliente/Nivel/celdas_vacias.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/celdas_vacias.cpp
 
-productos.o: productos.h productos.cpp
-	$(CC) $(CFLAGS) -c productos.cpp
+productos.o: ../../cliente/Nivel/productos.h ../../cliente/Nivel/productos.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/productos.cpp
 	
-receptor_resultados.o: receptor_resultados.h receptor_resultados.cpp
-	$(CC) $(CFLAGS) -c receptor_resultados.cpp
+receptor_resultados.o: ../../cliente/Nivel/receptor_resultados.h ../../cliente/Nivel/receptor_resultados.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/receptor_resultados.cpp
 
 socket.o: ../../libs/TDA/socket/socket.h ../../libs/TDA/socket/socket.cpp
 	$(CC) $(CFLAGS) -c ../../libs/TDA/socket/socket.cpp
@@ -60,17 +60,15 @@ $(CEXE): ventana.o superficie.o animacion.o fps.o texto.o text_box.o matriz.o ni
 prueba_enviar: receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp
 	$(CC) $(CFLAGS) receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp -o prueba_enviar
 
-
-
 clean:
 	-rm *.o
 
 
 cleanAll: clean
-	-rm $(CEXE)
+	-rm $(CEXE) prueba_enviar
 
 run: all
-	./$(CEXE)	
+	./prueba_enviar	
 
 test: $(CEXE)
 	valgrind ./$(CEXE)

@@ -1,7 +1,7 @@
 #ifndef CELDAS_VACIAS_H
 #define CELDAS_VACIAS_H
 
-#include "lista.h"
+#include "../../libs/TDA/lista/lista.h"
 #include "matriz.h"
 
 class ColumnaInvalida: public std::exception{};

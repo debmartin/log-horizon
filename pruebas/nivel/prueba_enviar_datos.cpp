@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../../libs/TDA/socket/socket.h"
 #include "../../libs/TDA/thread/thread.h"
-#include "receptor_resultados.h"
+#include "../../cliente/Nivel/receptor_resultados.h"
 #include <unistd.h>
 
 class Socket_receptor : public Thread{
