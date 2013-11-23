@@ -1,3 +1,6 @@
+#ifndef TEXT_BOX_H
+#define TEXT_BOX_H
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -56,3 +59,5 @@ class TextBox{
     bool modificacion;
     unsigned int distancia_borde;
 };
+
+#endif // TEXT_BOX_H

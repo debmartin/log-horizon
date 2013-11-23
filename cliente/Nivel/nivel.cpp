@@ -161,7 +161,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   celdas_vacias->inicializar(tablero->numero_columnas());
   
   std::string direccion = path + "sonidos/sound.wav";
-  sonido = Mix_LoadWAV(direccion.c_str());   // FALTA DEFINIR CLASE SONIDO
+  sonido = Mix_LoadWAV(direccion.c_str());
 }
 
 //
