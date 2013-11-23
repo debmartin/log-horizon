@@ -109,6 +109,8 @@ bool TextBox::dibujar(unsigned int cantidad_caracteres, SDL_Rect &destino, Venta
   }
   destino_aux.y = destino_aux.y + distancia_borde;
   destino_aux.h = destino_aux.h - distancia_borde * 2;
+  int w = destino_aux.w;
+  std::cout << w << std::endl;
   return texto->dibujar(destino_aux, ventana);
 }
 
