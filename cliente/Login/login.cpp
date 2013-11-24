@@ -119,14 +119,14 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   Superficie sup;
   Texto texto;
   texto.asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
-  texto.asignar_color(210,210,50,255);
+  texto.asignar_color(220,220,0,255);
   texto.copiar_texto("iniciar sesion", &sup);
   
   destino.x = destino.x + destino.w / 10;
   destino.y = destino.y + destino.h / 10;
   destino.w = destino.w - destino.w / 5;
   destino.h = destino.h - destino.h / 5;
-  iniciar_sesion->agregar_texto(&sup, destino, ventana, 2);
+  iniciar_sesion->agregar_texto(&sup, destino, ventana, 1);
   
   // SONIDO
   std::string direccion = "../../recursos/sonidos/login_theme.wav";
