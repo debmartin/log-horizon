@@ -134,7 +134,7 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   
   // TEXTO
   escritor->asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
-  escritor->asignar_color(255,192,203,255);
+  escritor->asignar_color(0,0,0,255);
   
   escritor->copiar_texto("Usuario:", &sup);
   textura_usuario->cargar_textura(&sup, ventana);
