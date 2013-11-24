@@ -21,9 +21,11 @@ text_box.o: ../../libs/SDL2/text_box/text_box.h ../../libs/SDL2/text_box/text_bo
 texto.o: ../../libs/SDL2/texto/texto.h ../../libs/SDL2/texto/texto.cpp
 	$(CC) $(CFLAGS) -c ../../libs/SDL2/texto/texto.cpp
 
+text_box_oculta.o: ../../libs/SDL2/text_box/text_box_oculta.h ../../libs/SDL2/text_box/text_box_oculta.cpp
+	$(CC) $(CFLAGS) -c ../../libs/SDL2/text_box/text_box_oculta.cpp
 
-$(CEXE): ventana.o superficie.o  texto.o text_box.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o  texto.o text_box.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): ventana.o superficie.o  texto.o text_box.o text_box_oculta.o $(CEXE).cpp
+	$(CC) $(CFLAGS) ventana.o superficie.o  texto.o text_box.o text_box_oculta.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

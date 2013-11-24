@@ -15,10 +15,10 @@ class TextBox{
     TextBox();
     
     //
-    ~TextBox();
+    virtual ~TextBox();
     
     //
-    bool asignar_fuente(std::string &path, int font_size, unsigned int dist_y);
+    bool asignar_fuente(std::string &path, int font_size, unsigned int dist_y, unsigned int cant_caracteres);
     
     //
     bool asignar_color(Uint8 r, Uint8 g, Uint8 b, Uint8 alpha);
@@ -42,13 +42,7 @@ class TextBox{
     void analizar_evento(SDL_Event &evento);
     
     //
-    bool dibujar(unsigned int cantidad_caracteres, Ventana *ventana);
-    
-    //
-    void ocultar_texto();
-    
-    //
-    void desocultar_texto();
+    bool dibujar(Ventana *ventana);
     
     //
     void activar();
@@ -58,8 +52,8 @@ class TextBox{
     
     //
     bool esta_activada();
+
   private:
-    std::string cadena;
     Textura *fondo;
     SDL_Rect *origen;
     bool activada;
@@ -68,7 +62,17 @@ class TextBox{
     bool modificacion;
     unsigned int distancia_borde;
     SDL_Rect *destino;
-    bool oculto;
+  
+  protected:
+    std::string mostrar;
+    std::string cadena;
+    size_t cantidad_caracteres;
+  
+    //
+    virtual void append_mostrar(const char c);
+
+    //
+    virtual void borrar_primero_mostrar();
 };
 
 #endif // TEXT_BOX_H

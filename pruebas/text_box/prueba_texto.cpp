@@ -11,7 +11,7 @@ int main(void){
   
   TextBox text;                                                        //
   std::string file = "../../recursos/fuentes/mono.ttf";
-  if (!text.asignar_fuente(file, 100, 3)) return 1;                       //
+  if (!text.asignar_fuente(file, 100, 3, 20)) return 1;                       //
   text.asignar_color(255,255,255,255);                                 //
   text.asignar_fondo("../../recursos/imagenes/fondo_texto.png", &ventana);
   text.alpha_fondo(100);
@@ -32,7 +32,7 @@ int main(void){
       text.analizar_evento(evento);
     }
     ventana.limpiar();
-    text.dibujar(20, &ventana);
+    text.dibujar(&ventana);
     ventana.presentar(20);
   }
   return 0;

@@ -9,7 +9,7 @@ Login::Login(){
   fondo = new Textura;
   iniciar_sesion = new Boton;
   usuario = new TextBox;
-  clave = new TextBox;
+  clave = new TextBoxOculta;
   sonido = NULL;
 }
 
@@ -58,17 +58,16 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   
   // BOTON
   
+  
   // USUARIO
   std::string fuente_mono = "../../recursos/fuentes/mono.ttf";
   std::string fondo_texto = "../../recursos/imagenes/fondo_texto.png";
-  usuario->asignar_fuente(fuente_mono, 50, 3);
+  usuario->asignar_fuente(fuente_mono, 50, 3, MAX_CARACTERES);
   usuario->asignar_fondo(fondo_texto, ventana);
   usuario->alpha_fondo(175);
   SDL_Rect destino;
   destino.x = ancho / 2 - ancho / 8;
   destino.y = alto / 2;
-  int a = destino.y;
-  std::cout << a << std::endl;
   destino.w = ancho * 2 / 8;
   destino.h = alto / 20;
   usuario->asignar_destino(destino);
@@ -76,15 +75,12 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   usuario->asignar_color(255,255,255,255);   
   
   // CLAVE
-  clave->asignar_fuente(fuente_mono, 50, 3);
+  clave->asignar_fuente(fuente_mono, 50, 3, MAX_CARACTERES);
   clave->asignar_fondo(fondo_texto, ventana);
   clave->alpha_fondo(175);
   destino.y = destino.y + destino.h * 2;
-  a = destino.y;
-  std::cout << a << std::endl;
   clave->asignar_destino(destino);
   clave->asignar_color(255,255,255,255);
-  clave->ocultar_texto();
   
   // SONIDO
   std::string direccion = "../../recursos/sonidos/login_theme.wav";
@@ -96,8 +92,8 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
 //
 int Login::dibujar(Ventana *ventana){
   fondo->dibujar(ventana);
-  usuario->dibujar(MAX_CARACTERES, ventana);
-  clave->dibujar(MAX_CARACTERES, ventana);
+  usuario->dibujar(ventana);
+  clave->dibujar(ventana);
   return 0;
 }
 
