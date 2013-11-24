@@ -2,6 +2,7 @@
 #define LOGIN_H
 
 #include "../../libs/SDL2/SDL.h"
+#include "../../libs/TDA/socket/socket.h"
 
 class Login{
   public:
@@ -10,6 +11,9 @@ class Login{
   
     //
     ~Login();
+    
+    //
+    void asignar_sockets(Socket *recibir, Socket *enviar);
     
     //
     int correr(Ventana *ventana, unsigned int ancho, unsigned  int alto);
@@ -26,6 +30,9 @@ class Login{
     SDL_Rect destino_usuario;
     SDL_Rect destino_clave;
     
+    Socket* recibir;
+    Socket* enviar;
+    
   protected:
     //
     int cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto);
@@ -35,6 +42,9 @@ class Login{
     
     //
     bool analizar_evento(SDL_Event &evento);
+    
+    //
+    virtual void enviar_datos();
 };
 
 #endif // LOGIN_H

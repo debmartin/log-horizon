@@ -52,6 +52,9 @@ class TextBox{
     
     //
     bool esta_activada();
+    
+    //
+    std::string ver_contenido(){return cadena;}
 
   private:
     Textura *fondo;

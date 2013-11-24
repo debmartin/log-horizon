@@ -14,6 +14,8 @@ Login::Login(){
   textura_clave = new Textura;
   textura_usuario = new Textura;
   sonido = NULL;
+  recibir = NULL;
+  enviar = NULL;
 }
 
 //
@@ -30,7 +32,7 @@ Login::~Login(){
 
 //
 int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
-  Login::cargar_archivos(ventana, ancho, alto);
+  this->cargar_archivos(ventana, ancho, alto);
   
   SDL_Event evento;
   bool corriendo = true;
@@ -41,11 +43,11 @@ int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
   while (corriendo){
     // Eventos
     while (SDL_PollEvent(&evento)){
-      corriendo = Login::analizar_evento(evento);
+      corriendo = this->analizar_evento(evento);
     }
     // Dibujado
     ventana->limpiar();
-    Login::dibujar(ventana);
+    this->dibujar(ventana);
     // actualizamos los fps
     if (SDL_GetTicks() - tiempo_actual < 1000){
       frames.actualizar();
@@ -53,6 +55,10 @@ int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
     }
     // Presentar en ventana
     ventana->presentar(delay);
+    if (iniciar_sesion->activado()){
+      this->enviar_datos();
+      corriendo = false;
+    }
   }
   return 0;
 }
@@ -162,4 +168,10 @@ bool Login::analizar_evento(SDL_Event &evento){
   clave->analizar_evento(evento);
   iniciar_sesion->analizar_evento(evento);
   return true;
+}
+
+//
+void Login::enviar_datos(){
+  std::cout << "usuario = " << usuario->ver_contenido() << std::endl;
+  std::cout << "contraseña = " << clave->ver_contenido() << std::endl;
 }
