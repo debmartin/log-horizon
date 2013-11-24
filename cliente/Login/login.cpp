@@ -60,7 +60,7 @@ int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
 //
 int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto){
   // FONDO
-  fondo->cargar_textura("../../recursos/imagenes/fondo_login.png", ventana);
+  fondo->cargar_textura("../../recursos/imagenes/fondo_login.jpg", ventana);
     
   // USUARIO
   std::string fuente_mono = "../../recursos/fuentes/mono.ttf";
@@ -118,7 +118,7 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   
   Superficie sup;
   Texto texto;
-  texto.asignar_fuente("../../recursos/fuentes/girls.ttf", 50);
+  texto.asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
   texto.asignar_color(210,210,50,255);
   texto.copiar_texto("iniciar sesion", &sup);
   
