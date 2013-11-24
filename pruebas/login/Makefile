@@ -33,8 +33,11 @@ text_box_oculta.o: ../../libs/SDL2/text_box/text_box_oculta.h ../../libs/SDL2/te
 login.o: ../../cliente/Login/login.h ../../cliente/Login/login.cpp
 	$(CC) $(CFLAGS) -c ../../cliente/Login/login.cpp
 
-$(CEXE): ventana.o superficie.o  texto.o boton.o text_box.o text_box_oculta.o fps.o login.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o  texto.o boton.o text_box.o text_box_oculta.o fps.o login.o $(CEXE).cpp -o $(CEXE)
+mensaje.o: ../../libs/SDL2/mensaje/mensaje.h ../../libs/SDL2/mensaje/mensaje.cpp
+	$(CC) $(CFLAGS) -c ../../libs/SDL2/mensaje/mensaje.cpp
+
+$(CEXE): ventana.o superficie.o  texto.o boton.o text_box.o text_box_oculta.o fps.o mensaje.o login.o $(CEXE).cpp
+	$(CC) $(CFLAGS) ventana.o superficie.o  texto.o boton.o text_box.o text_box_oculta.o fps.o mensaje.o login.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

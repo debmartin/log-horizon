@@ -29,6 +29,8 @@ class Login{
     Textura *textura_clave;
     SDL_Rect destino_usuario;
     SDL_Rect destino_clave;
+    Mensaje *mensaje;
+    bool conectando;
     
     Socket* recibir;
     Socket* enviar;

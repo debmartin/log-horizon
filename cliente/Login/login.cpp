@@ -16,6 +16,8 @@ Login::Login(){
   sonido = NULL;
   recibir = NULL;
   enviar = NULL;
+  mensaje = new Mensaje;
+  conectando = false;
 }
 
 //
@@ -27,6 +29,7 @@ Login::~Login(){
   delete escritor;
   delete textura_clave;
   delete textura_usuario;
+  delete mensaje;
   if (sonido) Mix_FreeChunk(sonido);
 }
 
@@ -57,7 +60,6 @@ int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
     ventana->presentar(delay);
     if (iniciar_sesion->activado()){
       this->enviar_datos();
-      corriendo = false;
     }
   }
   return 0;
@@ -147,6 +149,21 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   escritor->copiar_texto("Contraseña:", &sup);
   textura_clave->cargar_textura(&sup, ventana);
   
+  // MENSAJE
+  sup.cargar("../../recursos/imagenes/sub_ventana.png");
+  destino.w = ancho/3;
+  destino.h = alto/4;
+  destino.x = ancho/2 - destino.w/2;
+  destino.y = alto/2 - destino.h/2;
+  mensaje->asignar_fondo(&sup, destino, ventana);
+  mensaje->establecer_alpha_fondo(205);
+  escritor->copiar_texto("Enviando datos...", &sup);
+  destino.w = destino.w - destino.w / 5;
+  destino.h = destino.h / 4;
+  destino.y = destino.y + destino.h * 2 - destino.h / 2;
+  destino.x = destino.x + destino.w/8;
+  mensaje->asignar_mensaje(&sup, destino, ventana);
+  
   return 0;
 }
 
@@ -158,6 +175,7 @@ int Login::dibujar(Ventana *ventana){
   iniciar_sesion->dibujar(ventana);
   textura_usuario->dibujar(destino_usuario, ventana);
   textura_clave->dibujar(destino_clave, ventana);
+  if (conectando) mensaje->dibujar(ventana);
   return 0;
 }
 
@@ -172,6 +190,5 @@ bool Login::analizar_evento(SDL_Event &evento){
 
 //
 void Login::enviar_datos(){
-  std::cout << "usuario = " << usuario->ver_contenido() << std::endl;
-  std::cout << "contraseña = " << clave->ver_contenido() << std::endl;
+  conectando = true;
 }

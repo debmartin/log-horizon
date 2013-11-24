@@ -5,7 +5,6 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "../animacion/animacion.h"
 #include "../ventana/ventana.h"
 #include "../superficie/superficie.h"
 

@@ -15,6 +15,7 @@
 #include "text_box/text_box.h"
 #include "text_box/text_box_oculta.h"
 #include "boton/boton.h"
+#include "mensaje/mensaje.h"
 
 class SDL {
   public:
