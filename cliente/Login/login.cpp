@@ -78,7 +78,7 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   usuario->asignar_color(255,255,255,255);   
   
   destino_usuario.y = destino.y;
-  destino_usuario.x = destino.x - destino.w / 2;
+  destino_usuario.x = destino.x - destino.w / 2 - 5;
   destino_usuario.h = destino.h;
   destino_usuario.w = destino.w / 2;
   
@@ -91,7 +91,7 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   clave->asignar_color(255,255,255,255);
 
   destino_clave.y = destino.y;
-  destino_clave.x = destino.x - destino.w / 2;
+  destino_clave.x = destino.x - destino.w / 2 - 5;
   destino_clave.h = destino.h;
   destino_clave.w = destino.w / 2;
   
@@ -133,12 +133,12 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   sonido = Mix_LoadWAV(direccion.c_str());
   
   // TEXTO
-  escritor->asignar_fuente("../../recursos/fuentes/girls.ttf", 50);
-  escritor->asignar_color(255,255,255,255);
+  escritor->asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
+  escritor->asignar_color(0,0,0,255);
   
   escritor->copiar_texto("Usuario:", &sup);
   textura_usuario->cargar_textura(&sup, ventana);
-  escritor->copiar_texto("Clave:", &sup);
+  escritor->copiar_texto("Contraseña:", &sup);
   textura_clave->cargar_textura(&sup, ventana);
   
   return 0;
