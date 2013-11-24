@@ -20,6 +20,11 @@ class Login{
     TextBox *usuario;
     TextBox *clave;
     Mix_Chunk *sonido;
+    Texto *escritor;
+    Textura *textura_usuario;
+    Textura *textura_clave;
+    SDL_Rect destino_usuario;
+    SDL_Rect destino_clave;
     
   protected:
     //

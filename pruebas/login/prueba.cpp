@@ -3,8 +3,8 @@
 #include "../../cliente/Login/login.h"
 #include "../../libs/SDL2/SDL.h"
 
-#define ANCHO 1600
-#define ALTO 1200
+#define ANCHO 1200
+#define ALTO 800
 
 int main(void){
   SDL libreria = SDL(SDL_INIT_EVERYTHING);
