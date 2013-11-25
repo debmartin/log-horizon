@@ -3,7 +3,7 @@
 
 #include "dimension.h"
 #include "Constantes.h"
-#include "Cola.h"
+#include "../libs/TDA/cola/Cola.h"
 
 class Jugada {
     public:

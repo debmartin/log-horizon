@@ -3,7 +3,7 @@
 
 #include "Matriz.h"
 #include "Celda.h"
-#include "Lista.h"
+#include "../libs/TDA/lista/Lista.h"
 #include "Jugada.h"
 
 /* Tablero de Candy Crush */

@@ -1,6 +1,6 @@
 #ifndef NIVEL_H
 #define NIVEL_H
-#include "Lista.h"
+#include "../libs/TDA/lista/Lista.h"
 #include "Tablero.h"
 #include "Jugador.h"
 #include "ConjuntoJugadores.h"

@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 #include "Jugada.h"
-#include "socket.h"
+#include "../libs/TDA/socket/socket.h"
 #include "emisor_resultados.h"
 #include "Tablero.h"
 #include "ReceptorJugada.h"

@@ -1,9 +1,9 @@
 #ifndef EMISORTABLERO_H
 #define EMISORTABLERO_H
 
-#include "socket.h"
-#include "thread.h"
-#include "Lista.h"
+#include "../libs/TDA/socket/socket.h"
+#include "../libs/TDA/thread/thread.h"
+#include "../libs/TDA/lista/Lista.h"
 
 typedef struct celda_tablero{
     char col;
