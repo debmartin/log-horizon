@@ -37,7 +37,7 @@ Matriz<U>::~Matriz(){
     for(int i=0; i < tamanio->x(); i++){
       delete[] tabla[i];
     }
-    delete tabla;
+    delete[] tabla;
     delete tamanio;
 }
 

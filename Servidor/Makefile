@@ -43,11 +43,8 @@ thread.o: thread.h thread.cpp
 socket.o: socket.h socket.cpp
 	$(CC) $(CFLAGS) -c socket.cpp
 
-ThreadJugador.o: ThreadJugador.h ThreadJugador.cpp
-	$(CC) $(CFLAGS) -c ThreadJugador.cpp
-
-$(CEXE): Celda.o Jugador.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o emisor_resultados.o thread.o socket.o ThreadJugador.o $(CEXE).cpp
-	$(CC) $(CFLAGS) Celda.o Jugador.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o emisor_resultados.o thread.o socket.o ThreadJugador.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): Celda.o Jugador.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o emisor_resultados.o thread.o socket.o $(CEXE).cpp
+	$(CC) $(CFLAGS) Celda.o Jugador.o dimension.o FueraDeRango.o Jugada.o Nivel.o Tablero.o emisor_resultados.o thread.o socket.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

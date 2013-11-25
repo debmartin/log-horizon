@@ -2,8 +2,8 @@
 #define NIVEL_H
 #include "Lista.h"
 #include "Tablero.h"
-#include "Hash.h"
 #include "Jugador.h"
+#include "ConjuntoJugadores.h"
 #include <string>
 
 class Nivel{
@@ -18,9 +18,9 @@ class Nivel{
     protected:
     private:
         int puntaje_objetivo;
-        int puntaje_max;
         Tablero* tablero;
-        Jugador* jugador;
+        Mutex* mutex_recibir;
+        ConjuntoJugadores* jugadores;
 };
 
 #endif // NIVEL_H

@@ -22,4 +22,9 @@
 #define PUNTAJE_LINEA 10
 #define PUNTAJE_ESTRELLA 40
 
+#define MOVER '0'
+#define BORRAR '1'
+#define INSERTAR '2'
+#define TERMINAR '3'
+
 #endif // CONSTANTES_H_INCLUDED

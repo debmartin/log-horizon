@@ -65,7 +65,7 @@ void Tablero::estabilizarJugada(){
     estabilizar(pos1, pos2, false);
 }
 
-int Tablero::borrarSegmentosCol(Dimension& dest, Dimension& origen, bool actual_inclusive){
+int Tablero::borrarSegmentosCol(Dimension& dest, Dimension& origen, bool dest_inclusive){
     bool en_segmento = false, contar_segmento = true;
     int cant = 0;
     Dimension primero(dest), ultimo(origen), no_vacia(dest);
@@ -75,7 +75,7 @@ int Tablero::borrarSegmentosCol(Dimension& dest, Dimension& origen, bool actual_
 
         if(! contar_segmento) continue;
 
-        if(actual == dest && !actual_inclusive)
+        if(actual == dest && !dest_inclusive)
             contar_segmento = false;
 
         if((*this)[actual].esVacia() && en_segmento) {

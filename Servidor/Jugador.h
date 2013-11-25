@@ -7,17 +7,9 @@
 #include "socket.h"
 #include "emisor_resultados.h"
 #include "Tablero.h"
+#include "ReceptorJugada.h"
+#include "EmisorTablero.h"
 
-typedef struct coordenadas{
-    char columna;
-    char fila;
-} coordenadas_t;
-
-typedef struct parCoordenadas{
-    coordenadas_t pos1;
-    coordenadas_t pos2;
-    char extra;
-} par_t;
 
 typedef struct socks{
     Socket* enviar;
@@ -25,18 +17,6 @@ typedef struct socks{
     Socket* recibir;
     Socket* recibir_cli;
 } sockets_jugador_t;
-
-typedef struct celda_tablero{
-    char col;
-    char fila;
-    char tipo;
-    char color;
-} celda_t;
-
-typedef struct msj_celda{
-    char tipo;
-    celda_t celda;
-} msj_celda_t;
 
 typedef struct msj_puntos{
     char tipo;
@@ -52,8 +32,8 @@ class Jugador{
     public:
         Jugador(std::string& nombre, int enviar, int recibir);
         virtual ~Jugador();
-        void iniciar();
         int getPuntaje() { return puntaje; }
+        std::string Id() { return *id; }
         bool sumarPuntos();
         Jugada* obtenerJugada();
         bool terminarJugada();
@@ -61,9 +41,13 @@ class Jugador{
         int prepararSocketRecibir();
         int prepararSocketEnviar();
         void enviarBorrados();
-        void cerrarJugador();
-        void enviarPuntaje();
-        void enviarCelda(celda_t& celda);
+        void cerrar();
+        void enviarPuntaje(int id, int puntos);
+        void enviarTablero(Lista<celda_t*>& celdas);
+        void agregarMutex(Mutex* mutex_recibir);
+        void agregarIdActual(int* id_jugador);
+        void esperarJugada();
+        void terminarEmisionTablero();
     protected:
         int prepararSocket(int tipo, int puerto);
         bool recibirPar();
@@ -73,8 +57,11 @@ class Jugador{
         std::string* id;
         int puntaje;
         Jugada* jugada_actual;
+        EmisorTablero* emisor_tab;
         EmisorResultados* emisor;
-        Mutex* mutex;
+        Mutex* mutex_emisor;
+        Mutex* mutex_receptor;
         sockets_jugador_t* sockets;
+        ReceptorJugada* receptor;
 };
 #endif // JUGADOR_H
