@@ -56,7 +56,7 @@ class Nivel{
   protected:
     // Calcula el delay necesario para que el nivel se ejecute a 
     // 60 fps
-    int calcular_delay(FPS &frames);
+    void obtener_delay(FPS &frames, int tiempo_actual, int &delay);
     
     // Intercambia el contenido de las celdas cuyas coordenadas
     // son recibidas por parametro.

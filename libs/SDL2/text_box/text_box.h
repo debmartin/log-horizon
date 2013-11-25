@@ -56,6 +56,15 @@ class TextBox{
     //
     std::string ver_contenido(){return cadena;}
 
+    //
+    void ocultar();
+    
+    //
+    void no_ocultar();
+    
+    //
+    bool esta_oculta(){ return oculta;}
+
   private:
     Textura *fondo;
     SDL_Rect *origen;
@@ -65,11 +74,13 @@ class TextBox{
     bool modificacion;
     unsigned int distancia_borde;
     SDL_Rect *destino;
-  
-  protected:
+    bool oculta;
+    std::string mostrar_oculto;
     std::string mostrar;
     std::string cadena;
     size_t cantidad_caracteres;
+  
+  protected:
   
     //
     virtual void append_mostrar(const char c);

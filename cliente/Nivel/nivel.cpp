@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "../../libs/SDL2/SDL.h"
+#include "../../libs/json/include/json/json.h"
 #include "nivel.h"
 
 #define POS_X 100 // posicion en x de la matriz
@@ -60,28 +61,36 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   // DEFINIMOS LA MATRIZ
   tablero = new Matriz;
   std::string direccion_archivo = path + "estructura.dat";
-  std::ifstream archivo_estructura(direccion_archivo.c_str(), std::ifstream::in);
-  std::string linea;
   
-  coordenada_t dimension;
-  std::getline(archivo_estructura, linea);
-  dimension.x = atoi(linea.c_str());
-  std::getline(archivo_estructura, linea);
-  dimension.y = atoi(linea.c_str());
+  Json::Value estructura;
+  Json::Value aux;
+  Json::Reader reader;  
   
-  char **estructura = new char*[dimension.x];
-  char caracter;
-  for (int i = 0; i < dimension.x; i++){
-    estructura[i] = new char[dimension.y];
-    for (int z = 0; z < dimension.y; z++){
-      caracter = archivo_estructura.get();
-      if (caracter == '\n')
-        caracter = archivo_estructura.get();
-      estructura[i][z] = caracter;
+  std::ifstream archivo_estructura(direccion_archivo.c_str(), std::ifstream::binary | std::ifstream::in);
+  reader.parse(archivo_estructura, estructura, false);
+  
+  aux = estructura.get("filas", aux);
+  int filas = aux.asInt();
+  aux = estructura.get("columnas", aux);
+  int columnas = aux.asInt();
+
+  aux = estructura.get("matriz",aux );
+  
+  char **estructura_matriz = new char*[columnas];
+  for (int x = 0; x < columnas; x++){
+    estructura_matriz[x] = new char[filas];
+    for (int y = 0; y < filas; y++){
+      estructura_matriz[x][y] = aux[x][y].asInt();
     }
+    std::cout << std::endl;
   }
   
+  coordenada_t dimension;
+  dimension.x = columnas;
+  dimension.y = filas;
+  
   archivo_estructura.close();
+  
   ancho_celda = (ancho - POS_X * 2) / dimension.x;
   alto_celda = (alto - POS_Y * 2) / dimension.y;
   
@@ -91,13 +100,13 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   origen.h = alto_celda;
   origen.w = ancho_celda;
   
-  tablero->definir_forma(estructura, dimension, origen);
+  tablero->definir_forma(estructura_matriz, dimension, origen);
   tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup);
   
   for (int i = 0; i < dimension.x; i++){
-    delete[] estructura[i];
+    delete[] estructura_matriz[i];
   }
-  delete[] estructura;  
+  delete[] estructura_matriz;  
   
   fondo = new Textura;
   fondo->cargar_textura(fondo_sup, ventana);
@@ -162,6 +171,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   
   std::string direccion = path + "sonidos/sound.wav";
   sonido = Mix_LoadWAV(direccion.c_str());
+  sonido->volume = 60;
 }
 
 //
@@ -189,9 +199,8 @@ void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alt
     // Actualizacion
     Nivel::actualizar_animaciones();
     // actualizamos los fps
-    if (SDL_GetTicks() - tiempo_actual < 1000){
-      delay = Nivel::calcular_delay(frames);
-    }
+    Nivel::obtener_delay(frames, tiempo_actual, delay);
+  
     // Presentar en ventana
     ventana->presentar(delay);
   }
@@ -263,9 +272,11 @@ void Nivel::actualizar_animaciones(){
 }
 
 //
-int Nivel::calcular_delay(FPS &frames){
-  frames.actualizar();
-  return (1000/60.0f) * (frames.ver_fps()/60.0f);
+void Nivel::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
+  if (SDL_GetTicks() - tiempo_actual < 1000){
+    frames.actualizar();
+    delay =  (1000/60.0f) * (frames.ver_fps()/60.0f);
+  }
 }
 
 //

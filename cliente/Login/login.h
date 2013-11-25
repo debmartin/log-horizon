@@ -13,7 +13,7 @@ class Login{
     ~Login();
     
     //
-    void asignar_sockets(Socket *recibir, Socket *enviar);
+    void asignar_sockets(Socket* socket_recibir, Socket* socket_enviar);
     
     //
     int correr(Ventana *ventana, unsigned int ancho, unsigned  int alto);
@@ -27,8 +27,8 @@ class Login{
     Texto *escritor;
     Textura *textura_usuario;
     Textura *textura_clave;
-    SDL_Rect destino_usuario;
-    SDL_Rect destino_clave;
+    SDL_Rect destino_text_usuario;
+    SDL_Rect destino_text_clave;
     Mensaje *mensaje;
     bool conectando;
     
@@ -47,6 +47,9 @@ class Login{
     
     //
     virtual void enviar_datos();
+    
+    //
+    void obtener_delay(FPS &frames, int tiempo_actual, int &delay);
 };
 
 #endif // LOGIN_H

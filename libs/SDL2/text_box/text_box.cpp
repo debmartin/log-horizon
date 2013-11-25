@@ -13,6 +13,7 @@ TextBox::TextBox(){
   modificacion = true;
   destino = NULL;
   cantidad_caracteres = 0;
+  oculta = false;
 }
 
 //
@@ -86,6 +87,7 @@ void TextBox::analizar_evento(SDL_Event &evento){
     if (evento.type == SDL_KEYDOWN && evento.key.keysym.scancode == SDL_SCANCODE_BACKSPACE && cadena.length() > 0){
       cadena.erase(cadena.length() - 1, 1);
       mostrar.erase(mostrar.length() - 1, 1);
+      mostrar_oculto.erase(mostrar.length() - 1, 1);
       if (cadena.length() >= cantidad_caracteres)
         this->borrar_primero_mostrar();
         
@@ -96,6 +98,7 @@ void TextBox::analizar_evento(SDL_Event &evento){
       this->append_mostrar(c);
       if (mostrar.length() > cantidad_caracteres){
         mostrar.erase(0,1);
+        mostrar_oculto.erase(0,1);
       }
       modificacion = true; 
     }
@@ -117,11 +120,19 @@ bool TextBox::dibujar(Ventana *ventana){
   destino_aux.w = ancho_caracter * (mostrar.length() + 1);
   if (modificacion){
     Superficie *sup = new Superficie;
-    if (activada) mostrar += '|';
-    else mostrar += ' ';
-    
-    dibujador_texto->copiar_texto(mostrar, sup);
+    if (activada){
+      mostrar += '|';
+      mostrar_oculto += '|';
+    }else{
+      mostrar += ' ';
+      mostrar_oculto += ' ';
+    }
+    if (oculta)
+        dibujador_texto->copiar_texto(mostrar_oculto, sup);
+    else
+        dibujador_texto->copiar_texto(mostrar, sup);
     mostrar.erase(mostrar.length() - 1, 1);
+    mostrar_oculto.erase(mostrar_oculto.length() - 1, 1);
     
     texto->cargar_textura(sup, ventana);
     delete sup;
@@ -152,9 +163,23 @@ bool TextBox::esta_activada(){
 //
 void TextBox::append_mostrar(const char c){
   mostrar += c;
+  mostrar_oculto += '*';
 }
 
 //
 void TextBox::borrar_primero_mostrar(){
   mostrar.insert(0, 1, cadena[cadena.length() - cantidad_caracteres]);
+  mostrar.insert(0,1,'*');
+}
+
+//
+void TextBox::ocultar(){ 
+  modificacion = true;
+  oculta = true;
+}
+
+//
+void TextBox::no_ocultar(){ 
+  modificacion = true;
+  oculta = false;
 }

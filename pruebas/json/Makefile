@@ -5,12 +5,12 @@ CFLAGS = -Wall -pedantic -std=c++98 -g -L./lib ../../libs/json/libs/linux-gcc-4.
 #Nombre del programa principal
 CEXE = prueba
 
-all: json $(CEXE) prueba_leer 
+all: $(CEXE) prueba_leer
 
-$(CEXE): json prueba_leer $(CEXE).cpp
+$(CEXE): $(CEXE).cpp
 	$(CC) $(CFLAGS)  $(CEXE).cpp -o $(CEXE)
 
-prueba_leer: prueba_leer
+prueba_leer: prueba_leer.cpp
 	$(CC) $(CFLAGS) prueba_leer.cpp -o prueba_leer
 
 json:
@@ -23,7 +23,6 @@ clean:
 
 cleanAll: clean
 	-rm *.dat
-	cd ../../libs/json/; make clean
 	
 run: all
 	./$(CEXE)	

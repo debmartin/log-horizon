@@ -4,8 +4,8 @@
 // This is the JSON header
 #include "../../libs/json/include/json/json.h"
 
-#define COL 3
-#define FIL 4
+#define COL 9
+#define FIL 8
 
 int main(int argc, char **argv){
   Json::Value estructura;
@@ -14,14 +14,17 @@ int main(int argc, char **argv){
   
   Json::Value vec(Json::arrayValue);
   Json::Value matriz(Json::arrayValue);
-  for(int x = 0; x < FIL; x++){
-    for (int y = 0; y < COL; y++){
-      vec.append(Json::Value(x));
+  for(int x = 0; x < COL; x++){
+    for (int y = 0; y < FIL; y++){
+      vec.append(Json::Value(1));
     }
     matriz.append(vec);
     vec.clear();
   }
-  
+  matriz[1][2] = 0;
+  matriz[3][2] = 0;
+  matriz[5][2] = 0;
+  matriz[7][2] = 0;
   estructura["matriz"] = matriz;
   
   std::filebuf fb;
