@@ -78,15 +78,21 @@ class Nivel{
     // Envia el movimiento realizado al servidor.
     void enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente);
     
-    // Devuelve true si la coordenada ingresada es valida.
-    // Si la coordenada se va del rango de la matriz o la celda
-    // es hueca, se considerara invalida.
-    bool validar_coordenada(coordenada_t &origen);
-    
     // Inserta un producto del tipo y color en la celda de coordenada
     // ingresada por parametro
     void insertar(coordenada_t &celda, int tipo, int color);
     
+    //
+    void parsear_movimiento(dato_t &primero, dato_t &segundo);
+
+    //
+    void parsear_explosion(dato_t &primero, dato_t &segundo);
+
+    //
+    void parsear_insercion(dato_t &primero, dato_t &segundo);
+
+    //
+    void parsear_puntaje(dato_t &primero, dato_t &segundo);
 };
 
 #endif // NIVEL_H

@@ -27,7 +27,7 @@ class ReceptorResultados : public Thread{
     // Asigna un socket para poder recibir los datos que seran
     // encolados.
     // Pre: el socket debe existir
-    void agregar_socket(Socket *nuevo_socket);
+    void agregar_socket(Socket *nuevo_socket, int stop);
     
     // Funcion a realizar en otro hilo, recibe datos que almacenara
     // en la lista, hasta recibir una señal de finalizacion por el metodo
@@ -57,6 +57,7 @@ class ReceptorResultados : public Thread{
     Socket *socket;
     Mutex *mutex;
     bool seguir;
+    int stop_tipo;
 };
 
 #endif // RECEPTOR_RESULTADOS_H

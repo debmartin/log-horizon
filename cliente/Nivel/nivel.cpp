@@ -14,7 +14,7 @@
 #define MOVER 0
 #define EXPLOTAR 1
 #define INSERTAR 2
-#define PUNTAJE -1
+#define PUNTAJE 3
 
 //
 Nivel::Nivel(){
@@ -49,13 +49,13 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
                               int ancho, int alto, Socket* enviar, Socket* recibir){
                                 
   // SOCKETS
-  receptor->agregar_socket(recibir);
+  receptor->agregar_socket(recibir, PUNTAJE);
   receptor->correr();
   socket_enviar = enviar;
   
   // FONDOS
   Superficie *fondo_sup = new Superficie;
-  fondo_sup->cargar(path + "imagenes/fondo.png");
+  fondo_sup->cargar(path + "imagenes/fondo.jpg");
   fondo_sup->escalar(ancho,alto);
   
   // DEFINIMOS LA MATRIZ
@@ -115,15 +115,11 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
         
         struct stat buffer;
         Superficie sup_celda_especial;
-        bool especial = false;
         if (stat((celda_especial + ".png").c_str(), &buffer) == 0){
-          especial = true;
           sup_celda_especial.cargar(celda_especial + ".png");
+          tablero->dibujar_fondo_celdas(&sup_celda_especial, NULL, fondo_sup, coordenada_actual);
         }else if(stat((celda_especial + ".jpg").c_str(), &buffer) == 0){
-          especial = true;
           sup_celda_especial.cargar(celda_especial + ".jpg");
-        }
-        if (especial){
           tablero->dibujar_fondo_celdas(&sup_celda_especial, NULL, fondo_sup, coordenada_actual);
         }else{
           tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup, coordenada_actual);
@@ -156,17 +152,11 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       accion = receptor->ver_siguiente();
       if (accion == INSERTAR){
         receptor->borrar_siguiente(primero, segundo);
-        coordenada_t celda;
-        celda.x = primero.valor1;
-        celda.y = primero.valor2;
-        int tipo = segundo.valor1;
-        int color = segundo.valor2;
-        Nivel::insertar(celda, tipo, color);
+        Nivel::parsear_insercion(primero, segundo);
       }else{
         continuar = false;
       }
     }
-    ventana->presentar(10);
   }
   */
   
@@ -334,29 +324,14 @@ void Nivel::actualizar_receptor(){
     char tipo = receptor->borrar_siguiente(primero, segundo);
     switch(tipo){
       case MOVER:
-        coordenada_t origen, destino;
-        origen.x = primero.valor1;
-        origen.y = primero.valor2;
-        destino.x = segundo.valor1;
-        destino.y = segundo.valor2;
-        if (tablero->celda_existente(origen) && tablero->celda_existente(destino)){
-          Nivel::intercambiar(origen, destino);
-        }
+        this->parsear_movimiento(primero, segundo);
         break;
       case EXPLOTAR:
-        tablero->quitar_seleccion();
-        int tipo = segundo.valor1;
-        int color = segundo.valor2;
-        coordenada_t celda;
-        celda.x = primero.valor1;
-        celda.y = primero.valor2;
-        if (Nivel::validar_coordenada(celda) && tipo >= 0 && tipo < 3 && color >= 0 && color < 5){
-          reemplazo_t datos;
-          datos.tipo = tipo;
-          datos.color = color;
-          datos.celda = celda;
-          celdas_a_explotar->insertar_ultimo(datos);
-        }
+        this->parsear_explosion(primero, segundo);
+        break;
+      case INSERTAR:
+        break;
+      case PUNTAJE:
         break;
     }
     if (tipo != EXPLOTAR && !celdas_a_explotar->esta_vacia()){
@@ -370,6 +345,7 @@ void Nivel::actualizar_receptor(){
   }
 }
 
+//
 void Nivel::enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente){
   resultado_t movimiento;
   dato_t primero, segundo;
@@ -383,13 +359,52 @@ void Nivel::enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente
   socket_enviar->enviar(&movimiento , sizeof(resultado_t));
 }
 
-bool Nivel::validar_coordenada(coordenada_t &origen){
-  return (origen.x >= 0 && origen.x < tablero->numero_columnas() && origen.y >= 0 && origen.y < tablero->numero_filas());
-}
-
 //
 void Nivel::insertar(coordenada_t &celda, int tipo, int color){
   Textura *textura = productos->ver_textura(tipo,color);
   Animacion *animacion = productos->ver_animacion(tipo, color);
   tablero->insertar(textura, animacion, celda);
+}
+
+//
+void Nivel::parsear_movimiento(dato_t &primero, dato_t &segundo){
+  coordenada_t origen, destino;
+  origen.x = primero.valor1;
+  origen.y = primero.valor2;
+  destino.x = segundo.valor1;
+  destino.y = segundo.valor2;
+  if (tablero->celda_existente(origen) && tablero->celda_existente(destino)){
+    this->intercambiar(origen, destino);
+  }
+}
+
+//
+void Nivel::parsear_explosion(dato_t &primero, dato_t &segundo){
+  tablero->quitar_seleccion();
+  int tipo = segundo.valor1;
+  int color = segundo.valor2;
+  coordenada_t celda;
+  celda.x = primero.valor1;
+  celda.y = primero.valor2;
+  if (tablero->celda_existente(celda) && tipo >= 0 && tipo < 3 && color >= 0 && color < 5){
+    reemplazo_t datos;
+    datos.tipo = tipo;
+    datos.color = color;
+    datos.celda = celda;
+    celdas_a_explotar->insertar_ultimo(datos);
+  }
+}
+
+//
+void Nivel::parsear_insercion(dato_t &primero, dato_t &segundo){
+  coordenada_t celda;
+  celda.x = primero.valor1;
+  celda.y = primero.valor2;
+  int tipo = segundo.valor1;
+  int color = segundo.valor2;
+  Nivel::insertar(celda, tipo, color);
+}
+
+//
+void Nivel::parsear_puntaje(dato_t &primero, dato_t &segundo){
 }

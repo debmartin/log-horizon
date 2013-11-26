@@ -6,8 +6,6 @@
 
 #include "receptor_resultados.h"
 
-#define PUNTAJE 2
-
 // Constructor de la clase.
 ReceptorResultados::ReceptorResultados(){
   cola = new Lista<resultado_t>;
@@ -15,6 +13,7 @@ ReceptorResultados::ReceptorResultados(){
   seguir = true;
   socket = NULL;
   mutex = new Mutex;
+  stop_tipo = 0;
 }
 
 // Destructor de la clase
@@ -25,8 +24,9 @@ ReceptorResultados::~ReceptorResultados(){
 // Asigna un socket para poder recibir los datos que seran
 // encolados.
 // Pre: el socket debe existir
-void ReceptorResultados::agregar_socket(Socket *nuevo_socket){
+void ReceptorResultados::agregar_socket(Socket *nuevo_socket, int stop){
   socket = nuevo_socket;
+  stop_tipo = stop;
 }
 
 // Funcion a realizar en otro hilo, recibe datos que almacenara
@@ -43,7 +43,7 @@ void ReceptorResultados::funcion_a_correr(){
     mutex->bloquear();
     recibiendo = true;
     cola->insertar_ultimo(actual);
-    if (actual.tipo == PUNTAJE) recibiendo = false;
+    if (actual.tipo == stop_tipo) recibiendo = false;
   }
   mutex->desbloquear();
 }

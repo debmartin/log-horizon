@@ -87,7 +87,7 @@ void TextBox::analizar_evento(SDL_Event &evento){
     if (evento.type == SDL_KEYDOWN && evento.key.keysym.scancode == SDL_SCANCODE_BACKSPACE && cadena.length() > 0){
       cadena.erase(cadena.length() - 1, 1);
       mostrar.erase(mostrar.length() - 1, 1);
-      mostrar_oculto.erase(mostrar.length() - 1, 1);
+      mostrar_oculto.erase(mostrar_oculto.length() - 1, 1);
       if (cadena.length() >= cantidad_caracteres)
         this->borrar_primero_mostrar();
         
@@ -169,7 +169,7 @@ void TextBox::append_mostrar(const char c){
 //
 void TextBox::borrar_primero_mostrar(){
   mostrar.insert(0, 1, cadena[cadena.length() - cantidad_caracteres]);
-  mostrar.insert(0,1,'*');
+  mostrar_oculto.insert(0,1,'*');
 }
 
 //
