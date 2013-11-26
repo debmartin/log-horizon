@@ -119,7 +119,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
         if (stat((celda_especial + ".png").c_str(), &buffer) == 0){
           especial = true;
           sup_celda_especial.cargar(celda_especial + ".png");
-        }else if(stat((celda_especial + ".png").c_str(), &buffer) == 0){
+        }else if(stat((celda_especial + ".jpg").c_str(), &buffer) == 0){
           especial = true;
           sup_celda_especial.cargar(celda_especial + ".jpg");
         }
