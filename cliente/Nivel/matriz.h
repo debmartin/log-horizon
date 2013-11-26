@@ -92,7 +92,7 @@ class Matriz{
     
     // Dibuja en el espacio de cada celda, la superficie fondo celda
     // sobre la superficie fondo
-    bool dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Superficie *fondo);
+    bool dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Superficie *fondo, coordenada_t &celda);
     
     // Dibuja la matriz en la ventana ingresada
     bool dibujar(Ventana *ventana);

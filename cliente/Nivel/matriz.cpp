@@ -240,14 +240,16 @@ bool Matriz::apilar(Textura *tex, Animacion* anim, coordenada_t &celda){
 
 // Dibuja en el espacio de cada celda, la superficie fondo celda
 // sobre la superficie fondo
-bool Matriz::dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Superficie *fondo){
+bool Matriz::dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Superficie *fondo, coordenada_t &celda){
   if (!celdas) return false;
   
   SDL_Rect destino;
-  destino.x = primer_celda.x;
-  destino.y = primer_celda.y;
+  destino.x = primer_celda.x + primer_celda.w * celda.x;
+  destino.y = primer_celda.y + primer_celda.h * celda.y;
   destino.w = primer_celda.w;
   destino.h = primer_celda.h;
+  SDL_BlitScaled(fondo_celda->ver_surface(), sourc, fondo->ver_surface(), &destino);
+  /*
   for (int x = 0; x < columnas; x++){
     for (int y = 0; y < filas; y++){
       if (celdas[x][y]){
@@ -258,6 +260,7 @@ bool Matriz::dibujar_fondo_celdas(Superficie *fondo_celda, SDL_Rect *sourc, Supe
     destino.y = primer_celda.y;
     destino.x += primer_celda.w;
   }
+  */
   return true;
 }
 

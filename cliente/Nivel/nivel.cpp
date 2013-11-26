@@ -1,5 +1,8 @@
 #include <iostream>
 #include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/json/include/json/json.h"
@@ -55,9 +58,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   fondo_sup->cargar(path + "imagenes/fondo.png");
   fondo_sup->escalar(ancho,alto);
   
-  Superficie *fondo_celda = new Superficie;
-  fondo_celda->cargar(path + "imagenes/celda_fondo.png");
-  
   // DEFINIMOS LA MATRIZ
   tablero = new Matriz;
   std::string direccion_archivo = path + "estructura.dat";
@@ -82,7 +82,6 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
     for (int y = 0; y < filas; y++){
       estructura_matriz[x][y] = aux[x][y].asInt();
     }
-    std::cout << std::endl;
   }
   
   coordenada_t dimension;
@@ -100,8 +99,38 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   origen.h = alto_celda;
   origen.w = ancho_celda;
   
+  Superficie *fondo_celda = new Superficie;
+  fondo_celda->cargar(path + "imagenes/celda_fondo.png");
+  
   tablero->definir_forma(estructura_matriz, dimension, origen);
-  tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup);
+  for (int x = 0; x < columnas; x++){
+    for (int y = 0; y < filas; y++){
+      coordenada_t coordenada_actual;
+      coordenada_actual.x = x;
+      coordenada_actual.y = y;
+      if (tablero->celda_existente(coordenada_actual)){
+        char x_char = x + '0';
+        char y_char = y + '0';
+        std::string celda_especial = path + "imagenes/" + x_char + y_char;
+        
+        struct stat buffer;
+        Superficie sup_celda_especial;
+        bool especial = false;
+        if (stat((celda_especial + ".png").c_str(), &buffer) == 0){
+          especial = true;
+          sup_celda_especial.cargar(celda_especial + ".png");
+        }else if(stat((celda_especial + ".png").c_str(), &buffer) == 0){
+          especial = true;
+          sup_celda_especial.cargar(celda_especial + ".jpg");
+        }
+        if (especial){
+          tablero->dibujar_fondo_celdas(&sup_celda_especial, NULL, fondo_sup, coordenada_actual);
+        }else{
+          tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup, coordenada_actual);
+        }
+      }
+    }
+  }
   
   for (int i = 0; i < dimension.x; i++){
     delete[] estructura_matriz[i];
