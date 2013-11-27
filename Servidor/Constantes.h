@@ -25,6 +25,7 @@
 #define MOVER '0'
 #define BORRAR '1'
 #define INSERTAR '2'
-#define TERMINAR '3'
+#define PUNTOS '3'
+#define TERMINAR '4'
 
 #endif // CONSTANTES_H_INCLUDED

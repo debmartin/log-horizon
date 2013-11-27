@@ -1,3 +1,5 @@
+#include "emisor_resultados.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,7 +7,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#include "emisor_resultados.h"
 
 #define PUNTAJE 3
 #define MILISEGUNDOS 10

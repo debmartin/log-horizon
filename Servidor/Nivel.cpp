@@ -58,6 +58,7 @@ void Nivel::jugar(){
         jugadores->terminarJugada();
         nueva_jugada = NULL;
     }
+    jugadores->enviarGanador(puntaje_max >= puntaje_objetivo);
 }
 
 void Nivel::cerrarJugador(){

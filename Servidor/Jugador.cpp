@@ -6,38 +6,33 @@
 #define ENVIAR 0
 #define RECIBIR 1
 
-#define LARGO_VECTOR 4
 #define IP "127.0.0.1"
 
 using std::string;
 
-Jugador::Jugador(string& nombre, int enviar, int recibir) :
+Jugador::Jugador(usuario_t& usuario) :
     puerto_enviar(enviar), puerto_recibir(recibir), puntaje(0), jugada_actual(NULL), mutex_receptor(NULL){
-    id = new string(nombre);
-    sockets = new sockets_jugador_t();
-
-    sockets->enviar = NULL;
-    sockets->recibir = NULL;
-    sockets->enviar_cli = NULL;
-    sockets->recibir_cli = NULL;
+    id = usuario.nombre;
+    sockets = usuario.sockets;
 
     emisor_tab = new EmisorTablero();
-
     emisor = new EmisorResultados();
     mutex_emisor = new Mutex();
+
     emisor->agregar_mutex(mutex_emisor);
+    emisor->agregar_socket(sockets->enviar_cli)
+    emisor_tab->agregarMutex(mutex_emisor);
+    emisor_tab->agregarSocket(sockets->enviar_cli)
 
     receptor = new ReceptorJugada();
+    receptor->agregarSocket(sockets->recibir_cli);
 }
 
 Jugador::~Jugador(){
     if(jugada_actual) delete jugada_actual;
-    delete id;
     delete receptor;
     delete emisor;
-    delete emisor_tab;
     delete mutex_emisor;
-    delete sockets;
 }
 
 Jugada* Jugador::obtenerJugada(){
@@ -62,13 +57,13 @@ void Jugador::agregarMutex(Mutex* mutex_recibir){
 
 void Jugador::enviarTablero(Lista<celda_t*>& celdas){
     emisor_tab->agregarTablero(&celdas);
-    emisor_tab->agregarSocket(sockets->enviar_cli);
-    emisor_tab->agregarMutex(mutex_emisor);
     emisor_tab->correr();
 }
 
 void Jugador::terminarEmisionTablero(){
     emisor_tab->join();
+    delete emisor_tab;
+    emisor_tab = NULL;
 }
 
 bool Jugador::terminarJugada(){
@@ -76,6 +71,7 @@ bool Jugador::terminarJugada(){
         return false;
     delete jugada_actual;
     jugada_actual = NULL;
+    receptor->terminarActual();
     return true;
 }
 
@@ -112,56 +108,7 @@ void Jugador::cerrar(){
     emisor->finalizar();
     receptor->join();
     emisor->join();
-    Socket* sock_actual;
-
-    for(int i=0; i<4; i++){
-        switch (i){
-            case 0:
-                sock_actual = sockets->enviar;
-                break;
-            case 1:
-                sock_actual = sockets->enviar_cli;
-                break;
-            case 2:
-                sock_actual = sockets->recibir;
-                break;
-            case 3:
-                sock_actual = sockets->recibir_cli;
-        }
-        sock_actual->cerrar_enviar_recibir();
-        delete sock_actual;
-    }
     emisor->finalizar();
-}
-
-int Jugador::prepararSocket(int tipo, int puerto){
-    Socket* sockfd = (tipo == ENVIAR) ? sockets->enviar : sockets->recibir;
-    Socket* sockcli = (tipo == ENVIAR) ? sockets->enviar_cli : sockets->recibir_cli;
-
-    sockfd = new Socket();
-    sockfd->asignar_direccion(puerto, IP);
-    if (sockfd->reusar() == -1) return 1;
-    if (sockfd->asociar() == -1) return 2;
-    if (sockfd->escuchar() == -1) return 3;
-    sockcli = new Socket();
-    if (sockfd->aceptar(*sockcli) == -1) return 4;
-    return 0;
-}
-
-int Jugador::prepararSocketEnviar(){
-    if(sockets) return 5;
-    int res = prepararSocket(ENVIAR, puerto_enviar);
-    if (res != 0) return res;
-    emisor->agregar_socket(sockets->enviar_cli);
-    return 0;
-}
-
-int Jugador::prepararSocketRecibir(){
-    if(sockets) return 5;
-    int res = prepararSocket(RECIBIR, puerto_recibir);
-    if (res != 0) return res;
-    receptor->agregarSocket(sockets->recibir_cli);
-    return 0;
 }
 
 void Jugador::enviarBorrados(){
@@ -172,24 +119,28 @@ void Jugador::esperarJugada(){
     receptor->correr();
 }
 
-void Jugador::enviarPuntaje(int id, int puntos){
-//    std::stringstream ss;
-//    ss << jugada_actual->verPuntos();
-//    string puntos(ss.str());
-//
-//    msj_puntos_t msj;
-//    msj.tipo = TERMINAR;
-//    char vector[] = {msj.indice1, msj.indice2, msj.indice3, msj.indice4};
-//    int len = puntos.length(), contador = len-1;
-//
-//    for(int i=LARGO_VECTOR-1; i<=0; i--){
-//        char& indice = vector[i];
-//        if(contador >= 0)
-//             indice = '0';
-//        else
-//            indice = puntos[contador];
-//        contador--;
-//    }
-//
-//    sockets->enviar_cli->enviar(&msj, sizeof(msj));
+void Jugador::enviarPuntaje(int puntos){
+    std::stringstream ss;
+    ss << puntos;
+    string str_puntos(ss.str());
+
+    char msj[LEN_MSJ];
+    msj[0] = PUNTOS;
+    int len = str_puntos.length(), contador = len-1;
+
+    for(int i = LEN_MSJ-2; i>=0; i--){
+        char& indice = msj[i];
+        if(contador >= 0)
+            indice = str_puntos[contador];
+        else
+            indice = '0';
+        contador--;
+    }
+    enviarMensaje(msj, LEN_MSJ);
+}
+
+void Jugador::enviarMensaje(void* mensaje, int len){
+    mutex_emisor->bloquear();
+    sockets->enviar_cli->enviar(mensaje, len);
+    mutex_emisor->desbloquear();
 }

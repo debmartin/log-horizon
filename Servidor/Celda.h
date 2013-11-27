@@ -2,6 +2,7 @@
 #define CELDA_H
 #include <cstdlib>
 #include "Constantes.h"
+
 class Celda {
     public:
         Celda();

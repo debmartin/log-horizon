@@ -3,8 +3,9 @@
 
 #include <string>
 #include <sstream>
-#include "Jugada.h"
 #include "../libs/TDA/socket/socket.h"
+#include "../libs/TDA/thread/thread.h"
+#include "Jugada.h"
 #include "emisor_resultados.h"
 #include "Tablero.h"
 #include "ReceptorJugada.h"
@@ -17,14 +18,6 @@ typedef struct socks{
     Socket* recibir;
     Socket* recibir_cli;
 } sockets_jugador_t;
-
-typedef struct msj_puntos{
-    char tipo;
-    char indice1;
-    char indice2;
-    char indice3;
-    char indice4;
-} msj_puntos_t;
 
 
 
@@ -42,12 +35,13 @@ class Jugador{
         int prepararSocketEnviar();
         void enviarBorrados();
         void cerrar();
-        void enviarPuntaje(int id, int puntos);
+        void enviarPuntaje(int puntos);
         void enviarTablero(Lista<celda_t*>& celdas);
         void agregarMutex(Mutex* mutex_recibir);
         void agregarIdActual(int* id_jugador);
         void esperarJugada();
         void terminarEmisionTablero();
+        void enviarMensaje(void* mensaje, int len);
     protected:
         int prepararSocket(int tipo, int puerto);
         bool recibirPar();
