@@ -25,6 +25,7 @@ int main(void){
   
   SDL libreria = SDL(SDL_INIT_EVERYTHING);
   libreria.habilitar_sonido(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+  libreria.habilitar_texto();
   Ventana *ventana = new Ventana;
   ventana->abrir(ANCHO,ALTO);
   ventana->dimension_logica(ANCHO,ALTO);

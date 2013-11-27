@@ -16,9 +16,6 @@ animacion.o: ../../libs/SDL2/animacion/animacion.h ../../libs/SDL2/animacion/ani
 superficie.o: ../../libs/SDL2/superficie/superficie.h ../../libs/SDL2/superficie/superficie.cpp
 	$(CC) $(CFLAGS) -c ../../libs/SDL2/superficie/superficie.cpp
 	
-text_box.o: ../../libs/SDL2/text_box/text_box.h ../../libs/SDL2/text_box/text_box.cpp
-	$(CC) $(CFLAGS) -c ../../libs/SDL2/text_box/text_box.cpp
-
 fps.o: ../../libs/SDL2/fps/fps.h ../../libs/SDL2/fps/fps.cpp
 	$(CC) $(CFLAGS) -c ../../libs/SDL2/fps/fps.cpp
 	
@@ -36,6 +33,9 @@ explosion.o: ../../cliente/Nivel/explosion.h ../../cliente/Nivel/explosion.cpp
 	
 celdas_vacias.o: ../../cliente/Nivel/celdas_vacias.h ../../cliente/Nivel/celdas_vacias.cpp
 	$(CC) $(CFLAGS) -c ../../cliente/Nivel/celdas_vacias.cpp
+	
+puntaje.o: ../../cliente/Nivel/puntaje.h ../../cliente/Nivel/puntaje.cpp
+	$(CC) $(CFLAGS) -c ../../cliente/Nivel/puntaje.cpp
 
 productos.o: ../../cliente/Nivel/productos.h ../../cliente/Nivel/productos.cpp
 	$(CC) $(CFLAGS) -c ../../cliente/Nivel/productos.cpp
@@ -50,8 +50,8 @@ thread.o: ../../libs/TDA/thread/thread.h ../../libs/TDA/thread/thread.cpp
 	$(CC) $(CFLAGS) -c ../../libs/TDA/thread/thread.cpp
 
 
-$(CEXE): ventana.o superficie.o animacion.o fps.o texto.o text_box.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o animacion.o fps.o texto.o text_box.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): puntaje.o ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
+	$(CC) $(CFLAGS) puntaje.o ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
 
 prueba_enviar: receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp
 	$(CC) $(CFLAGS) receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp -o prueba_enviar

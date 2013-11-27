@@ -1,8 +1,11 @@
 #include <iostream>
 #include "../../libs/TDA/socket/socket.h"
 #include "../../libs/TDA/thread/thread.h"
-#include "../../cliente/Nivel/receptor_resultados.h"
 #include <unistd.h>
+#include <stdio.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <stdlib.h>
 
 class Socket_receptor : public Thread{
   public:
@@ -14,19 +17,11 @@ class Socket_receptor : public Thread{
       sock->escuchar();
       cliente = new Socket;
       sock->aceptar(*cliente);
-      resultado_t resultado;
+      char resultado[5];
       while(true){
-        if (cliente->recibir(&resultado, sizeof(resultado_t)) == 0){
+        if (cliente->recibir(&resultado[0], 5) == 0){
           return;
         }
-        int a = resultado.tipo;
-        int b = resultado.primero.valor1;
-        int c = resultado.primero.valor2;
-        int d = resultado.segundo.valor1;
-        int e = resultado.segundo.valor2;
-        
-        std::cout << "recibido: " << a << b << c << d << e << std::endl;
-
       }
     }
   
@@ -49,21 +44,26 @@ int main(void){
   if (socket->escuchar() == -1) return 3;
   Socket *cliente = new Socket;
   if (socket->aceptar(*cliente) == -1) return 4;
-  resultado_t resultado;
-  dato_t dato1, dato2;
   std::string linea;
   while(true){
     std::getline(std::cin, linea);
     if (linea[0] == 'q') return 0;
-    resultado.tipo = linea[0] - '0';
-    dato1.valor1 =  linea[1] - '0';
-    dato1.valor2 = linea[2] - '0';
-    dato2.valor1 = linea[3] - '0';
-    dato2.valor2 = linea[4] - '0';
-    resultado.primero = dato1;
-    resultado.segundo = dato2;
-    if (cliente->enviar(&resultado, sizeof(resultado_t)) == -1) return 5;
-/*    
-*/  }
+    linea[0] -= '0';
+    if (linea[0] != 3){
+      linea[1] -= '0';
+      linea[2] -= '0';
+      linea[3] -= '0';
+      linea[4] -= '0';
+      if (cliente->enviar(&linea[0], 5) == -1) return 5;
+    }else{
+      char aux[5];
+      memcpy(&aux[0], &linea[1], 4);
+      aux[4] = '\0';
+      uint32_t puntos_aux = atoi(aux);
+      puntos_aux = htonl(puntos_aux);
+      memcpy(&linea[1], &puntos_aux, 4);
+      if (cliente->enviar(&linea[0], 5) == -1) return 6;
+    }
+  }
   return 0;
 }

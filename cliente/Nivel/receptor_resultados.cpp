@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <arpa/inet.h>
+#include <string.h>
 
 #include "receptor_resultados.h"
 
@@ -37,8 +38,13 @@ void ReceptorResultados::funcion_a_correr(){
   mutex->bloquear();
   while (seguir){
     mutex->desbloquear();
+    char tipo;
+    uint32_t mensaje;
+    socket->recibir(&tipo , sizeof(tipo));
+    socket->recibir(&mensaje , sizeof(mensaje));
     resultado_t actual;
-    socket->recibir(&actual , sizeof(resultado_t));
+    actual.tipo = tipo;
+    actual.mensaje = mensaje;
     
     mutex->bloquear();
     recibiendo = true;
@@ -65,14 +71,13 @@ bool ReceptorResultados::cola_vacia(){
 }
 
 // Elimina el siguiente dato de la cola y almacena los datos
-// en los parametros ingresados y retorna el tipo de mensaje
+// en el parametro ingresado y retorna el tipo de mensaje
 // desencolado
-char ReceptorResultados::borrar_siguiente(dato_t &primer_dato, dato_t &segundo_dato){
+char ReceptorResultados::borrar_siguiente(uint32_t &mensaje){
   mutex->bloquear();
   resultado_t aux = cola->borrar_primero();
   mutex->desbloquear();
-  primer_dato = aux.primero;
-  segundo_dato = aux.segundo;
+  mensaje = aux.mensaje;
   return aux.tipo;
 }
 

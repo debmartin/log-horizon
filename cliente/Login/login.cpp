@@ -83,7 +83,7 @@ void Login::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
 //
 int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto){
   // FONDO
-  fondo->cargar_textura("../../recursos/imagenes/fondo_login.jpg", ventana);
+  fondo->cargar_textura("../../recursos/imagenes/fondo_login.png", ventana);
   
   // usado como punto de referencia para los demas destinos
   SDL_Rect destino;
@@ -123,6 +123,17 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   destino_text_clave.x = destino.x - destino.w / 2 - 5;
   destino_text_clave.h = destino.h;
   destino_text_clave.w = destino.w / 2;
+
+  // TEXTO
+  Superficie sup;
+  
+  escritor->asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
+  escritor->asignar_color(0,0,0,255);
+  
+  escritor->copiar_texto("Usuario:", &sup);
+  textura_usuario->cargar_textura(&sup, ventana);
+  escritor->copiar_texto("Contraseña:", &sup);
+  textura_clave->cargar_textura(&sup, ventana);
   
   // BOTON  
   SDL_Rect normal, apretado, sobre;
@@ -146,11 +157,9 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   
   iniciar_sesion->asignar_texturas("../../recursos/imagenes/boton.png", estructura, ventana);
   
-  Superficie sup;
-  Texto texto;
-  texto.asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
-  texto.asignar_color(220,220,0,255);
-  texto.copiar_texto("iniciar sesion", &sup);
+  escritor->asignar_color(220,220,0,255);
+  escritor->copiar_texto("iniciar sesion", &sup);
+  escritor->asignar_color(0,0,0,255);
   
   SDL_Rect destino_texto;
   destino_texto.x = destino_boton.x + destino_boton.w / 10;
@@ -164,28 +173,19 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   sonido = Mix_LoadWAV(direccion.c_str());
   sonido->volume = VOLUMEN;
   
-  // TEXTO
-  escritor->asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
-  escritor->asignar_color(0,0,0,255);
-  
-  escritor->copiar_texto("Usuario:", &sup);
-  textura_usuario->cargar_textura(&sup, ventana);
-  escritor->copiar_texto("Contraseña:", &sup);
-  textura_clave->cargar_textura(&sup, ventana);
-  
   // MENSAJE
   sup.cargar("../../recursos/imagenes/sub_ventana.png");
-  destino.w = ancho/3;
-  destino.h = alto/4;
-  destino.x = ancho/2 - destino.w/2;
-  destino.y = alto/2 - destino.h/2;
+  destino.w = ancho / 3;
+  destino.h = alto / 4;
+  destino.x = ancho / 2 - destino.w / 2;
+  destino.y = alto / 2 - destino.h / 2;
   mensaje->asignar_fondo(&sup, destino, ventana);
   mensaje->establecer_alpha_fondo(ALPHA_MENSAJE);
   escritor->copiar_texto("Enviando datos...", &sup);
   destino.w = destino.w - destino.w / 5;
   destino.h = destino.h / 4;
   destino.y = destino.y + destino.h * 2 - destino.h / 2;
-  destino.x = destino.x + destino.w/8;
+  destino.x = destino.x + destino.w / 8;
   mensaje->asignar_mensaje(&sup, destino, ventana);
   
   return 0;

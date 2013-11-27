@@ -20,6 +20,9 @@ class Texto{
     bool asignar_fuente(const std::string& path, int font_tam);
     
     // Asigna un color al texto
+    void asignar_color(SDL_Color color_nuevo){color = color_nuevo;}
+    
+    // Asigna un color al texto
     void asignar_color(Uint8 r, Uint8 g, Uint8 b, Uint8 alpha_level);
     
     // Copia el string 
@@ -30,6 +33,9 @@ class Texto{
     
     //
     void agregar_borde(int espesor);
+    
+    //
+    bool fuente_cargada(){return fuente != NULL;}
 
   private:
     SDL_Color color;

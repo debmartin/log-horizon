@@ -89,3 +89,9 @@ bool Boton::dibujar(Ventana *ventana){
   }
   return true;
 }
+
+//
+void Boton::establecer_alpha(Uint8 alpha){
+  textura->establecer_alpha(alpha);
+  texto->establecer_alpha(alpha);
+}

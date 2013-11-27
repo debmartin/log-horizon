@@ -16,6 +16,8 @@
 #define INSERTAR 2
 #define PUNTAJE 3
 
+#define VOLUMEN 60
+
 //
 Nivel::Nivel(){
   fondo = NULL;
@@ -27,8 +29,8 @@ Nivel::Nivel(){
   productos = new Productos;
   receptor = new ReceptorResultados;
   celdas_a_explotar = new Lista<reemplazo_t>;
+  puntaje = new Puntaje;
   socket_enviar = NULL;
-  
 }
 
 //
@@ -42,12 +44,12 @@ Nivel::~Nivel(){
   delete productos;
   delete receptor;
   delete celdas_a_explotar;
+  delete puntaje;
 }
 
 //
 void Nivel::inicializar_datos(const std::string &path, Ventana *ventana, 
                               int ancho, int alto, Socket* enviar, Socket* recibir){
-                                
   // SOCKETS
   receptor->agregar_socket(recibir, PUNTAJE);
   receptor->correr();
@@ -55,7 +57,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   
   // FONDOS
   Superficie *fondo_sup = new Superficie;
-  fondo_sup->cargar(path + "imagenes/fondo.jpg");
+  fondo_sup->cargar(path + "imagenes/fondo.png");
   fondo_sup->escalar(ancho,alto);
   
   // DEFINIMOS LA MATRIZ
@@ -111,15 +113,12 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       if (tablero->celda_existente(coordenada_actual)){
         char x_char = x + '0';
         char y_char = y + '0';
-        std::string celda_especial = path + "imagenes/" + x_char + y_char;
+        std::string celda_especial = path + "imagenes/" + x_char + y_char + ".png";
         
         struct stat buffer;
         Superficie sup_celda_especial;
-        if (stat((celda_especial + ".png").c_str(), &buffer) == 0){
-          sup_celda_especial.cargar(celda_especial + ".png");
-          tablero->dibujar_fondo_celdas(&sup_celda_especial, NULL, fondo_sup, coordenada_actual);
-        }else if(stat((celda_especial + ".jpg").c_str(), &buffer) == 0){
-          sup_celda_especial.cargar(celda_especial + ".jpg");
+        if (stat(celda_especial.c_str(), &buffer) == 0){
+          sup_celda_especial.cargar(celda_especial);
           tablero->dibujar_fondo_celdas(&sup_celda_especial, NULL, fondo_sup, coordenada_actual);
         }else{
           tablero->dibujar_fondo_celdas(fondo_celda, NULL, fondo_sup, coordenada_actual);
@@ -188,15 +187,30 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   // CELDAS VACIAS
   celdas_vacias->inicializar(tablero->numero_columnas());
   
+  // PUNTAJE
+  SDL_Color color;
+  color.r = 0;
+  color.g = 0;
+  color.b = 0;
+  color.a = 255;
+  
+  puntaje->asignar_fuente("../../recursos/fuentes/orange.ttf", 50, color);
+  SDL_Rect destino_puntaje;
+  destino_puntaje.x = 10;
+  destino_puntaje.y = 10;
+  destino_puntaje.w = 35;
+  destino_puntaje.h = 50;
+  puntaje->asignar_destino(destino_puntaje, ventana);
+  
+  // SONIDO
   std::string direccion = path + "sonidos/sound.wav";
   sonido = Mix_LoadWAV(direccion.c_str());
-  sonido->volume = 60;
+  sonido->volume = VOLUMEN;
 }
 
 //
 void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir){
   // Inicializacion
-
   Nivel::inicializar_datos(path, ventana, ancho, alto, enviar, recibir);
 
   SDL_Event evento;
@@ -269,6 +283,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
 void Nivel::dibujar(Ventana *ventana){
   fondo->dibujar(ventana);
   tablero->dibujar(ventana);
+  puntaje->dibujar();
 }
 
 //
@@ -319,19 +334,19 @@ void Nivel::explotar(coordenada_t &celda, int tipo, int color){
 //
 void Nivel::actualizar_receptor(){
   if (!receptor->cola_vacia()){
-    dato_t primero;
-    dato_t segundo;
-    char tipo = receptor->borrar_siguiente(primero, segundo);
+    Uint32 mensaje;
+    char tipo = receptor->borrar_siguiente(mensaje);
     switch(tipo){
       case MOVER:
-        this->parsear_movimiento(primero, segundo);
+        this->parsear_movimiento(mensaje);
         break;
       case EXPLOTAR:
-        this->parsear_explosion(primero, segundo);
+        this->parsear_explosion(mensaje);
         break;
       case INSERTAR:
         break;
       case PUNTAJE:
+        Nivel::parsear_puntaje(mensaje);
         break;
     }
     if (tipo != EXPLOTAR && !celdas_a_explotar->esta_vacia()){
@@ -347,46 +362,48 @@ void Nivel::actualizar_receptor(){
 
 //
 void Nivel::enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente){
-  resultado_t movimiento;
-  dato_t primero, segundo;
-  primero.valor1 = celda.x;
-  primero.valor2 = celda.y;
-  segundo.valor1 = celda_adyacente.x;
-  segundo.valor2 = celda_adyacente.y;
-  movimiento.tipo = MOVER;
-  movimiento.primero = primero;
-  movimiento.segundo = segundo;
-  socket_enviar->enviar(&movimiento , sizeof(resultado_t));
+  char mensaje[5];
+  mensaje[0] = MOVER;
+  mensaje[1] = celda.x;
+  mensaje[2] = celda.y;
+  mensaje[3] = celda_adyacente.x;
+  mensaje[4] = celda_adyacente.y;
+  socket_enviar->enviar(mensaje, 5);
 }
 
 //
 void Nivel::insertar(coordenada_t &celda, int tipo, int color){
-  Textura *textura = productos->ver_textura(tipo,color);
-  Animacion *animacion = productos->ver_animacion(tipo, color);
-  tablero->insertar(textura, animacion, celda);
+  if (tablero->celda_existente(celda) ){
+    Textura *textura = productos->ver_textura(tipo,color);
+    Animacion *animacion = productos->ver_animacion(tipo, color);
+    tablero->insertar(textura, animacion, celda);
+  }
 }
 
 //
-void Nivel::parsear_movimiento(dato_t &primero, dato_t &segundo){
+void Nivel::parsear_movimiento(uint32_t &mensaje){
   coordenada_t origen, destino;
-  origen.x = primero.valor1;
-  origen.y = primero.valor2;
-  destino.x = segundo.valor1;
-  destino.y = segundo.valor2;
-  if (tablero->celda_existente(origen) && tablero->celda_existente(destino)){
+  char traducir[4];
+  memcpy(traducir, &mensaje, 4);
+  origen.x = traducir[0];
+  origen.y = traducir[1];
+  destino.x = traducir[2];
+  destino.y = traducir[3];
+  if (tablero->celda_existente(origen) && tablero->celda_existente(destino) && (origen.x != destino.x || origen.y != destino.y)){
     this->intercambiar(origen, destino);
   }
 }
 
 //
-void Nivel::parsear_explosion(dato_t &primero, dato_t &segundo){
-  tablero->quitar_seleccion();
-  int tipo = segundo.valor1;
-  int color = segundo.valor2;
+void Nivel::parsear_explosion(uint32_t &mensaje){
+  char traducir[4];
+  memcpy(traducir, &mensaje, 4);
   coordenada_t celda;
-  celda.x = primero.valor1;
-  celda.y = primero.valor2;
-  if (tablero->celda_existente(celda) && tipo >= 0 && tipo < 3 && color >= 0 && color < 5){
+  celda.x = traducir[0];
+  celda.y = traducir[1];
+  int tipo = traducir[2];
+  int color = traducir[3];
+  if (tablero->celda_existente(celda) && tipo <= 3 && tipo >= 0 && color >= 0 && color <= 4){
     reemplazo_t datos;
     datos.tipo = tipo;
     datos.color = color;
@@ -396,15 +413,21 @@ void Nivel::parsear_explosion(dato_t &primero, dato_t &segundo){
 }
 
 //
-void Nivel::parsear_insercion(dato_t &primero, dato_t &segundo){
+void Nivel::parsear_insercion(uint32_t &mensaje){
+  char traducir[4];
+  memcpy(traducir, &mensaje, 4);
   coordenada_t celda;
-  celda.x = primero.valor1;
-  celda.y = primero.valor2;
-  int tipo = segundo.valor1;
-  int color = segundo.valor2;
-  Nivel::insertar(celda, tipo, color);
+  celda.x = traducir[0];
+  celda.y = traducir[1];
+  int tipo = traducir[2];
+  int color = traducir[3];
+  if (tablero->celda_existente(celda)){
+    Nivel::insertar(celda, tipo, color);
+  }
 }
 
 //
-void Nivel::parsear_puntaje(dato_t &primero, dato_t &segundo){
+void Nivel::parsear_puntaje(uint32_t &mensaje){
+  unsigned int dif = ntohl(mensaje);
+  puntaje->sumar_puntos(dif);
 }

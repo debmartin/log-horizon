@@ -1,14 +1,18 @@
 #ifndef NIVEL_H
 #define NIVEL_H
 
-#include "../../libs/SDL2/SDL.h"
+#include <arpa/inet.h>
+
 #include "matriz.h"
-#include "../../libs/TDA/lista/lista.h"
 #include "explosion.h"
 #include "celdas_vacias.h"
 #include "productos.h"
-#include "../../libs/TDA/socket/socket.h"
 #include "receptor_resultados.h"
+#include "puntaje.h"
+
+#include "../../libs/SDL2/SDL.h"
+#include "../../libs/TDA/lista/lista.h"
+#include "../../libs/TDA/socket/socket.h"
 
 
 class Nivel{
@@ -52,6 +56,7 @@ class Nivel{
     Socket *socket_enviar;
     Lista<reemplazo_t> *celdas_a_explotar;
     Mix_Chunk *sonido;
+    Puntaje *puntaje;
     
   protected:
     // Calcula el delay necesario para que el nivel se ejecute a 
@@ -83,16 +88,16 @@ class Nivel{
     void insertar(coordenada_t &celda, int tipo, int color);
     
     //
-    void parsear_movimiento(dato_t &primero, dato_t &segundo);
+    void parsear_movimiento(uint32_t &mensaje);
 
     //
-    void parsear_explosion(dato_t &primero, dato_t &segundo);
+    void parsear_explosion(uint32_t &mensaje);
 
     //
-    void parsear_insercion(dato_t &primero, dato_t &segundo);
+    void parsear_insercion(uint32_t &mensaje);
 
     //
-    void parsear_puntaje(dato_t &primero, dato_t &segundo);
+    void parsear_puntaje(uint32_t &mensaje);
 };
 
 #endif // NIVEL_H

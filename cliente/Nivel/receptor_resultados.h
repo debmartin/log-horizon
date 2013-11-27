@@ -4,16 +4,11 @@
 #include "../../libs/TDA/socket/socket.h"
 #include "../../libs/TDA/thread/thread.h"
 #include "../../libs/TDA/lista/lista.h"
-
-typedef struct dato{
-  char valor1;
-  char valor2;
-}dato_t;
+#include <arpa/inet.h>
 
 typedef struct resultado{
   char tipo;
-  dato_t primero;
-  dato_t segundo;
+  uint32_t mensaje;
 }resultado_t;
 
 class ReceptorResultados : public Thread{
@@ -43,7 +38,7 @@ class ReceptorResultados : public Thread{
     // Elimina el siguiente dato de la cola y almacena los datos
     // en los parametros ingresados y retorna el tipo de mensaje
     // desencolado
-    char borrar_siguiente(dato_t &primer_dato, dato_t &segundo_dato);
+    char borrar_siguiente(uint32_t &mensaje);
     
     // Devuelve el tipo del siguiente mensaje
     char ver_siguiente();

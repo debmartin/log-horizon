@@ -325,6 +325,6 @@ bool Matriz::adyacente_seleccionado(coordenada_t &celda, coordenada_t &celda_ady
 // devuelve true si existe la celda de coordenadas ingresadas
 // por parametro, caso contrario retorna false
 bool Matriz::celda_existente(coordenada_t &celda){
-  if (celda.x < 0 || celda.x > columnas || celda.y < 0 || celda.y > filas) return false;
+  if (celda.x < 0 || celda.x >= columnas || celda.y < 0 || celda.y >= filas) return false;
   return celdas[celda.x][celda.y] != NULL;
 }

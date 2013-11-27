@@ -19,8 +19,7 @@ Texto::~Texto(){}
 bool Texto::asignar_fuente(const std::string& path, int font_tam){
   if (fuente) TTF_CloseFont(fuente);
   fuente = TTF_OpenFont(path.c_str(), font_tam);
-  if (!fuente) return false;
-  return true;
+  return fuente != NULL;
 }
 
 // Asigna un color al texto
