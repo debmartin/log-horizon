@@ -56,10 +56,14 @@ class Nivel{
     Socket *socket_enviar;
     Socket *socket_recibir;
     Lista<reemplazo_t> *celdas_a_explotar;
-    Mix_Chunk *sonido;
     Puntaje *puntaje;
     Mensaje *mensaje;
     bool finalizado;
+    
+
+    Mix_Chunk *sonido_explosion;
+    Mix_Chunk *sonido_movimiento;
+    Mix_Chunk *sonido_seleccion;
     
   protected:
     // Calcula el delay necesario para que el nivel se ejecute a 

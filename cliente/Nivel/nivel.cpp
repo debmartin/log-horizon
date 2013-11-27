@@ -18,7 +18,7 @@
 #define PUNTAJE 3
 #define FINALIZAR 4
 
-#define VOLUMEN 60
+#define VOLUMEN_ANIMACIONES 40
 
 //
 Nivel::Nivel(){
@@ -36,6 +36,10 @@ Nivel::Nivel(){
   socket_enviar = NULL;
   socket_recibir = NULL;
   finalizado = false;
+
+  sonido_explosion = NULL;
+  sonido_movimiento = NULL;
+  sonido_seleccion = NULL;
 }
 
 //
@@ -51,6 +55,10 @@ Nivel::~Nivel(){
   delete celdas_a_explotar;
   delete puntaje;
   delete mensaje;
+  
+  if (sonido_explosion) Mix_FreeChunk(sonido_explosion);
+  if (sonido_movimiento) Mix_FreeChunk(sonido_movimiento);
+  if (sonido_seleccion) Mix_FreeChunk(sonido_seleccion);
 }
 
 //
@@ -221,9 +229,18 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   mensaje->establecer_alpha_fondo(ALPHA_MENSAJE);
   
   // SONIDO
-  std::string direccion = path + "sonidos/sound.wav";
-  sonido = Mix_LoadWAV(direccion.c_str());
-  sonido->volume = VOLUMEN;
+
+  std::string direccion_explosion = "../../recursos/sonidos/explosion.wav";
+  std::string direccion_movimiento = "../../recursos/sonidos/movimiento.wav";
+  std::string direccion_seleccion = "../../recursos/sonidos/seleccion.wav";
+
+  sonido_explosion = Mix_LoadWAV(direccion_explosion.c_str());
+  sonido_movimiento = Mix_LoadWAV(direccion_movimiento.c_str());
+  sonido_seleccion = Mix_LoadWAV(direccion_seleccion.c_str());
+
+  if (sonido_explosion) sonido_explosion->volume = VOLUMEN_ANIMACIONES;
+  if (sonido_movimiento) sonido_movimiento->volume = VOLUMEN_ANIMACIONES;
+  if (sonido_seleccion) sonido_seleccion->volume = VOLUMEN_ANIMACIONES;
 }
 
 //
@@ -236,7 +253,7 @@ void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alt
   FPS frames;
   int tiempo_actual = SDL_GetTicks();
   int delay = 16;
-  
+
   while (corriendo){
     // Eventos
     while (SDL_PollEvent(&evento)){
@@ -283,6 +300,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
               Nivel::enviar_movimiento(celda, celda_adyacente);
             }else{
               tablero->seleccionar(seleccion, celda);
+              Mix_PlayChannel(-1, sonido_seleccion, 0);
             }
           }else if(evento.button.button == SDL_BUTTON_RIGHT){
             tablero->quitar_seleccion();
@@ -335,7 +353,7 @@ void Nivel::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
 //
 void Nivel::intercambiar(coordenada_t &origen, coordenada_t &destino){
   tablero->intercambiar(origen, destino);
-  Mix_PlayChannel(-1, sonido, 0);
+  Mix_PlayChannel(-1, sonido_movimiento, 0);
 }
 
 //
@@ -378,7 +396,7 @@ void Nivel::actualizar_receptor(){
         datos = celdas_a_explotar->borrar_primero();
         Nivel::explotar(datos.celda, datos.tipo, datos.color);
       }while (!celdas_a_explotar->esta_vacia());
-      Mix_PlayChannel(-1, sonido, 0);
+      Mix_PlayChannel(-1, sonido_explosion, 0);
     }
   }
 }
