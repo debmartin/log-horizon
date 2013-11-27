@@ -10,11 +10,13 @@
 
 #define POS_X 100 // posicion en x de la matriz
 #define POS_Y 100 // posicion de y en la matriz
+#define ALPHA_MENSAJE 200
 
 #define MOVER 0
 #define EXPLOTAR 1
 #define INSERTAR 2
 #define PUNTAJE 3
+#define FINALIZAR 4
 
 #define VOLUMEN 60
 
@@ -30,7 +32,10 @@ Nivel::Nivel(){
   receptor = new ReceptorResultados;
   celdas_a_explotar = new Lista<reemplazo_t>;
   puntaje = new Puntaje;
+  mensaje = new Mensaje;
   socket_enviar = NULL;
+  socket_recibir = NULL;
+  finalizado = false;
 }
 
 //
@@ -45,6 +50,7 @@ Nivel::~Nivel(){
   delete receptor;
   delete celdas_a_explotar;
   delete puntaje;
+  delete mensaje;
 }
 
 //
@@ -54,6 +60,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   receptor->agregar_socket(recibir, PUNTAJE);
   receptor->correr();
   socket_enviar = enviar;
+  socket_recibir = recibir;
   
   // FONDOS
   Superficie *fondo_sup = new Superficie;
@@ -152,7 +159,7 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
       if (accion == INSERTAR){
         receptor->borrar_siguiente(primero, segundo);
         Nivel::parsear_insercion(primero, segundo);
-      }else{
+      }else if (accion == PUNTAJE){
         continuar = false;
       }
     }
@@ -202,6 +209,17 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
   destino_puntaje.h = 50;
   puntaje->asignar_destino(destino_puntaje, ventana);
   
+  // MENSAJE
+  Superficie sup;
+  sup.cargar("../../recursos/imagenes/sub_ventana.png");
+  SDL_Rect destino_mensaje;
+  destino_mensaje.w = ancho;
+  destino_mensaje.h = alto / 5;
+  destino_mensaje.x = 0;
+  destino_mensaje.y = alto / 2 - destino_mensaje.h / 2;
+  mensaje->asignar_fondo(&sup, destino_mensaje, ventana);
+  mensaje->establecer_alpha_fondo(ALPHA_MENSAJE);
+  
   // SONIDO
   std::string direccion = path + "sonidos/sound.wav";
   sonido = Mix_LoadWAV(direccion.c_str());
@@ -247,7 +265,7 @@ bool Nivel::analizar_evento(SDL_Event &evento){
     return false;
     
   }else if (!tablero->esta_ocupada() && !explosion->explosion_en_curso() && 
-            receptor->cola_vacia() && !receptor->recibiendo_datos()){
+            receptor->cola_vacia() && !receptor->recibiendo_datos() && !finalizado){
     if (evento.type == SDL_MOUSEBUTTONDOWN){
       coordenada_t celda;
       celda.x = (evento.button.x - POS_X) / ancho_celda;
@@ -284,6 +302,7 @@ void Nivel::dibujar(Ventana *ventana){
   fondo->dibujar(ventana);
   tablero->dibujar(ventana);
   puntaje->dibujar();
+  if (finalizado) mensaje->dibujar(ventana);
 }
 
 //
@@ -344,9 +363,13 @@ void Nivel::actualizar_receptor(){
         this->parsear_explosion(mensaje);
         break;
       case INSERTAR:
+        Nivel::parsear_insercion(mensaje);
         break;
       case PUNTAJE:
         Nivel::parsear_puntaje(mensaje);
+        break;
+      case FINALIZAR:
+        finalizado = true;
         break;
     }
     if (tipo != EXPLOTAR && !celdas_a_explotar->esta_vacia()){
@@ -373,7 +396,7 @@ void Nivel::enviar_movimiento(coordenada_t &celda, coordenada_t &celda_adyacente
 
 //
 void Nivel::insertar(coordenada_t &celda, int tipo, int color){
-  if (tablero->celda_existente(celda) ){
+  if (tablero->celda_existente(celda) && tipo <= 3 && tipo >= 0 && color >= 0 && color <= 4){
     Textura *textura = productos->ver_textura(tipo,color);
     Animacion *animacion = productos->ver_animacion(tipo, color);
     tablero->insertar(textura, animacion, celda);

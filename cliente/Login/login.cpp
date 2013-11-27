@@ -6,6 +6,7 @@
 #define FONDO_TEXTO 175
 #define VOLUMEN 30
 #define ALPHA_MENSAJE 220
+#define DELAY 16
 
 //
 Login::Login(){
@@ -52,7 +53,7 @@ int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
   bool corriendo = true;
   FPS frames;
   int tiempo_actual = SDL_GetTicks();
-  int delay = 16;
+  int delay = DELAY;
   Mix_PlayChannel(-1, sonido, -1);
   while (corriendo){
     // Eventos

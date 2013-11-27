@@ -54,9 +54,12 @@ class Nivel{
     int alto_celda;
     ReceptorResultados *receptor;
     Socket *socket_enviar;
+    Socket *socket_recibir;
     Lista<reemplazo_t> *celdas_a_explotar;
     Mix_Chunk *sonido;
     Puntaje *puntaje;
+    Mensaje *mensaje;
+    bool finalizado;
     
   protected:
     // Calcula el delay necesario para que el nivel se ejecute a 

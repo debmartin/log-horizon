@@ -35,13 +35,15 @@ void ReceptorResultados::agregar_socket(Socket *nuevo_socket, int stop){
 // "finalizar"
 void ReceptorResultados::funcion_a_correr(){
   if (!socket || !mutex) return;
+  
   mutex->bloquear();
   while (seguir){
     mutex->desbloquear();
+    
     char tipo;
     uint32_t mensaje;
-    socket->recibir(&tipo , sizeof(tipo));
-    socket->recibir(&mensaje , sizeof(mensaje));
+    socket->recibir(&tipo ,sizeof(tipo));
+    socket->recibir(&mensaje ,sizeof(mensaje));
     resultado_t actual;
     actual.tipo = tipo;
     actual.mensaje = mensaje;
@@ -59,14 +61,16 @@ bool ReceptorResultados::recibiendo_datos(){
   mutex->bloquear();
   bool respuesta = recibiendo;
   mutex->desbloquear();
+  
   return respuesta;
 }
 
 // devuelve true si no hay datos en la cola, caso contrario false
 bool ReceptorResultados::cola_vacia(){
   mutex->bloquear();
-  bool respuesta =  cola->esta_vacia();
+  bool respuesta = cola->esta_vacia();
   mutex->desbloquear();
+  
   return respuesta;
 }
 
@@ -77,6 +81,7 @@ char ReceptorResultados::borrar_siguiente(uint32_t &mensaje){
   mutex->bloquear();
   resultado_t aux = cola->borrar_primero();
   mutex->desbloquear();
+  
   mensaje = aux.mensaje;
   return aux.tipo;
 }
@@ -86,6 +91,7 @@ char ReceptorResultados::ver_siguiente(){
   mutex->bloquear();
   resultado_t aux = cola->ver_primero();
   mutex->desbloquear();
+  
   return aux.tipo;
 }
 
