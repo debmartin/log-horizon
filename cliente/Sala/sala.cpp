@@ -72,7 +72,7 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, unsigned int an
   fondo->cargar_textura(path + "imagenes/fondo_sala.png", ventana);
   
   // TEXTO  
-  escritor->asignar_fuente(path + "fuentes/orange.ttf", 50);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 100);
   escritor->asignar_color(220,220,0,255);
   
   // BOTON CREAR
@@ -102,7 +102,7 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, unsigned int an
   crear->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
   
   Superficie sup;
-  escritor->copiar_texto("Crear partida", &sup);
+  escritor->copiar_texto("Crear", &sup);
     
   SDL_Rect destino_texto;
   destino_texto.x = destino_boton.x + destino_boton.w / 10;
@@ -121,7 +121,7 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, unsigned int an
   
   unirse->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
   
-  escritor->copiar_texto("Unirse a partida", &sup);
+  escritor->copiar_texto("Unirse", &sup);
     
   destino_texto.x = destino_boton.x + destino_boton.w / 10;
   destino_texto.y = destino_boton.y + destino_boton.h / 10;

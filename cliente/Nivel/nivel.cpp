@@ -208,7 +208,7 @@ void Nivel::inicializar(const std::string &path, Ventana *ventana, unsigned int 
   color.b = 0;
   color.a = 255;
   
-  puntaje->asignar_fuente("../../recursos/fuentes/orange.ttf", 50, color);
+  puntaje->asignar_fuente("../../recursos/fuentes/orange.ttf", 100, color);
   SDL_Rect destino_puntaje;
   destino_puntaje.x = 10;
   destino_puntaje.y = 10;

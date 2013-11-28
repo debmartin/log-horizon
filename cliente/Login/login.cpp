@@ -89,7 +89,7 @@ int Login::inicializar(const std::string &path, Ventana *ventana, unsigned int a
   // TEXTO
   Superficie sup;
   
-  escritor->asignar_fuente(path + "fuentes/orange.ttf", 50);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 100);
   escritor->asignar_color(0,0,0,255);
   
   escritor->copiar_texto("Usuario:", &sup);
@@ -218,8 +218,6 @@ bool Login::analizar_evento(SDL_Event &evento){
 
 //
 bool Login::enviar_datos(){
-  std::cout << "enviando usuario: " << usuario->ver_contenido() << std::endl;
-  std::cout << "enviando contraseña: " << clave->ver_contenido() << std::endl;
   conectando = false;
   return true;
 }
