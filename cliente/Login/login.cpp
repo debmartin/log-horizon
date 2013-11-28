@@ -18,12 +18,13 @@ Login::Login(){
   textura_clave = new Textura;
   textura_usuario = new Textura;
   sonido = NULL;
-  recibir = NULL;
-  enviar = NULL;
+  socket_recibir = NULL;
+  socket_enviar = NULL;
   mensaje = new Mensaje;
   conectando = false;
-  enviar = NULL;
-  recibir = NULL;
+  socket_enviar = NULL;
+  socket_recibir = NULL;
+  conectando = false;
 }
 
 //
@@ -40,51 +41,11 @@ Login::~Login(){
 }
 
 //
-void Login::asignar_sockets(Socket* socket_recibir, Socket* socket_enviar){
-  recibir = socket_recibir;
-  enviar = socket_enviar;
-}
-
-//
-int Login::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
-  this->cargar_archivos(ventana, ancho, alto);
-  
-  SDL_Event evento;
-  bool corriendo = true;
-  FPS frames;
-  int tiempo_actual = SDL_GetTicks();
-  int delay = DELAY;
-  Mix_PlayChannel(-1, sonido, -1);
-  while (corriendo){
-    // Eventos
-    while (SDL_PollEvent(&evento)){
-      corriendo = this->analizar_evento(evento);
-    }
-    // Dibujado
-    ventana->limpiar();
-    this->dibujar(ventana);
-    
-    // actualizamos los fps
-    this->obtener_delay(frames, tiempo_actual, delay);
-    
-    // Presentar en ventana
-    ventana->presentar(delay);
-  }
-  return 0;
-}
-
-//
-void Login::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
-  if (SDL_GetTicks() - tiempo_actual < 1000){
-    frames.actualizar();
-    delay =  (1000/60.0f) * (frames.ver_fps()/60.0f);
-  }
-}
-
-//
-int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto){
+int Login::inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir){
+  socket_recibir = recibir;
+  socket_enviar = enviar;
   // FONDO
-  fondo->cargar_textura("../../recursos/imagenes/fondo_login.png", ventana);
+  fondo->cargar_textura(path + "imagenes/fondo_login.png", ventana);
   
   // usado como punto de referencia para los demas destinos
   SDL_Rect destino;
@@ -95,8 +56,8 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   
   
   // USUARIO
-  std::string fuente_mono = "../../recursos/fuentes/mono.ttf";
-  std::string fondo_texto = "../../recursos/imagenes/fondo_texto.png";
+  std::string fuente_mono = path + "fuentes/mono.ttf";
+  std::string fondo_texto = path + "imagenes/fondo_texto.png";
   usuario->asignar_fuente(fuente_mono, 50, 3, MAX_CARACTERES);
   usuario->asignar_fondo(fondo_texto, ventana);
   usuario->alpha_fondo(FONDO_TEXTO);
@@ -128,7 +89,7 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   // TEXTO
   Superficie sup;
   
-  escritor->asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 50);
   escritor->asignar_color(0,0,0,255);
   
   escritor->copiar_texto("Usuario:", &sup);
@@ -156,7 +117,7 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   estructura.resaltado = sobre;
   estructura.destino = destino_boton;
   
-  iniciar_sesion->asignar_texturas("../../recursos/imagenes/boton.png", estructura, ventana);
+  iniciar_sesion->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
   
   escritor->asignar_color(220,220,0,255);
   escritor->copiar_texto("iniciar sesion", &sup);
@@ -170,12 +131,12 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   iniciar_sesion->agregar_texto(&sup, destino_texto, ventana, 1);
   
   // SONIDO
-  std::string direccion = "../../recursos/sonidos/login_theme.wav";
+  std::string direccion = path + "sonidos/login_theme.wav";
   sonido = Mix_LoadWAV(direccion.c_str());
   sonido->volume = VOLUMEN;
   
   // MENSAJE
-  sup.cargar("../../recursos/imagenes/sub_ventana.png");
+  sup.cargar(path + "imagenes/sub_ventana.png");
   destino.w = ancho / 3;
   destino.h = alto / 4;
   destino.x = ancho / 2 - destino.w / 2;
@@ -190,6 +151,43 @@ int Login::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int a
   mensaje->asignar_mensaje(&sup, destino, ventana);
   
   return 0;
+}
+
+//
+bool Login::correr(Ventana *ventana){
+  if (!socket_recibir || !socket_enviar) return false;
+  SDL_Event evento;
+  bool corriendo = true;
+  FPS frames;
+  int tiempo_actual = SDL_GetTicks();
+  int delay = DELAY;
+  Mix_PlayChannel(-1, sonido, -1);
+  while (corriendo){
+    // Eventos
+    while (SDL_PollEvent(&evento)){
+      corriendo = this->analizar_evento(evento);
+    }
+    // Dibujado
+    ventana->limpiar();
+    this->dibujar(ventana);
+    
+    // actualizamos los fps
+    this->obtener_delay(frames, tiempo_actual, delay);
+    
+    // Presentar en ventana
+    ventana->presentar(delay);
+    
+    if (conectando && this->enviar_datos()) return true;
+  }
+  return false;
+}
+
+//
+void Login::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
+  if (SDL_GetTicks() - tiempo_actual < 1000){
+    frames.actualizar();
+    delay =  (1000/60.0f) * (frames.ver_fps()/60.0f);
+  }
 }
 
 //
@@ -211,14 +209,17 @@ bool Login::analizar_evento(SDL_Event &evento){
     usuario->analizar_evento(evento);
     clave->analizar_evento(evento);
     iniciar_sesion->analizar_evento(evento);
-  }
-  if (iniciar_sesion->activado()){
-    this->enviar_datos();
+    if (iniciar_sesion->activado()){
+      conectando = true;
+    }
   }
   return true;
 }
 
 //
-void Login::enviar_datos(){
-  conectando = true;
+bool Login::enviar_datos(){
+  std::cout << "enviando usuario: " << usuario->ver_contenido() << std::endl;
+  std::cout << "enviando contraseña: " << clave->ver_contenido() << std::endl;
+  conectando = false;
+  return true;
 }

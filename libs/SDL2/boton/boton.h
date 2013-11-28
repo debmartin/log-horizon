@@ -40,7 +40,7 @@ class Boton{
     
     //
     bool activado(){return apretado;}
-  
+    
     // Setea el nivel alpha de la textura del boton
     void establecer_alpha(Uint8 alpha);
   private:

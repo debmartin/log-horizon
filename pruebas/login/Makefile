@@ -33,8 +33,11 @@ login.o: ../../cliente/Login/login.h ../../cliente/Login/login.cpp
 mensaje.o: ../../libs/SDL2/mensaje/mensaje.h ../../libs/SDL2/mensaje/mensaje.cpp
 	$(CC) $(CFLAGS) -c ../../libs/SDL2/mensaje/mensaje.cpp
 
-$(CEXE): ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o $(CEXE).cpp
-	$(CC) $(CFLAGS) ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o $(CEXE).cpp -o $(CEXE)
+socket.o: ../../libs/TDA/socket/socket.h ../../libs/TDA/socket/socket.cpp
+	$(CC) $(CFLAGS) -c ../../libs/TDA/socket/socket.cpp
+
+$(CEXE): socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o $(CEXE).cpp
+	$(CC) $(CFLAGS) socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

@@ -9,9 +9,11 @@ Sala::Sala(){
   fondo = new Textura;
   crear = new Boton;
   unirse = new Boton;
+  seleccion = new Seleccion;
   escritor = new Texto;
-  enviar = NULL;
-  recibir = NULL;
+  socket_enviar = NULL;
+  socket_recibir = NULL;
+  seleccionando = false;
 }
 
 //
@@ -19,19 +21,13 @@ Sala::~Sala(){
   delete fondo;
   delete crear;
   delete unirse;
+  delete seleccion;
   delete escritor;
 }
 
 //
-void Sala::asignar_sockets(Socket* socket_recibir, Socket* socket_enviar){
-  recibir = socket_recibir;
-  enviar = socket_enviar;
-}
-
-//
-int Sala::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
-  this->cargar_archivos(ventana, ancho, alto);
-  
+bool Sala::correr(Ventana *ventana){
+  if (!socket_recibir || !socket_enviar) return false;
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -52,7 +48,7 @@ int Sala::correr(Ventana *ventana, unsigned int ancho, unsigned  int alto){
     // Presentar en ventana
     ventana->presentar(delay);
   }
-  return 0;
+  return false;
 }
 
 //
@@ -64,12 +60,19 @@ void Sala::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
 }
 
 //
-int Sala::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto){
+int Sala::inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir){
+  // SELECCIOn
+  seleccion->inicializar(path, ventana, ancho, alto, enviar, recibir);
+  
+  // SOCKETS
+  socket_recibir = recibir;
+  socket_enviar = enviar;
+  
   // FONDO
-  fondo->cargar_textura("../../recursos/imagenes/fondo_login.png", ventana);
+  fondo->cargar_textura(path + "imagenes/fondo_sala.png", ventana);
   
   // TEXTO  
-  escritor->asignar_fuente("../../recursos/fuentes/orange.ttf", 50);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 50);
   escritor->asignar_color(220,220,0,255);
   
   // BOTON CREAR
@@ -86,8 +89,9 @@ int Sala::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int al
   SDL_Rect destino_boton;
   destino_boton.w = ancho / 4;
   destino_boton.h = alto / 10;
+  
   destino_boton.y = alto - destino_boton.h * 2;
-  destino_boton.x = destino_boton.w / 2;
+  destino_boton.x = ancho / 4 - destino_boton.w / 2;
   
   estructura_boton_t estructura;
   estructura.normal = normal;
@@ -95,7 +99,7 @@ int Sala::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int al
   estructura.resaltado = sobre;
   estructura.destino = destino_boton;
   
-  crear->asignar_texturas("../../recursos/imagenes/boton.png", estructura, ventana);
+  crear->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
   
   Superficie sup;
   escritor->copiar_texto("Crear partida", &sup);
@@ -108,24 +112,19 @@ int Sala::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int al
   crear->agregar_texto(&sup, destino_texto, ventana, 1);
   
   // BOTON UNIRSE
-  destino_boton.w = ancho / 4;
-  destino_boton.h = alto / 10;
-  destino_boton.y = alto - destino_boton.h * 2;
-  destino_boton.x = destino_boton.w * 5/2;
+  destino_boton.x = ancho * 3/4 - destino_boton.w / 2;
   
   estructura.normal = normal;
   estructura.apretado = apretado;
   estructura.resaltado = sobre;
   estructura.destino = destino_boton;
   
-  unirse->asignar_texturas("../../recursos/imagenes/boton.png", estructura, ventana);
+  unirse->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
   
   escritor->copiar_texto("Unirse a partida", &sup);
     
   destino_texto.x = destino_boton.x + destino_boton.w / 10;
   destino_texto.y = destino_boton.y + destino_boton.h / 10;
-  destino_texto.w = destino_boton.w - destino_boton.w / 5;
-  destino_texto.h = destino_boton.h - destino_boton.h / 5;
   unirse->agregar_texto(&sup, destino_texto, ventana, 1);
   
   return 0;
@@ -134,18 +133,29 @@ int Sala::cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int al
 //
 int Sala::dibujar(Ventana *ventana){
   fondo->dibujar(ventana);
-  crear->dibujar(ventana);
-  unirse->dibujar(ventana);
+  if (!seleccionando){
+    crear->dibujar(ventana);
+    unirse->dibujar(ventana);
+  }else{
+    seleccion->dibujar(ventana);
+  }
   return 0;
 }
 
 //
 bool Sala::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT) return false;
-  crear->analizar_evento(evento);
-  unirse->analizar_evento(evento);
-  if (crear->activado()){
-    // hacer algo
+  if (!seleccionando){
+    crear->analizar_evento(evento);
+    unirse->analizar_evento(evento);
+    if (crear->activado()){
+      seleccionando = true;
+    }else if(unirse->activado()){
+      seleccionando = true;
+    }    
+  }else{
+    if (!seleccion->analizar_evento(evento))
+      seleccionando = false;
   }
   return true;
 }

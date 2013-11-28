@@ -10,13 +10,13 @@ class Login{
     Login();
   
     //
-    ~Login();
+    virtual ~Login();
     
     //
-    void asignar_sockets(Socket* socket_recibir, Socket* socket_enviar);
+    bool correr(Ventana *ventana);
     
     //
-    int correr(Ventana *ventana, unsigned int ancho, unsigned  int alto);
+    int inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir);
     
   private:
     Textura *fondo;
@@ -32,12 +32,10 @@ class Login{
     Mensaje *mensaje;
     bool conectando;
     
-    Socket* recibir;
-    Socket* enviar;
+    Socket* socket_recibir;
+    Socket* socket_enviar;
     
   protected:
-    //
-    int cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto);
     
     //
     int dibujar(Ventana *ventana);
@@ -46,7 +44,7 @@ class Login{
     bool analizar_evento(SDL_Event &evento);
     
     //
-    virtual void enviar_datos();
+    virtual bool enviar_datos();
     
     //
     void obtener_delay(FPS &frames, int tiempo_actual, int &delay);

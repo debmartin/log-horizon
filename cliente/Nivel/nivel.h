@@ -21,28 +21,15 @@ class Nivel{
     Nivel();
     
     // Destructor de clase
-    ~Nivel();
+    virtual ~Nivel();
     
     // Metodo principal de la clase, inicializa todos los datos necesarios
     // para la ejecucion del nivel, y lo pone en marcha.
-    void correr(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir);
+    bool correr(Ventana* ventana);
   
     // Inicializa los datos necesarios para la ejecucion del nivel
-    void inicializar_datos(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir);
+    void inicializar(const std::string &path, Ventana* ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir);
     
-    // Dibuja en la ventana todos los elementos del nivel
-    void dibujar(Ventana *ventana);
-  
-    // Analiza el evento ingresado por parametro, realizando diferentes
-    // acciones en base al tipo de evento.
-    // Si el evento es un click izquierdo, seleccionara la celda en
-    // la ubicacion del mouse, en caso de haber una celda adyacente seleccionada,
-    // intercambiara contenidos con dicha celda.
-    bool analizar_evento(SDL_Event &evento);
-    
-    // Actualiza todas las animaciones utilizadas por el nivel.
-    void actualizar_animaciones();
-  
   private:
     Productos *productos;
     Matriz *tablero;
@@ -66,6 +53,19 @@ class Nivel{
     Mix_Chunk *sonido_seleccion;
     
   protected:
+    // Dibuja en la ventana todos los elementos del nivel
+    void dibujar(Ventana *ventana);
+  
+    // Analiza el evento ingresado por parametro, realizando diferentes
+    // acciones en base al tipo de evento.
+    // Si el evento es un click izquierdo, seleccionara la celda en
+    // la ubicacion del mouse, en caso de haber una celda adyacente seleccionada,
+    // intercambiara contenidos con dicha celda.
+    bool analizar_evento(SDL_Event &evento);
+    
+    // Actualiza todas las animaciones utilizadas por el nivel.
+    void actualizar_animaciones();
+    
     // Calcula el delay necesario para que el nivel se ejecute a 
     // 60 fps
     void obtener_delay(FPS &frames, int tiempo_actual, int &delay);

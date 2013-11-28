@@ -3,6 +3,7 @@
 
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/TDA/socket/socket.h"
+#include "seleccion.h"
 
 class Sala{
   public:
@@ -10,27 +11,25 @@ class Sala{
     Sala();
   
     //
-    ~Sala();
+    virtual ~Sala();
     
     //
-    void asignar_sockets(Socket* socket_recibir, Socket* socket_enviar);
+    bool correr(Ventana *ventana);
     
     //
-    int correr(Ventana *ventana, unsigned int ancho, unsigned  int alto);
+    int inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir);
     
   private:
     Textura *fondo;
     Boton *crear;
     Boton *unirse;
+    Seleccion *seleccion;
     Texto *escritor;
-    
-    Socket* recibir;
-    Socket* enviar;
+    bool seleccionando;
+    Socket* socket_recibir;
+    Socket* socket_enviar;
     
   protected:
-    //
-    int cargar_archivos(Ventana *ventana, unsigned int ancho, unsigned  int alto);
-    
     //
     int dibujar(Ventana *ventana);
     

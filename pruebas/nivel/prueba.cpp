@@ -31,8 +31,8 @@ int main(void){
   ventana->dimension_logica(ANCHO,ALTO);
   
   Nivel *nivel = new Nivel;
-  
-  nivel->correr("nivel1/", ventana, ANCHO, ALTO, socket_emisor, socket_receptor);
+  nivel->inicializar("nivel1/", ventana, ANCHO, ALTO, socket_emisor, socket_receptor);
+  nivel->correr(ventana);
   delete nivel;
   delete socket_receptor;
   

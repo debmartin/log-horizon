@@ -62,8 +62,7 @@ Nivel::~Nivel(){
 }
 
 //
-void Nivel::inicializar_datos(const std::string &path, Ventana *ventana, 
-                              int ancho, int alto, Socket* enviar, Socket* recibir){
+void Nivel::inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir){
   // SOCKETS
   receptor->agregar_socket(recibir, PUNTAJE);
   receptor->correr();
@@ -244,10 +243,8 @@ void Nivel::inicializar_datos(const std::string &path, Ventana *ventana,
 }
 
 //
-void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alto, Socket* enviar, Socket* recibir){
-  // Inicializacion
-  Nivel::inicializar_datos(path, ventana, ancho, alto, enviar, recibir);
-
+bool Nivel::correr(Ventana* ventana){
+  if (!socket_recibir || !socket_enviar) return false;
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -274,6 +271,7 @@ void Nivel::correr(const std::string &path, Ventana* ventana, int ancho, int alt
   }
   receptor->finalizar();
   receptor->join();
+  return true;
 }
 
 //
@@ -302,11 +300,6 @@ bool Nivel::analizar_evento(SDL_Event &evento){
               tablero->seleccionar(seleccion, celda);
               Mix_PlayChannel(-1, sonido_seleccion, 0);
             }
-          }else if(evento.button.button == SDL_BUTTON_RIGHT){
-            tablero->quitar_seleccion();
-            int color = rand() % 5;
-            int tipo = rand() % 4;
-            Nivel::explotar(celda, tipo, color);
           }
         }
       }

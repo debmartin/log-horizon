@@ -15,8 +15,24 @@ int main(void){
   ventana.abrir(ANCHO,ALTO);
   ventana.dimension_logica(ANCHO, ALTO);
   
+  Socket *socket_receptor = new Socket;
+  socket_receptor->asignar_direccion(8000, "127.0.0.1");
+ /* if (socket_receptor->conectar() == -1){
+    delete socket_receptor;
+    return 1;
+  }
+*/
+  Socket *socket_emisor = new Socket;
+  socket_emisor->asignar_direccion(8001, "127.0.0.1");
+/*  if (socket_emisor->conectar() == -1){
+    delete socket_emisor;
+    delete socket_receptor;
+    return 1;
+  }
+ */ 
   Login log;
-  log.correr(&ventana, ANCHO, ALTO);
+  log.inicializar("../../recursos/", &ventana, ANCHO, ALTO, socket_emisor, socket_receptor);
+  log.correr(&ventana);
   
   return 0;
 }
