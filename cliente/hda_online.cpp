@@ -36,29 +36,36 @@ int main(void){
   libreria.habilitar_texto();
   libreria.habilitar_sonido(44100, MIX_DEFAULT_FORMAT, 2, 4096);
   
-  Ventana ventana;
-  ventana.abrir(ancho, alto);
-  ventana.dimension_logica(ancho, alto);
+  Ventana *ventana = new Ventana;
+  ventana->abrir(ancho, alto);
+  ventana->dimension_logica(ancho, alto);
   std::string titulo = "Hora de Aventura Online";
-  ventana.titulo(titulo);
+  ventana->titulo(titulo);
   
   Login *log = new Login;
-  log->inicializar("../recursos/", &ventana, ancho, alto, socket_emisor, socket_receptor);
-  bool seguir = log->correr(&ventana);
+  log->inicializar("../recursos/", ventana, ancho, alto, socket_emisor, socket_receptor);
+  bool seguir = log->correr(ventana);
   delete log;
   if (!seguir) return 0;
   
   Sala *sala = new Sala;
-  sala->inicializar("../recursos/", &ventana, ancho, alto, socket_emisor, socket_receptor);
-  seguir = sala->correr(&ventana);
-  if (!seguir){
-    delete sala;
-    return 0;
+  sala->inicializar("../recursos/", ventana, ancho, alto, socket_emisor, socket_receptor);
+//  Nivel *nivel = new Nivel;
+//  nivel->inicializar("../recursos/", ventana, ancho, alto, socket_emisor, socket_receptor);
+  while (seguir){
+    
+    seguir = sala->correr(ventana);
+    if (seguir){
+//      seguir = nivel->correr(ventana);
+    }
   }
   
-  // idem a sala pero para nivel
-  
   delete sala;
+//  delete nivel;
+  socket_emisor->cerrar_enviar_recibir();
+  socket_receptor->cerrar_enviar_recibir();
+  delete socket_emisor;
+  delete socket_receptor;
   
   return 0;
 }

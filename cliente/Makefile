@@ -40,12 +40,39 @@ seleccion.o: Sala/seleccion.h Sala/seleccion.cpp
 socket.o: ../libs/TDA/socket/socket.h ../libs/TDA/socket/socket.cpp
 	$(CC) $(CFLAGS) -c ../libs/TDA/socket/socket.cpp
 
-$(CEXE): seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp
-	$(CC) $(CFLAGS) seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp -o $(CEXE)
+animacion.o: ../libs/SDL2/animacion/animacion.h ../libs/SDL2/animacion/animacion.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/animacion/animacion.cpp
+
+matriz.o: Nivel/matriz.h Nivel/matriz.cpp
+	$(CC) $(CFLAGS) -c Nivel/matriz.cpp
+
+nivel.o: Nivel/nivel.h Nivel/nivel.cpp
+	$(CC) $(CFLAGS) -c Nivel/nivel.cpp
+	
+explosion.o: Nivel/explosion.h Nivel/explosion.cpp
+	$(CC) $(CFLAGS) -c Nivel/explosion.cpp
+	
+celdas_vacias.o: Nivel/celdas_vacias.h Nivel/celdas_vacias.cpp
+	$(CC) $(CFLAGS) -c Nivel/celdas_vacias.cpp
+	
+puntaje.o: Nivel/puntaje.h Nivel/puntaje.cpp
+	$(CC) $(CFLAGS) -c Nivel/puntaje.cpp
+
+productos.o: Nivel/productos.h Nivel/productos.cpp
+	$(CC) $(CFLAGS) -c Nivel/productos.cpp
+	
+receptor_resultados.o: Nivel/receptor_resultados.h Nivel/receptor_resultados.cpp
+	$(CC) $(CFLAGS) -c Nivel/receptor_resultados.cpp
+
+	
+thread.o: ../libs/TDA/thread/thread.h ../libs/TDA/thread/thread.cpp
+	$(CC) $(CFLAGS) -c ../libs/TDA/thread/thread.cpp
+
+$(CEXE): animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp
+	$(CC) $(CFLAGS) animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o
-
 
 cleanAll: clean
 	-rm $(CEXE)
