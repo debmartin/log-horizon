@@ -31,6 +31,8 @@ class Puntaje{
     Ventana *ventana;
     size_t ancho_caracter;
     
+    unsigned int dif_final;
+    
   protected:
     //
     void actualizar_textura();

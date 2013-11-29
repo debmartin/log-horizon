@@ -30,7 +30,7 @@ int Seleccion::inicializar(const std::string &path, Ventana *ventana, unsigned i
   socket_enviar = enviar;
     
   // TEXTO  
-  escritor->asignar_fuente(path + "fuentes/orange.ttf", 100);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 50);
   escritor->asignar_color(220,220,0,255);
   
   // BOTON ANTERIOR

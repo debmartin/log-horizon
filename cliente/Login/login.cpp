@@ -89,7 +89,7 @@ int Login::inicializar(const std::string &path, Ventana *ventana, unsigned int a
   // TEXTO
   Superficie sup;
   
-  escritor->asignar_fuente(path + "fuentes/orange.ttf", 100);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 30);
   escritor->asignar_color(0,0,0,255);
   
   escritor->copiar_texto("Usuario:", &sup);
@@ -120,7 +120,7 @@ int Login::inicializar(const std::string &path, Ventana *ventana, unsigned int a
   iniciar_sesion->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
   
   escritor->asignar_color(220,220,0,255);
-  escritor->copiar_texto("iniciar sesion", &sup);
+  escritor->copiar_texto("Iniciar Sesion", &sup);
   escritor->asignar_color(0,0,0,255);
   
   SDL_Rect destino_texto;

@@ -12,6 +12,7 @@ Puntaje::Puntaje(){
   puntaje = 0;
   destino = NULL;
   ancho_caracter = 0;
+  dif_final = 0;
 }
 
 //
@@ -40,22 +41,26 @@ bool Puntaje::asignar_destino(SDL_Rect &nuevo_destino, Ventana *ventana_dest){
 
 //
 void Puntaje::sumar_puntos(unsigned int dif){
-  puntaje += dif;
-  if (destino){
+  dif_final += dif;
+  /*if (destino){
     this->actualizar_textura();
-  }
+  }*/
 }
 
 //
 bool Puntaje::dibujar(){
   if (!destino) return false;
+  if (dif_final > 0) this->actualizar_textura();
   return textura_puntaje->dibujar(*destino, ventana);
 }
 
 //
 void Puntaje::actualizar_textura(){
   std::string puntaje_string;
-  if (puntaje != 0){
+  if (dif_final > 0){
+    std::cout << "en el if " << std::endl;
+    puntaje++;
+    dif_final--;
     size_t largo_clave = (int)log10((double)puntaje) + 1;
     destino->w = largo_clave * ancho_caracter;
     char *clave = new char[largo_clave + 1];

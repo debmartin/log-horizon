@@ -72,7 +72,7 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, unsigned int an
   fondo->cargar_textura(path + "imagenes/fondo_sala.png", ventana);
   
   // TEXTO  
-  escritor->asignar_fuente(path + "fuentes/orange.ttf", 100);
+  escritor->asignar_fuente(path + "fuentes/orange.ttf", 50);
   escritor->asignar_color(220,220,0,255);
   
   // BOTON CREAR
