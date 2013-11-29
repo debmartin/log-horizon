@@ -10,6 +10,8 @@ using std::string;
 
 // Constructor de la clase, lanza una excepcion en caso de error
 Socket::Socket()throw(SocketError){
+  dir.sin_port = 0;
+  dir.sin_addr.s_addr = 0;
   socketid = socket(AF_INET, SOCK_STREAM, 0);
   if (socketid == -1) throw SocketError();
 }
@@ -115,4 +117,9 @@ int Socket::recibir(void* msg, const int len){
 // Devuelve el puerto que se le asigno al socket
 int Socket::ver_puerto(){
   return ntohs(dir.sin_port);
+}
+
+// 
+in_addr_t Socket::ver_ip(){
+  return dir.sin_addr.s_addr;
 }

@@ -35,6 +35,9 @@ class Socket{
     // Devuelve el puerto que se le asigno al socket
     int ver_puerto();
     
+    // Devuelve la ip que se le asigno al socket
+    in_addr_t ver_ip();
+    
     // Impide que el socket pueda enviar y recibir datos.
     void cerrar_enviar_recibir();
 

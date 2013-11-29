@@ -13,6 +13,10 @@ $(CEXE): $(CEXE).cpp
 prueba_leer: prueba_leer.cpp
 	$(CC) $(CFLAGS) prueba_leer.cpp -o prueba_leer
 
+prueba_config: escribir_config.cpp
+	$(CC) $(CFLAGS) escribir_config.cpp -o escribir_config
+
+
 json:
 	cd ../../libs/json/; make
 
