@@ -8,6 +8,9 @@
 #define ALPHA_MENSAJE 220
 #define DELAY 16
 
+#define OK 0
+#define ERROR 1
+
 //
 Login::Login(){
   fondo = new Textura;
@@ -159,6 +162,7 @@ int Login::inicializar(const std::string &path, Ventana *ventana, Socket* enviar
 //
 bool Login::correr(Ventana *ventana){
   if (!socket_recibir || !socket_enviar) return false;
+  
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -221,6 +225,18 @@ bool Login::analizar_evento(SDL_Event &evento){
 
 //
 bool Login::enviar_datos(){
+  std::string cadena = usuario->ver_contenido();
+  unsigned int largo = cadena.size();
+  socket_enviar->enviar(&largo, sizeof(largo));
+  socket_enviar->enviar(cadena.c_str(), largo);
+  
+  cadena = clave->ver_contenido();
+  largo = cadena.size();
+  socket_enviar->enviar(&largo, sizeof(largo));
+  socket_enviar->enviar(cadena.c_str(), largo);
+  
+  char respuesta;
+  socket_recibir->recibir(&respuesta, sizeof(char));
   conectando = false;
-  return true;
+  return respuesta == OK;
 }

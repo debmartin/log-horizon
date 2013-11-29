@@ -1,6 +1,13 @@
 #ifndef HDA_ONLINE
 #define HDA_ONLINE
 
+#include <iostream>
+
+#include "../libs/TDA/socket/socket.h"
+#include "../libs/json/include/json/json.h"
+#include "../libs/SDL2/SDL.h"
+
+
 class HDA_Online{
   public:
     //
@@ -15,7 +22,7 @@ class HDA_Online{
     Socket *emisor;
     Socket *receptor;
     Ventana *ventana;
-    SDL *libreria;
+    SDL libreria;
     
   protected:
     //

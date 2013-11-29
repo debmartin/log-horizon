@@ -2,10 +2,7 @@
 #include <stdlib.h>
 #include <fstream>
 
-#include "cliente.h"
-#include "Login/login.h"
-#include "Sala/sala.h"
-#include "Nivel/nivel.h"
+#include "hda_online.h"
 #include "../libs/json/include/json/json.h"
 #include "../libs/SDL2/SDL.h"
 
@@ -32,6 +29,7 @@ void leer_datos_iniciales(int &ancho, int &alto, std::string &ip, int &puerto){
 
 bool conectar(Socket *iniciador, Socket *a_conectar){
   in_addr_t ip = iniciador->ver_ip();
+  unsigned int puerto;
   iniciador->recibir(&puerto, sizeof(int));
   a_conectar->asignar_direccion(puerto, ip);
   return a_conectar->conectar() != -1;
@@ -42,17 +40,26 @@ int main(void){
   std::string ip;
   leer_datos_iniciales(ancho, alto, ip, puerto);
   
-  if (iniciador->conectar() == -1) return -1;
   Socket *iniciador = new Socket;
+  iniciador->asignar_direccion(puerto, ip.c_str());
+  if (iniciador->conectar() == -1) return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
+  
   Socket *receptor = new Socket;
+  
+  if (!conectar(iniciador, receptor)){
+     delete receptor;
+     return -2;
+  }
   Socket *emisor = new Socket;
-  iniciador->asignar_direccion(puerto, ip);
-  if (!conectar(iniciador, receptor)) return -2;
-  if (!conectar(iniciador, emisor)) return -3;
+  if (!conectar(iniciador, emisor)){
+    delete emisor;
+    delete receptor;
+    return -3;
+  }
   
   delete iniciador;
   
-  HDA_Online juego(alto, ancho, receptor, emisor);
+  HDA_Online juego(ancho, alto, emisor, receptor);
   juego.correr();
   
   delete receptor;

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "cliente.h"
+#include "hda_online.h"
 #include "Login/login.h"
 #include "Sala/sala.h"
 #include "Nivel/nivel.h"
@@ -19,23 +19,23 @@ HDA_Online::HDA_Online(int ancho, int alto, Socket *socket_emisor, Socket *socke
   libreria.habilitar_texto();
   libreria.habilitar_sonido(44100, MIX_DEFAULT_FORMAT, 2, 4096);
   
-  Ventana *ventana = new Ventana;
+  ventana = new Ventana;
   ventana->abrir(ancho, alto);
   ventana->dimension_logica(ancho, alto);
-  ventana->titulo(TITULO);
+  std::string titulo = TITULO;
+  ventana->titulo(titulo);
 }
 
 //
 HDA_Online::~HDA_Online(){
   delete ventana;
-  delete libreria;
 }
 
 //
 void HDA_Online::correr(){
   bool seguir = this->login();
   Sala sala;
-  sala.inicializar(RECURSOS, ventana, ancho, alto, socket_emisor, socket_receptor);  
+  sala.inicializar(RECURSOS, ventana, emisor, receptor);  
   while (seguir){
     seguir = sala.correr(ventana);
     // path_nivel = sala.ver_nivel();
@@ -47,14 +47,15 @@ void HDA_Online::correr(){
 
 //
 bool HDA_Online::login(){
-  Login log = Login;
-  log.inicializar(RECURSOS, ventana, ancho, alto, socket_emisor, socket_receptor);
-  bool seguir = log.correr(ventana);
+  Login log;
+  std::string path_recursos = RECURSOS;
+  log.inicializar(path_recursos, ventana, emisor, receptor);
+  return log.correr(ventana);
 }
 
 //
-bool HDA_Online::nivel(c){
+bool HDA_Online::nivel(){
   Nivel nivel;
-  nivel.inicializar(RECURSOS, ventana, ancho, alto, socket_emisor, socket_receptor);
+  nivel.inicializar(RECURSOS, ventana, emisor, receptor);
   return nivel.correr(ventana);
 }
