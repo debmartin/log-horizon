@@ -3,7 +3,7 @@ CC = g++
 #Opciones usadas para compilar
 CFLAGS = -Wall -pedantic -std=c++98 -g `sdl2-config --libs` -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -pthread -L./lib ../libs/json/libs/linux-gcc-4.8/libjson_linux-gcc-4.8_libmt.so
 #Nombre del programa principal
-CEXE = hda_online
+CEXE = cliente
 
 all: $(CEXE) 
 
@@ -63,13 +63,15 @@ productos.o: Nivel/productos.h Nivel/productos.cpp
 	
 receptor_resultados.o: Nivel/receptor_resultados.h Nivel/receptor_resultados.cpp
 	$(CC) $(CFLAGS) -c Nivel/receptor_resultados.cpp
-
 	
 thread.o: ../libs/TDA/thread/thread.h ../libs/TDA/thread/thread.cpp
 	$(CC) $(CFLAGS) -c ../libs/TDA/thread/thread.cpp
 
-$(CEXE): animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp
-	$(CC) $(CFLAGS) animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp -o $(CEXE)
+hda_online.o: hda_online.h hda_online.cpp
+	$(CC) $(CFLAGS) -c hda_online.cpp
+
+$(CEXE): hda_online.o animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp
+	$(CC) $(CFLAGS) hda_online.o animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

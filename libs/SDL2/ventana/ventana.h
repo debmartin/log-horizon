@@ -34,9 +34,17 @@ class Ventana{
     
     // Devuelve el renderizador de la ventana
     SDL_Renderer *ver_renderer(){return renderer;}
+    
+    // Devuelve el alto en pixeles de la ventana
+    unsigned int ver_alto(){return alto;}
+    
+    // Devuelve el ancho en pixeles de la ventana
+    unsigned int ver_ancho(){return ancho;}
   private:
     SDL_Renderer *renderer;
     SDL_Window *ventana;
+    unsigned int ancho;
+    unsigned int alto;
 };
 
 

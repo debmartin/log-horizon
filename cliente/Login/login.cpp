@@ -41,11 +41,14 @@ Login::~Login(){
 }
 
 //
-int Login::inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir){
+int Login::inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir){
   socket_recibir = recibir;
   socket_enviar = enviar;
   // FONDO
   fondo->cargar_textura(path + "imagenes/fondo_login.png", ventana);
+  
+  unsigned int ancho = ventana->ver_ancho();
+  unsigned int alto = ventana->ver_alto();
   
   // usado como punto de referencia para los demas destinos
   SDL_Rect destino;

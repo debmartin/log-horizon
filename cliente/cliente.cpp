@@ -50,7 +50,13 @@ int main(void){
   if (!conectar(iniciador, receptor)) return -2;
   if (!conectar(iniciador, emisor)) return -3;
   
+  delete iniciador;
+  
   HDA_Online juego(alto, ancho, receptor, emisor);
+  juego.correr();
+  
+  delete receptor;
+  delete emisor;
 
   return 0;
 }

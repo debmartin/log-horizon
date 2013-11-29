@@ -16,7 +16,7 @@ class Login{
     bool correr(Ventana *ventana);
     
     //
-    int inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir);
+    int inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir);
     
   private:
     Textura *fondo;

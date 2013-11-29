@@ -28,7 +28,7 @@ class Nivel{
     bool correr(Ventana* ventana);
   
     // Inicializa los datos necesarios para la ejecucion del nivel
-    void inicializar(const std::string &path, Ventana* ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir);
+    void inicializar(const std::string &path, Ventana* ventana, Socket* enviar, Socket* recibir);
     
   private:
     Productos *productos;

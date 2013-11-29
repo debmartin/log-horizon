@@ -25,7 +25,10 @@ Seleccion::~Seleccion(){
 }
 
 //
-int Seleccion::inicializar(const std::string &path, Ventana *ventana, unsigned int ancho, unsigned int alto, Socket* enviar, Socket* recibir){
+int Seleccion::inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir){
+  unsigned int alto = ventana->ver_alto();
+  unsigned int ancho = ventana->ver_ancho();
+  
   socket_recibir = recibir;
   socket_enviar = enviar;
     

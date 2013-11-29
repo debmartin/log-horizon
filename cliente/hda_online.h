@@ -8,10 +8,24 @@ class HDA_Online{
   
     //
     ~HDA_Online();
+    
+    //
+    void correr();
   private:
     Socket *emisor;
     Socket *receptor;
     Ventana *ventana;
+    SDL *libreria;
+    
+  protected:
+    //
+    bool login();
+    
+    //
+    bool sala();
+    
+    //
+    bool nivel();
 };
 
 #endif // HDA_ONLINE

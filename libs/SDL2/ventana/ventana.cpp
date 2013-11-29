@@ -23,7 +23,9 @@ Ventana::~Ventana(){
 // Abre una ventana con la dimension ingresada, en pixeles
 // Pre: ancho y alto deben ser positivos
 // Post: se abrio una ventana de las dimensiones ingresadas.
-bool Ventana::abrir(const int ancho, const int alto){
+bool Ventana::abrir(const int nuevo_ancho, const int nuevo_alto){
+  ancho = nuevo_ancho;
+  alto = nuevo_alto;
   if (renderer){
     SDL_DestroyRenderer(renderer);
     renderer = NULL;
