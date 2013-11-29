@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../../libs/TDA/socket/socket.h"
+#include "../../libs/TDA/socket/socket_prefijo.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <arpa/inet.h>
@@ -7,7 +8,7 @@
 #include <stdlib.h>
 
 int main(void){
-  Socket asignador;
+  SocketPrefijo asignador;
   asignador.asignar_direccion(8000, "127.0.0.1");
   asignador.reusar();
   asignador.asociar();
@@ -15,7 +16,7 @@ int main(void){
   Socket asignador_emisor;
   asignador.aceptar(asignador_emisor);
   
-  Socket receptor_aux, emisor_aux;
+  SocketPrefijo receptor_aux, emisor_aux;
   receptor_aux.asignar_direccion(8010, "127.0.0.1");
   receptor_aux.reusar();
   receptor_aux.asociar();
@@ -31,30 +32,27 @@ int main(void){
   asignador_emisor.enviar(&puerto_emisor, sizeof(int));
   asignador_emisor.enviar(&puerto_receptor, sizeof(int));
   
-  Socket receptor, emisor;
+  SocketPrefijo receptor, emisor;
   emisor_aux.aceptar(emisor);
   receptor_aux.aceptar(receptor);
   
   char respuesta = 1; 
-  while (respuesta == 1){
   std::string usuario_valido = "Deuteronomio";
   std::string clave_valida = "123qwe";
-  unsigned int largo_usuario;
-  unsigned int largo_clave;
+  while (respuesta == 1){
   
-    receptor.recibir(&largo_usuario, sizeof(int));
-    char *usuario = new char[largo_usuario + 1];
-    usuario[largo_usuario] = '\0';
-    receptor.recibir(usuario, largo_usuario);
-    std::cout << largo_usuario << std::endl;
-    std::cout << "usuario: " << usuario << std::endl;
+    uint32_t largo;
+    receptor.recibir_largo(largo);
+    char *usuario = new char[largo + 1];
+    usuario[largo] = '\0';
+    receptor.recibir(usuario, largo);
+    std::cout << "largo = " << largo << " usuario: " << usuario << std::endl;
     
-    receptor.recibir(&largo_clave, sizeof(int));
-    char *clave = new char[largo_clave + 1];
-    clave[largo_clave] = '\0';
-    receptor.recibir(clave, largo_clave);
-    std::cout << largo_clave << std::endl;
-    std::cout << "clave: " << clave << std::endl;
+    receptor.recibir_largo(largo);
+    char *clave = new char[largo + 1];
+    clave[largo] = '\0';
+    receptor.recibir(clave, largo);
+    std::cout << "largo = " << largo << " clave: " << clave << std::endl;
     
     if (strcmp(usuario, usuario_valido.c_str()) == 0 && strcmp(clave, clave_valida.c_str()) == 0)
       respuesta = 0;

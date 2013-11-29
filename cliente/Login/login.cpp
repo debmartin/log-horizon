@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "login.h"
+#include "../../libs/TDA/socket/socket_prefijo.h"
 
 #define MAX_CARACTERES 20
 #define FONDO_TEXTO 175
@@ -44,7 +45,7 @@ Login::~Login(){
 }
 
 //
-int Login::inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir){
+int Login::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir){
   socket_recibir = recibir;
   socket_enviar = enviar;
   // FONDO
@@ -226,14 +227,10 @@ bool Login::analizar_evento(SDL_Event &evento){
 //
 bool Login::enviar_datos(){
   std::string cadena = usuario->ver_contenido();
-  unsigned int largo = cadena.size();
-  socket_enviar->enviar(&largo, sizeof(largo));
-  socket_enviar->enviar(cadena.c_str(), largo);
+  socket_enviar->enviar_con_prefijo(cadena.c_str(), cadena.size());
   
   cadena = clave->ver_contenido();
-  largo = cadena.size();
-  socket_enviar->enviar(&largo, sizeof(largo));
-  socket_enviar->enviar(cadena.c_str(), largo);
+  socket_enviar->enviar_con_prefijo(cadena.c_str(), cadena.size());
   
   char respuesta;
   socket_recibir->recibir(&respuesta, sizeof(char));

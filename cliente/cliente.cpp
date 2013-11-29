@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "hda_online.h"
+#include "../libs/TDA/socket/socket_prefijo.h"
 #include "../libs/json/include/json/json.h"
 #include "../libs/SDL2/SDL.h"
 
@@ -27,7 +28,7 @@ void leer_datos_iniciales(int &ancho, int &alto, std::string &ip, int &puerto){
   puerto = aux.asInt();
 }
 
-bool conectar(Socket *iniciador, Socket *a_conectar){
+bool conectar(SocketPrefijo *iniciador, SocketPrefijo *a_conectar){
   in_addr_t ip = iniciador->ver_ip();
   unsigned int puerto;
   iniciador->recibir(&puerto, sizeof(int));
@@ -40,17 +41,17 @@ int main(void){
   std::string ip;
   leer_datos_iniciales(ancho, alto, ip, puerto);
   
-  Socket *iniciador = new Socket;
+  SocketPrefijo *iniciador = new SocketPrefijo;
   iniciador->asignar_direccion(puerto, ip.c_str());
   if (iniciador->conectar() == -1) return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
   
-  Socket *receptor = new Socket;
+  SocketPrefijo *receptor = new SocketPrefijo;
   
   if (!conectar(iniciador, receptor)){
      delete receptor;
      return -2;
   }
-  Socket *emisor = new Socket;
+  SocketPrefijo *emisor = new SocketPrefijo;
   if (!conectar(iniciador, emisor)){
     delete emisor;
     delete receptor;

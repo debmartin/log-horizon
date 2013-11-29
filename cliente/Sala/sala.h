@@ -3,6 +3,7 @@
 
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/TDA/socket/socket.h"
+#include "../../libs/TDA/socket/socket_prefijo.h"
 #include "seleccion.h"
 
 class Sala{
@@ -17,7 +18,7 @@ class Sala{
     bool correr(Ventana *ventana);
     
     //
-    int inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir);
+    int inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir);
     
   private:
     Textura *fondo;
@@ -26,8 +27,8 @@ class Sala{
     Seleccion *seleccion;
     Texto *escritor;
     bool seleccionando;
-    Socket* socket_recibir;
-    Socket* socket_enviar;
+    SocketPrefijo* socket_recibir;
+    SocketPrefijo* socket_enviar;
     
   protected:
     //

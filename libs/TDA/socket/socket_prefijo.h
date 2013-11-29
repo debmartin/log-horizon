@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#include "common-socket.h"
+#include "socket.h"
 
 class SocketPrefijo : public Socket{
   public:

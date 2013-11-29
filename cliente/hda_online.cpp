@@ -11,7 +11,7 @@
 #define TITULO "Hora de Aventura Online"
 
 //
-HDA_Online::HDA_Online(int ancho, int alto, Socket *socket_emisor, Socket *socket_receptor){
+HDA_Online::HDA_Online(int ancho, int alto, SocketPrefijo *socket_emisor, SocketPrefijo *socket_receptor){
   emisor = socket_emisor;
   receptor = socket_receptor;
   

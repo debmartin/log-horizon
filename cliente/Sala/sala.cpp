@@ -60,7 +60,7 @@ void Sala::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
 }
 
 //
-int Sala::inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir){
+int Sala::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir){
   unsigned int ancho = ventana->ver_ancho();
   unsigned int alto = ventana->ver_alto();
   

@@ -13,6 +13,7 @@
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/TDA/lista/lista.h"
 #include "../../libs/TDA/socket/socket.h"
+#include "../../libs/TDA/socket/socket_prefijo.h"
 
 
 class Nivel{
@@ -28,7 +29,7 @@ class Nivel{
     bool correr(Ventana* ventana);
   
     // Inicializa los datos necesarios para la ejecucion del nivel
-    void inicializar(const std::string &path, Ventana* ventana, Socket* enviar, Socket* recibir);
+    void inicializar(const std::string &path, Ventana* ventana, SocketPrefijo* enviar, SocketPrefijo* recibir);
     
   private:
     Productos *productos;
@@ -40,14 +41,13 @@ class Nivel{
     int ancho_celda;
     int alto_celda;
     ReceptorResultados *receptor;
-    Socket *socket_enviar;
-    Socket *socket_recibir;
+    SocketPrefijo *socket_enviar;
+    SocketPrefijo *socket_recibir;
     Lista<reemplazo_t> *celdas_a_explotar;
     Puntaje *puntaje;
     Mensaje *mensaje;
     bool finalizado;
     
-
     Mix_Chunk *sonido_explosion;
     Mix_Chunk *sonido_movimiento;
     Mix_Chunk *sonido_seleccion;

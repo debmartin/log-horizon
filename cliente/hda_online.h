@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "../libs/TDA/socket/socket_prefijo.h"
 #include "../libs/TDA/socket/socket.h"
 #include "../libs/json/include/json/json.h"
 #include "../libs/SDL2/SDL.h"
@@ -11,7 +12,7 @@
 class HDA_Online{
   public:
     //
-    HDA_Online(int ancho, int alto, Socket *socket_emisor, Socket *socket_receptor);
+    HDA_Online(int ancho, int alto, SocketPrefijo *socket_emisor, SocketPrefijo *socket_receptor);
   
     //
     ~HDA_Online();
@@ -19,8 +20,8 @@ class HDA_Online{
     //
     void correr();
   private:
-    Socket *emisor;
-    Socket *receptor;
+    SocketPrefijo *emisor;
+    SocketPrefijo *receptor;
     Ventana *ventana;
     SDL libreria;
     
