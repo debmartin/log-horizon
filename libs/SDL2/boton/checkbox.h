@@ -1,5 +1,5 @@
-#ifndef BOTON_H
-#define BOTON_H
+#ifndef CHECKBOX_H
+#define CHECKBOX_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -7,33 +7,39 @@
 
 #include "../ventana/ventana.h"
 #include "../superficie/superficie.h"
+#include "boton.h"
 
-typedef struct estructura_boton{
+
+typedef struct estructura_checkbox{
   SDL_Rect normal;
   SDL_Rect apretado;
   SDL_Rect resaltado;
+  SDL_Rect resaltado_apretado;
   SDL_Rect destino;
-}estructura_boton_t;
+}estructura_checkbox_t;
 
-class Boton{
+class CheckBox : public Boton{
   public:
     //
-    Boton();
+    void analizar_evento(SDL_Event &evento);
     
     //
-    virtual ~Boton();
-    
+    bool asignar_texturas(Superficie *sup, estructura_checkbox_t &estructura, Ventana *ventana);
+            
     //
-    virtual bool asignar_texturas(Superficie *sup, estructura_boton_t &estructura, Ventana *ventana);
+    bool asignar_texturas(const std::string &path, estructura_checkbox_t &estructura, Ventana *ventana);
                              
+    private:
+      SDL_Rect src_apretado_resaltado;
+/*  
     //
-    bool asignar_texturas(const std::string &path, estructura_boton_t &estructura, Ventana *ventana);
+    CheckBox();
+    
+    //
+    ~CheckBox();
     
     //
     bool agregar_texto(Superficie *sup, SDL_Rect &dest_texto, Ventana *ventana, int desp);
-    
-    //
-    virtual void analizar_evento(SDL_Event &evento);
     
     //
     bool dibujar(Ventana *ventana);
@@ -44,7 +50,7 @@ class Boton{
     // Setea el nivel alpha de la textura del boton
     void establecer_alpha(Uint8 alpha);
     
-  protected:
+  private:
     Textura *textura;
     SDL_Rect src_normal;
     SDL_Rect src_apretado;
@@ -54,7 +60,7 @@ class Boton{
     SDL_Rect destino_texto;
     bool apretado;
     SDL_Rect destino;
-    int desp;
+    int desp;*/
 };
 
-#endif // BOTON_H
+#endif // CHECKBOX_H
