@@ -37,7 +37,10 @@ int main(void){
   estructura.resaltado_apretado = apretado_sobre;
   
   boton.asignar_texturas("../../recursos/imagenes/checkbox.png", estructura, &ventana);
-   
+  
+  Textura fondo;
+  fondo.cargar_textura("../../recursos/imagenes/fondo_editor.png", &ventana);
+  
   SDL_Event evento;
   bool seguir = true;
 
@@ -49,7 +52,7 @@ int main(void){
       if (boton.activado()) std::cout << "esta apretado" << std::endl;
     }
     ventana.limpiar();
-    
+    fondo.dibujar(&ventana);
     boton.dibujar(&ventana);
     ventana.presentar(20);
   }

@@ -137,19 +137,18 @@ int Login::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo*
   sonido->volume = VOLUMEN;
   
   // MENSAJE
-  sup.cargar(path + "imagenes/sub_ventana.png");
   destino.w = ancho / 3;
   destino.h = alto / 4;
   destino.x = ancho / 2 - destino.w / 2;
   destino.y = alto / 2 - destino.h / 2;
-  mensaje->asignar_fondo(&sup, destino, ventana);
+  mensaje->asignar_fondo(path + "imagenes/sub_ventana.png", destino, ventana);
   mensaje->establecer_alpha_fondo(ALPHA_MENSAJE);
-  escritor->copiar_texto("Enviando datos...", &sup);
+  mensaje->asignar_escritor(path + "fuentes/orange.ttf", 30);
   destino.w = destino.w - destino.w / 5;
   destino.h = destino.h / 4;
   destino.y = destino.y + destino.h * 2 - destino.h / 2;
   destino.x = destino.x + destino.w / 8;
-  mensaje->asignar_mensaje(&sup, destino, ventana);
+  mensaje->asignar_mensaje("Enviando datos...", destino, ventana);
   
   datos_inicializados = true;
   return 0;
@@ -213,6 +212,7 @@ bool Login::analizar_evento(SDL_Event &evento){
     usuario->analizar_evento(evento);
     clave->analizar_evento(evento);
     iniciar_sesion->analizar_evento(evento);
+    if (iniciar_sesion->activado()) std::cout << "apretaste el boton" << std::endl;
     if (iniciar_sesion->activado() && usuario->ver_contenido() != "" && clave->ver_contenido() != ""){
       this->enviar_datos();
     }
