@@ -4,6 +4,7 @@
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/TDA/socket/socket.h"
 #include "../../libs/TDA/socket/socket_prefijo.h"
+#include "autentificador.h"
 
 class Login{
   public:
@@ -20,6 +21,7 @@ class Login{
     int inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir);
     
   private:
+    bool datos_inicializados;
     Textura *fondo;
     Boton *iniciar_sesion;
     TextBox *usuario;
@@ -31,10 +33,9 @@ class Login{
     SDL_Rect destino_text_usuario;
     SDL_Rect destino_text_clave;
     Mensaje *mensaje;
-    bool conectando;
     
-    SocketPrefijo* socket_recibir;
-    SocketPrefijo* socket_enviar;
+    bool conectando;
+    Autentificador *autentificador;    
     
   protected:
     
@@ -45,10 +46,7 @@ class Login{
     bool analizar_evento(SDL_Event &evento);
     
     //
-    virtual bool enviar_datos();
-    
-    //
-    void obtener_delay(FPS &frames, int tiempo_actual, int &delay);
+    void enviar_datos();
 };
 
 #endif // LOGIN_H

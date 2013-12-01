@@ -66,10 +66,6 @@ class Nivel{
     // Actualiza todas las animaciones utilizadas por el nivel.
     void actualizar_animaciones();
     
-    // Calcula el delay necesario para que el nivel se ejecute a 
-    // 60 fps
-    void obtener_delay(FPS &frames, int tiempo_actual, int &delay);
-    
     // Intercambia el contenido de las celdas cuyas coordenadas
     // son recibidas por parametro.
     void intercambiar(coordenada_t &origen, coordenada_t &destino);

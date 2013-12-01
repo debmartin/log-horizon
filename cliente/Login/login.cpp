@@ -9,9 +9,6 @@
 #define ALPHA_MENSAJE 220
 #define DELAY 16
 
-#define OK 0
-#define ERROR 1
-
 //
 Login::Login(){
   fondo = new Textura;
@@ -22,13 +19,10 @@ Login::Login(){
   textura_clave = new Textura;
   textura_usuario = new Textura;
   sonido = NULL;
-  socket_recibir = NULL;
-  socket_enviar = NULL;
   mensaje = new Mensaje;
   conectando = false;
-  socket_enviar = NULL;
-  socket_recibir = NULL;
-  conectando = false;
+  datos_inicializados = false;
+  autentificador = new Autentificador;
 }
 
 //
@@ -41,13 +35,13 @@ Login::~Login(){
   delete textura_clave;
   delete textura_usuario;
   delete mensaje;
+  delete autentificador;
   if (sonido) Mix_FreeChunk(sonido);
 }
 
 //
 int Login::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir){
-  socket_recibir = recibir;
-  socket_enviar = enviar;
+  autentificador->asignar_sockets(enviar, recibir);
   // FONDO
   fondo->cargar_textura(path + "imagenes/fondo_login.png", ventana);
   
@@ -157,13 +151,13 @@ int Login::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo*
   destino.x = destino.x + destino.w / 8;
   mensaje->asignar_mensaje(&sup, destino, ventana);
   
+  datos_inicializados = true;
   return 0;
 }
 
 //
 bool Login::correr(Ventana *ventana){
-  if (!socket_recibir || !socket_enviar) return false;
-  
+  if (!datos_inicializados) return false;
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -180,22 +174,24 @@ bool Login::correr(Ventana *ventana){
     this->dibujar(ventana);
     
     // actualizamos los fps
-    this->obtener_delay(frames, tiempo_actual, delay);
+    frames.obtener_delay(tiempo_actual, delay);
     
     // Presentar en ventana
     ventana->presentar(delay);
     
-    if (conectando && this->enviar_datos()) return true;
+    if (conectando && !autentificador->en_curso()){
+      if (autentificador->usuario_valido()){
+        int *a = new int;
+        autentificador->join((void**)&a);
+        return true;
+      }else{
+        int *a = new int;
+        autentificador->join((void**)&a);
+        conectando = false;
+      }
+    }
   }
   return false;
-}
-
-//
-void Login::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
-  if (SDL_GetTicks() - tiempo_actual < 1000){
-    frames.actualizar();
-    delay =  (1000/60.0f) * (frames.ver_fps()/60.0f);
-  }
 }
 
 //
@@ -213,27 +209,20 @@ int Login::dibujar(Ventana *ventana){
 //
 bool Login::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT) return false;
-  if (!conectando){
+  if (!autentificador->en_curso()){
     usuario->analizar_evento(evento);
     clave->analizar_evento(evento);
     iniciar_sesion->analizar_evento(evento);
-    if (iniciar_sesion->activado()){
-      conectando = true;
+    if (iniciar_sesion->activado() && usuario->ver_contenido() != "" && clave->ver_contenido() != ""){
+      this->enviar_datos();
     }
   }
   return true;
 }
 
 //
-bool Login::enviar_datos(){
-  std::string cadena = usuario->ver_contenido();
-  socket_enviar->enviar_con_prefijo(cadena.c_str(), cadena.size());
-  
-  cadena = clave->ver_contenido();
-  socket_enviar->enviar_con_prefijo(cadena.c_str(), cadena.size());
-  
-  char respuesta;
-  socket_recibir->recibir(&respuesta, sizeof(char));
-  conectando = false;
-  return respuesta == OK;
+void Login::enviar_datos(){
+  conectando = true;
+  autentificador->autentificar(usuario->ver_contenido(), clave->ver_contenido());
+  autentificador->correr();
 }

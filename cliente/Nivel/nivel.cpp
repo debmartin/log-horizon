@@ -267,7 +267,8 @@ bool Nivel::correr(Ventana* ventana){
     // Actualizacion
     Nivel::actualizar_animaciones();
     // actualizamos los fps
-    Nivel::obtener_delay(frames, tiempo_actual, delay);
+    //Nivel::obtener_delay(frames, tiempo_actual, delay);
+    frames.obtener_delay(tiempo_actual, delay);
   
     // Presentar en ventana
     ventana->presentar(delay);
@@ -335,14 +336,6 @@ void Nivel::actualizar_animaciones(){
         Nivel::apilar(reemplazo.tipo,reemplazo.color,reemplazo.celda);
       }
     }
-  }
-}
-
-//
-void Nivel::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
-  if (SDL_GetTicks() - tiempo_actual < 1000){
-    frames.actualizar();
-    delay =  (1000/60.0f) * (frames.ver_fps()/60.0f);
   }
 }
 

@@ -14,6 +14,9 @@ class FPS {
     // Devuelve la cantidad de frames en el ultimo segundo
     int ver_fps();
 
+    //
+    void obtener_delay(int tiempo_actual, int &delay);
+
   private:
     unsigned int OldTime;
     unsigned int NumFrames;

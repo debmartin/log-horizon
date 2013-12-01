@@ -25,7 +25,7 @@ ReceptorResultados::~ReceptorResultados(){
 // Asigna un socket para poder recibir los datos que seran
 // encolados.
 // Pre: el socket debe existir
-void ReceptorResultados::agregar_socket(Socket *nuevo_socket, int stop){
+void ReceptorResultados::agregar_socket(SocketPrefijo *nuevo_socket, int stop){
   socket = nuevo_socket;
   stop_tipo = stop;
 }

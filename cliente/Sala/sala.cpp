@@ -4,6 +4,10 @@
 
 #define DELAY 16
 
+#define CREAR 0
+#define UNIRSE 1
+#define SALIRSE -1
+
 //
 Sala::Sala(){
   fondo = new Textura;
@@ -12,7 +16,6 @@ Sala::Sala(){
   seleccion = new Seleccion;
   escritor = new Texto;
   socket_enviar = NULL;
-  socket_recibir = NULL;
   seleccionando = false;
 }
 
@@ -26,40 +29,6 @@ Sala::~Sala(){
 }
 
 //
-bool Sala::correr(Ventana *ventana){
-  if (!socket_recibir || !socket_enviar) return false;
-  SDL_Event evento;
-  bool corriendo = true;
-  FPS frames;
-  int tiempo_actual = SDL_GetTicks();
-  int delay = DELAY;
-  while (corriendo){
-    // Eventos
-    while (SDL_PollEvent(&evento)){
-      corriendo = this->analizar_evento(evento);
-    }
-    // Dibujado
-    ventana->limpiar();
-    this->dibujar(ventana);
-    
-    // actualizamos los fps
-    this->obtener_delay(frames, tiempo_actual, delay);
-    
-    // Presentar en ventana
-    ventana->presentar(delay);
-  }
-  return false;
-}
-
-//
-void Sala::obtener_delay(FPS &frames, int tiempo_actual, int &delay){
-  if (SDL_GetTicks() - tiempo_actual < 1000){
-    frames.actualizar();
-    delay =  (1000/60.0f) * (frames.ver_fps()/60.0f);
-  }
-}
-
-//
 int Sala::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir){
   unsigned int ancho = ventana->ver_ancho();
   unsigned int alto = ventana->ver_alto();
@@ -68,7 +37,6 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* 
   seleccion->inicializar(path, ventana, enviar, recibir);
   
   // SOCKETS
-  socket_recibir = recibir;
   socket_enviar = enviar;
   
   // FONDO
@@ -134,6 +102,32 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* 
 }
 
 //
+bool Sala::correr(Ventana *ventana){
+  if (!socket_enviar) return false;
+  SDL_Event evento;
+  bool corriendo = true;
+  FPS frames;
+  int tiempo_actual = SDL_GetTicks();
+  int delay = DELAY;
+  while (corriendo){
+    // Eventos
+    while (SDL_PollEvent(&evento)){
+      corriendo = this->analizar_evento(evento);
+    }
+    // Dibujado
+    ventana->limpiar();
+    this->dibujar(ventana);
+    
+    // actualizamos los fps
+    frames.obtener_delay(tiempo_actual, delay);
+    
+    // Presentar en ventana
+    ventana->presentar(delay);
+  }
+  return false;
+}
+
+//
 int Sala::dibujar(Ventana *ventana){
   fondo->dibujar(ventana);
   if (!seleccionando){
@@ -147,23 +141,29 @@ int Sala::dibujar(Ventana *ventana){
 
 //
 bool Sala::analizar_evento(SDL_Event &evento){
-  if (evento.type == SDL_QUIT) return false;
+  if (evento.type == SDL_QUIT){
+    this->enviar_datos(SALIRSE);
+    return false;
+  }
   if (!seleccionando){
     crear->analizar_evento(evento);
     unirse->analizar_evento(evento);
     if (crear->activado()){
+      this->enviar_datos(CREAR);
       seleccionando = true;
+      seleccion->esta_creada(false);
     }else if(unirse->activado()){
+      this->enviar_datos(UNIRSE);
       seleccionando = true;
-    }    
+      seleccion->esta_creada(true);
+    }
   }else{
-    if (!seleccion->analizar_evento(evento))
-      seleccionando = false;
+    seleccionando = seleccion->analizar_evento(evento);
   }
   return true;
 }
 
 //
-void Sala::enviar_datos(){
-  // enviar datos (?)
+void Sala::enviar_datos(char eleccion){
+  socket_enviar->enviar(&eleccion, sizeof(eleccion));
 }

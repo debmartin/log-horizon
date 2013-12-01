@@ -4,6 +4,13 @@
 
 #define DELAY 16
 
+#define ANTERIOR 2
+#define SIGUIENTE 3
+#define ACEPTAR 4
+#define RETROCEDER 5
+#define OK 6
+#define ERROR 7
+
 //
 Seleccion::Seleccion(){
   fondo = new Textura;
@@ -12,6 +19,8 @@ Seleccion::Seleccion(){
   anterior = new Boton;
   escritor = new Texto;
   retroceder = new Boton;
+  partida = new Partida;
+  partida_aceptada = false;
 }
 
 //
@@ -22,14 +31,14 @@ Seleccion::~Seleccion(){
   delete anterior;
   delete escritor;
   delete retroceder;
+  delete partida;
 }
 
 //
-int Seleccion::inicializar(const std::string &path, Ventana *ventana, Socket* enviar, Socket* recibir){
+int Seleccion::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir){
   unsigned int alto = ventana->ver_alto();
   unsigned int ancho = ventana->ver_ancho();
   
-  socket_recibir = recibir;
   socket_enviar = enviar;
     
   // TEXTO  
@@ -123,6 +132,13 @@ int Seleccion::inicializar(const std::string &path, Ventana *ventana, Socket* en
   destino_texto.y = destino_boton.y + destino_boton.h / 10;
   retroceder->agregar_texto(&sup, destino_texto, ventana, 1);
 
+  // PARTIDA
+  SDL_Rect destino_partida;
+  destino_partida.w = ancho - 100;
+  destino_partida.x = 50;
+  destino_partida.h = alto/3;
+  destino_partida.y = 100; 
+  partida->inicializar(recibir, path + "fuentes/orange.ttf", destino_partida, ventana);
 
   return 0;
 }
@@ -133,15 +149,55 @@ int Seleccion::dibujar(Ventana *ventana){
   anterior->dibujar(ventana);
   aceptar->dibujar(ventana);
   retroceder->dibujar(ventana);
+  partida->dibujar(ventana);
   return 0;
 }
 
 //
 bool Seleccion::analizar_evento(SDL_Event &evento){
-  aceptar->analizar_evento(evento);
-  anterior->analizar_evento(evento);
-  siguiente->analizar_evento(evento);
+  if (evento.type == SDL_QUIT){
+    partida->finalizar_recibir();
+    return -1;
+  }
+  if (!partida_aceptada){
+    aceptar->analizar_evento(evento);
+    anterior->analizar_evento(evento);
+    siguiente->analizar_evento(evento);
+    if (anterior->activado()){
+      this->enviar_datos(ANTERIOR);
+    }else if (siguiente->activado()){
+      this->enviar_datos(SIGUIENTE);
+    }else if (aceptar->activado()){
+      partida_aceptada = true;
+      anterior->establecer_alpha(100);
+      siguiente->establecer_alpha(100);
+      this->enviar_datos(ACEPTAR);
+    }
+  }
+
   retroceder->analizar_evento(evento);
-  if (retroceder->activado()) return false;
+  if (retroceder->activado()){
+    this->enviar_datos(RETROCEDER);
+    std::cout << "antes del join" << std::endl;
+    partida->finalizar_recibir();
+    std::cout << "despues del join" << std::endl;
+    if (partida_aceptada){
+      partida_aceptada = false;
+      anterior->establecer_alpha(255);
+      siguiente->establecer_alpha(255);
+    }else{
+      return false;
+    }
+  }
   return true;
+}
+
+//
+void Seleccion::esta_creada(bool es_creada){
+  partida->recibir_datos(es_creada);
+}
+
+//
+void Seleccion::enviar_datos(char eleccion){
+  socket_enviar->enviar(&eleccion, sizeof(eleccion));
 }

@@ -27,7 +27,6 @@ class Sala{
     Seleccion *seleccion;
     Texto *escritor;
     bool seleccionando;
-    SocketPrefijo* socket_recibir;
     SocketPrefijo* socket_enviar;
     
   protected:
@@ -38,10 +37,7 @@ class Sala{
     bool analizar_evento(SDL_Event &evento);
     
     //
-    virtual void enviar_datos();
-    
-    //
-    void obtener_delay(FPS &frames, int tiempo_actual, int &delay);
+    virtual void enviar_datos(char dato);
 };
 
 #endif // SALA_H

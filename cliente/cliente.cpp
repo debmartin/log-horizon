@@ -28,12 +28,19 @@ void leer_datos_iniciales(int &ancho, int &alto, std::string &ip, int &puerto){
   puerto = aux.asInt();
 }
 
-bool conectar(SocketPrefijo *iniciador, SocketPrefijo *a_conectar){
+bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *emisor){
   in_addr_t ip = iniciador->ver_ip();
-  unsigned int puerto;
-  iniciador->recibir(&puerto, sizeof(int));
-  a_conectar->asignar_direccion(puerto, ip);
-  return a_conectar->conectar() != -1;
+  unsigned int puerto_receptor, puerto_emisor;
+  
+  iniciador->recibir(&puerto_receptor, sizeof(unsigned int));
+  puerto_receptor = ntohl(puerto_receptor);
+  iniciador->recibir(&puerto_emisor, sizeof(unsigned int));
+  puerto_emisor = ntohl(puerto_emisor);
+  
+  receptor->asignar_direccion(puerto_receptor, ip);
+  if (receptor->conectar() == -1) return false;;
+  emisor->asignar_direccion(puerto_emisor, ip);
+  return emisor->conectar() != -1;  
 }
 
 int main(void){
@@ -46,18 +53,15 @@ int main(void){
   if (iniciador->conectar() == -1) return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
   
   SocketPrefijo *receptor = new SocketPrefijo;
+  SocketPrefijo *emisor = new SocketPrefijo;
   
-  if (!conectar(iniciador, receptor)){
+  
+  if (!conectar(iniciador, receptor, emisor)){
      delete receptor;
+     delete emisor;
      return -2;
   }
-  SocketPrefijo *emisor = new SocketPrefijo;
-  if (!conectar(iniciador, emisor)){
-    delete emisor;
-    delete receptor;
-    return -3;
-  }
-  
+
   delete iniciador;
   
   HDA_Online juego(ancho, alto, emisor, receptor);

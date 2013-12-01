@@ -43,6 +43,7 @@ class Boton{
     
     // Setea el nivel alpha de la textura del boton
     void establecer_alpha(Uint8 alpha);
+    
   private:
     Textura *textura;
     SDL_Rect src_normal;

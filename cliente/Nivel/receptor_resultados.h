@@ -2,6 +2,7 @@
 #define RECEPTOR_RESULTADOS_H
 
 #include "../../libs/TDA/socket/socket.h"
+#include "../../libs/TDA/socket/socket_prefijo.h"
 #include "../../libs/TDA/thread/thread.h"
 #include "../../libs/TDA/lista/lista.h"
 #include <arpa/inet.h>
@@ -22,12 +23,7 @@ class ReceptorResultados : public Thread{
     // Asigna un socket para poder recibir los datos que seran
     // encolados.
     // Pre: el socket debe existir
-    void agregar_socket(Socket *nuevo_socket, int stop);
-    
-    // Funcion a realizar en otro hilo, recibe datos que almacenara
-    // en la lista, hasta recibir una señal de finalizacion por el metodo
-    // "finalizar"
-    void funcion_a_correr();
+    void agregar_socket(SocketPrefijo *nuevo_socket, int stop);
   
     // devuelve true si se esta recibiendo datos, caso contrario false
     bool recibiendo_datos();
@@ -49,10 +45,15 @@ class ReceptorResultados : public Thread{
   private:
     Lista<resultado_t> *cola;
     bool recibiendo;
-    Socket *socket;
+    SocketPrefijo *socket;
     Mutex *mutex;
     bool seguir;
     int stop_tipo;
+  protected:
+    // Funcion a realizar en otro hilo, recibe datos que almacenara
+    // en la lista, hasta recibir una señal de finalizacion por el metodo
+    // "finalizar"
+    void funcion_a_correr();
 };
 
 #endif // RECEPTOR_RESULTADOS_H

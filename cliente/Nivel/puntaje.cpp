@@ -42,9 +42,6 @@ bool Puntaje::asignar_destino(SDL_Rect &nuevo_destino, Ventana *ventana_dest){
 //
 void Puntaje::sumar_puntos(unsigned int dif){
   dif_final += dif;
-  /*if (destino){
-    this->actualizar_textura();
-  }*/
 }
 
 //
@@ -58,7 +55,6 @@ bool Puntaje::dibujar(){
 void Puntaje::actualizar_textura(){
   std::string puntaje_string;
   if (dif_final > 0){
-    std::cout << "en el if " << std::endl;
     puntaje++;
     dif_final--;
     size_t largo_clave = (int)log10((double)puntaje) + 1;

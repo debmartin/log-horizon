@@ -64,11 +64,11 @@ void Boton::analizar_evento(SDL_Event &evento){
     if (evento.type == SDL_MOUSEBUTTONDOWN){
       src_actual = src_apretado;
       apretado = true;
-    }else if(evento.type == SDL_MOUSEBUTTONUP){
-      apretado = false;
-    }
-    if(!apretado){
+    }else if(evento.type == SDL_MOUSEBUTTONUP || evento.type == SDL_MOUSEMOTION){
       src_actual = src_resaltado;
+      apretado = false;
+    }else{
+      apretado = false;
     }
   }else{
     src_actual = src_normal;
@@ -81,7 +81,7 @@ bool Boton::dibujar(Ventana *ventana){
   if (!textura->dibujar(src_actual, destino, ventana)) return false;
   if (texto){
     SDL_Rect destino_aux = destino_texto;
-    if (apretado){
+    if (src_actual.x == src_apretado.x && src_actual.y == src_apretado.y){
       destino_aux.x = destino_aux.x + desp;
       destino_aux.y = destino_aux.y + desp;
     }

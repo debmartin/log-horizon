@@ -24,3 +24,10 @@ int FPS::ver_fps(){
   return NumFrames;
 }
 
+//
+void FPS::obtener_delay(int tiempo_actual, int &delay){
+  if (SDL_GetTicks() - tiempo_actual < 1000){
+    this->actualizar();
+    delay =  (1000/60.0f) * (this->ver_fps()/60.0f);
+  }
+}
