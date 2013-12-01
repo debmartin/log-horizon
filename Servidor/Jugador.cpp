@@ -11,7 +11,7 @@
 using std::string;
 
 Jugador::Jugador(usuario_t& usuario) :
-    puerto_enviar(enviar), puerto_recibir(recibir), puntaje(0), jugada_actual(NULL), mutex_receptor(NULL){
+    puntaje(0), jugada_actual(NULL), mutex_receptor(NULL){
     id = usuario.nombre;
     sockets = usuario.sockets;
 
@@ -20,12 +20,12 @@ Jugador::Jugador(usuario_t& usuario) :
     mutex_emisor = new Mutex();
 
     emisor->agregar_mutex(mutex_emisor);
-    emisor->agregar_socket(sockets->enviar_cli)
+    emisor->agregar_socket(usuario.sockets->enviar_cli);
     emisor_tab->agregarMutex(mutex_emisor);
-    emisor_tab->agregarSocket(sockets->enviar_cli)
+    emisor_tab->agregarSocket(usuario.sockets->enviar_cli);
 
     receptor = new ReceptorJugada();
-    receptor->agregarSocket(sockets->recibir_cli);
+    receptor->agregarSocket(usuario.sockets->recibir_cli);
 }
 
 Jugador::~Jugador(){

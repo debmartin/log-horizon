@@ -31,15 +31,15 @@ int main(){
         }
     }
     Dimension dim(filas, columnas);
-    Nivel* nivel = new Nivel(dim, estructura, 300);
-    std::string nombre("yo");
-    nivel->agregarJugador(nombre);
+//    Nivel* nivel = new Nivel(dim, estructura, 300);
+//    std::string nombre("yo");
+//    nivel->agregarJugador(nombre);
 //    nivel->enviarTablero();
 //    nivel->jugar();
 //    nivel->cerrarJugador();
     for(int  i=0; i<columnas; i++)
         delete[] estructura[i];
     delete[] estructura;
-    delete nivel;
+//    delete nivel;
     return 0;
 }

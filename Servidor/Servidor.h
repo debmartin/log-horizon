@@ -1,54 +1,61 @@
 #ifndef SERVIDOR_H
 #define SERVIDOR_H
 
+#include "../libs/TDA/thread/thread.h"
 #include "../libs/TDA/socket/socket.h"
 #include <exception>
 #include <string>
-
-#define PUERTO_ESCUCHA 8000
-
-typedef struct _socks{
-    Socket* enviar;
-    Socket* enviar_cli;
-    Socket* recibir;
-    Socket* recibir_cli;
-} sockets_jugador_t;
-
-
-typedef struct _usuario{
-    std::string* nombre;
-    std::string* contrasenia;
-    sockets_jugador_t* sockets;
-} usuario_t;
-
-typedef struct _nivel{
-    std::string* nombre;
-    int puntaje;
-    int cant_jugadores;
-} nivel_t;
-
+#include "estructuras.h"
+#include <vector>
+#include <map>
+#include "Constantes.h"
+#include "Login.h"
+#include "SalaPartidas.h"
+#include "Nivel.h"
 
 
 class ServidorCrearSocket : public std::exception{};
 
-class Servidor
-{
+class ServidorUsuario;
+
+class Servidor : public Thread{
     public:
         Servidor();
         virtual ~Servidor();
-        void recibirConexion(sockets_jugador_t& sockets);
-        int asignarPuerto(Socket& sockfd);
-        void enviarPuertos(sockets_jugador_t& sockets);
-        bool aceptarSubConexiones(sockets_jugador_t& sockets);
-        void recibirUsuarioContrasenia(usuario_t& nuevo_usuario);
+        void cargarNiveles();
+        void aceptarConexion();
+        std::string generarUsuario();
+        int elegirPartida(std::string& nombre_usuario);
+        bool iniciarPartida(int nro_partida);
+        void correrUsuario();
+        void cerrarUsuario(std::string& nombre);
+        void cerrar();
     protected:
+        void cerrarPartida(int nro_partida, std::vector<usuario_t*>*& jugadores_partida);
+        void funcion_a_correr();
     private:
-        int proximo_puerto;
-        Socket* cliente_actual;
+        Mutex* mutex_login;
         Socket* socket_escucha;
-        usuario_t* nuevo_usuario;
-        vector<nivel_t*> niveles;
-        vector<nivel_t*> partidas;
+        std::vector<nivel_t*>* niveles;
+        std::vector<Socket*>* aceptados;
+        std::vector<usuario_t*>* en_espera_login;
+        std::map<std::string, usuario_t*>* conectados;
+        std::map<int, partida_t*>* partidas;
+        std::vector<ServidorUsuario*>* servidores;
+        bool seguir;
+        int cant_partidas;
+};
+
+class ServidorUsuario : public Thread {
+    public:
+        ServidorUsuario(Servidor* nuevo_servidor);
+        ~ServidorUsuario();
+        void terminar();
+    protected:
+        void funcion_a_correr();
+    private:
+        Servidor* servidor;
+        bool seguir;
 };
 
 #endif // SERVIDOR_H

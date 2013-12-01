@@ -5,11 +5,12 @@
 
 
 using std::string;
+using std::istream;
 
-Nivel::Nivel(Dimension& tam, char** estructura, int max_puntos) :
+Nivel::Nivel(istream* arch_estructura, istream* arch_probabilidades, int max_puntos) :
     puntaje_objetivo(max_puntos) {
     srand(time(NULL));
-    tablero = new Tablero(tam, estructura);
+//    tablero = new Tablero(tam, estructura);
     mutex_recibir = new Mutex();
     jugadores = new ConjuntoJugadores(mutex_recibir);
 }
@@ -20,8 +21,8 @@ Nivel::~Nivel(){
     delete mutex_recibir;
 }
 
-void Nivel::agregarJugador(string& nombre){
-    jugadores->agregar(nombre, PUERTO_ENVIAR, PUERTO_RECIBIR);
+void Nivel::agregarJugador(usuario_t& usuario){
+    jugadores->agregar(usuario);
 }
 
 void Nivel::imprimirTablero(){

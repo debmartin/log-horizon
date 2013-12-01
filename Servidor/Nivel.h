@@ -8,9 +8,9 @@
 
 class Nivel{
     public:
-        Nivel(Dimension& tam, char** estructura, int max_puntos);
+        Nivel(std::istream* arch_estructura, std::istream* arch_probabilidades, int max_puntos);
         virtual ~Nivel();
-        void agregarJugador(std::string& nombre);
+        void agregarJugador(usuario_t& usuario);
         void imprimirTablero();
         void jugar();
         void cerrarJugador();

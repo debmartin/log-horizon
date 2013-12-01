@@ -1,6 +1,8 @@
 #ifndef CONSTANTES_H_INCLUDED
 #define CONSTANTES_H_INCLUDED
 
+#define PUERTO_ESCUCHA 8000
+
 #define ROJO 'r'
 #define AMARILLO 'y'
 #define VERDE 'g'
@@ -27,5 +29,16 @@
 #define INSERTAR '2'
 #define PUNTOS '3'
 #define TERMINAR '4'
+
+#define CREAR 0
+#define UNIRSE 1
+
+#define ELEGIR '4'
+#define AVANZAR '3'
+#define RETROCEDER '2'
+#define VOLVER '5'
+
+#define INICIAR '9'
+#define CONFIRMO '8'
 
 #endif // CONSTANTES_H_INCLUDED

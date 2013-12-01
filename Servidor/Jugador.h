@@ -10,20 +10,12 @@
 #include "Tablero.h"
 #include "ReceptorJugada.h"
 #include "EmisorTablero.h"
-
-
-typedef struct socks{
-    Socket* enviar;
-    Socket* enviar_cli;
-    Socket* recibir;
-    Socket* recibir_cli;
-} sockets_jugador_t;
-
+#include "estructuras.h"
 
 
 class Jugador{
     public:
-        Jugador(std::string& nombre, int enviar, int recibir);
+        Jugador(usuario_t& usuario);
         virtual ~Jugador();
         int getPuntaje() { return puntaje; }
         std::string Id() { return *id; }

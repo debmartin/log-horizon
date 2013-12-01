@@ -1,7 +1,8 @@
 #include "funciones_auxiliares.h"
-
+#include <cstring>
 #define TAM_UINT32 sizeof(uint32_t)
 #define TAM_BUFFER 30
+
 
 using std::string;
 
@@ -24,9 +25,9 @@ void recibirMsjPrefijo(Socket& sock_cli, string& mensaje){
     }
 }
 
-void enviarMsjPrefijo(Socket& sock_cli, void* mensaje, int len_msj){
-    int largo = len + TAM_UINT32;
-    void msj[largo];
+void enviarMsjPrefijo(Socket& sock_cli, const void* mensaje, int len_msj){
+    int largo = len_msj + TAM_UINT32;
+    char* msj = new char[largo];
     uint32_t len = htonl((uint32_t) len_msj);
     memcpy(msj, &len, TAM_UINT32);
     memcpy(msj + TAM_UINT32, mensaje, len_msj);
@@ -37,4 +38,5 @@ void enviarMsjPrefijo(Socket& sock_cli, void* mensaje, int len_msj){
         if (cant == -1) break;
         enviados += cant;
     }
+    delete msj;
 }

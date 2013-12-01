@@ -4,9 +4,12 @@
 #include "../libs/TDA/socket/socket.h"
 #include <string>
 
-void recibirMsjPrefijo(Socket& sock_cli, std::string& mensaje);
+using std::string;
 
-void enviarMsjPrefijo(Socket& sock_cli, void* mensaje, int len_msj);
+void recibirMsjPrefijo(Socket& sock_cli, string& mensaje);
+
+void enviarMsjPrefijo(Socket& sock_cli, const void* mensaje, int len_msj);
+
 
 
 #endif  // FUNCIONES_AUXILIARES_H
