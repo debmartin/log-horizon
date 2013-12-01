@@ -34,10 +34,12 @@ class Seleccion{
     Boton *siguiente;
     Boton *anterior;
     Boton *retroceder;
+    Boton *iniciar;
     Texto *escritor;
     Partida *partida;
     Socket* socket_enviar;
     bool partida_aceptada;
+    bool creador;
 };
 
 #endif // SELECCION_H

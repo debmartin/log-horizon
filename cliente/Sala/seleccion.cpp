@@ -19,8 +19,10 @@ Seleccion::Seleccion(){
   anterior = new Boton;
   escritor = new Texto;
   retroceder = new Boton;
+  iniciar = new Boton;
   partida = new Partida;
   partida_aceptada = false;
+  creador = false;
 }
 
 //
@@ -32,6 +34,7 @@ Seleccion::~Seleccion(){
   delete escritor;
   delete retroceder;
   delete partida;
+  delete iniciar;
 }
 
 //
@@ -113,6 +116,18 @@ int Seleccion::inicializar(const std::string &path, Ventana *ventana, SocketPref
   destino_texto.x = destino_boton.x + destino_boton.w / 10;
   destino_texto.y = destino_boton.y + destino_boton.h / 10;
   aceptar->agregar_texto(&sup, destino_texto, ventana, 1);
+  
+  // BOTON INICIAR
+  estructura.normal = normal;
+  estructura.apretado = apretado;
+  estructura.resaltado = sobre;
+  estructura.destino = destino_boton;
+  
+  iniciar->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
+  
+  escritor->copiar_texto("Iniciar Partida", &sup);
+  
+  iniciar->agregar_texto(&sup, destino_texto, ventana, 1);
 
   // BOTON RETROCEDER
 
@@ -147,9 +162,11 @@ int Seleccion::inicializar(const std::string &path, Ventana *ventana, SocketPref
 int Seleccion::dibujar(Ventana *ventana){
   siguiente->dibujar(ventana);
   anterior->dibujar(ventana);
-  aceptar->dibujar(ventana);
+  
   retroceder->dibujar(ventana);
   partida->dibujar(ventana);
+  if (!partida_aceptada) aceptar->dibujar(ventana);
+  else if(creador) iniciar->dibujar(ventana);
   return 0;
 }
 
@@ -173,8 +190,10 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
       siguiente->establecer_alpha(100);
       this->enviar_datos(ACEPTAR);
     }
+  }else{
+    iniciar->analizar_evento(evento);
   }
-
+    
   retroceder->analizar_evento(evento);
   if (retroceder->activado()){
     this->enviar_datos(RETROCEDER);
@@ -195,6 +214,7 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
 //
 void Seleccion::esta_creada(bool es_creada){
   partida->recibir_datos(es_creada);
+  creador = !es_creada;
 }
 
 //
