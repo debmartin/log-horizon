@@ -10,6 +10,7 @@
 #define RETROCEDER 5
 #define OK 6
 #define ERROR 7
+#define FINALIZAR -1
 
 //
 Seleccion::Seleccion(){
@@ -172,10 +173,13 @@ int Seleccion::dibujar(Ventana *ventana){
 
 //
 bool Seleccion::analizar_evento(SDL_Event &evento){
-  if (evento.type == SDL_QUIT){
+/*  if (evento.type == SDL_QUIT){
+    this->enviar_datos(FINALIZAR);
+    std::cout << "antes del join en seleccion" << std::cout;
     partida->finalizar_recibir();
+    std::cout << "despues del join en seleccion" << std::cout;
     return -1;
-  }
+  }*/
   if (!partida_aceptada){
     aceptar->analizar_evento(evento);
     anterior->analizar_evento(evento);
@@ -197,9 +201,6 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
   retroceder->analizar_evento(evento);
   if (retroceder->activado()){
     this->enviar_datos(RETROCEDER);
-    std::cout << "antes del join" << std::endl;
-    partida->finalizar_recibir();
-    std::cout << "despues del join" << std::endl;
     if (partida_aceptada){
       partida_aceptada = false;
       anterior->establecer_alpha(255);
@@ -212,9 +213,19 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
 }
 
 //
-void Seleccion::esta_creada(bool es_creada){
-  partida->recibir_datos(es_creada);
+void Seleccion::partidas_creadas(bool es_creada){
+  partida->partidas_creadas(es_creada);
   creador = !es_creada;
+}
+
+//
+void Seleccion::recibir_datos(){
+  partida->recibir_datos();
+}
+
+//
+void Seleccion::finalizar_recibir_datos(){
+  partida->finalizar_recibir();
 }
 
 //

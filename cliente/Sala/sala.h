@@ -28,6 +28,7 @@ class Sala{
     Texto *escritor;
     bool seleccionando;
     SocketPrefijo* socket_enviar;
+    SocketPrefijo* socket_recibir;
     
   protected:
     //

@@ -34,8 +34,10 @@ HDA_Online::~HDA_Online(){
 //
 void HDA_Online::correr(){
   bool seguir = this->login();
+  if (!seguir) return;
   Sala sala;
-  sala.inicializar(RECURSOS, ventana, emisor, receptor);
+  std::string path = RECURSOS;
+  sala.inicializar(path, ventana, emisor, receptor);
   while (seguir){
     seguir = sala.correr(ventana);
     // path_nivel = sala.ver_nivel();

@@ -89,8 +89,12 @@ void Partida::actualizar(Ventana *ventana){
 }
 
 //
-void Partida::recibir_datos(bool es_creada){
-  receptor_partidas.es_creada(es_creada);
+void Partida::partidas_creadas(bool es_creada){
+  receptor_partidas.partidas_creadas(es_creada);
+}
+
+//
+void Partida::recibir_datos(){
   receptor_partidas.correr();
 }
 

@@ -44,12 +44,13 @@ void ReceptorPartidas::funcion_a_correr(){
     receptor->recibir(&max_puntos, sizeof(max_puntos));
     receptor->recibir(&max_pjs, sizeof(max_pjs));
     receptor->recibir(&pjs, sizeof(pjs));
-
+    std::cout << "largo = " << largo << " partida = " << partida_aux << " puntos = " << max_puntos << " max pjs = " << max_pjs << " pjs = " << pjs << std::endl;
     if (creada){
       receptor->recibir_largo(largo);
       creador_aux = new char[largo+1];
       creador_aux[largo] = '\0';
       receptor->recibir(creador_aux, largo);
+      std::cout << " largo2 = " << largo << " creador = " << creador_aux << std::endl;
     }
     
     mutex.bloquear();

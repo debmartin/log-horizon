@@ -20,10 +20,13 @@ class Partida{
     int dibujar(Ventana *ventana);
     
     //
-    void recibir_datos(bool es_creada);
+    void partidas_creadas(bool es_creada);
     
     //
     void finalizar_recibir(){receptor_partidas.join();}
+    
+    //
+    void recibir_datos();
     
   private:
     Texto *escritor;

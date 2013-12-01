@@ -23,10 +23,16 @@ class Seleccion{
     bool analizar_evento(SDL_Event &evento);
     
     //
-    void esta_creada(bool es_creada);
+    void partidas_creadas(bool es_creada);
+    
+    //
+    void recibir_datos();
     
     //
     void enviar_datos(char eleccion);
+    
+    //
+    void finalizar_recibir_datos();
     
   private:
     Textura *fondo;

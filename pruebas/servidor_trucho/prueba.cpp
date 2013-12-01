@@ -18,9 +18,15 @@
 
 class EnviarNivel : public Thread{
   public:
-    void asignar_sockets(SocketPrefijo &emisor_, SocketPrefijo &receptor_){
+    void asignar_sockets(SocketPrefijo &emisor_){
       emisor = emisor_;
-      receptor = receptor_;
+    }
+    
+    void enviar_mensaje(char mensaje_){
+      mutex.bloquear();
+      mensaje = mensaje_;
+      std::cout << "mensaje ahora es " << (int) mensaje << std::endl;
+      mutex.desbloquear();
     }
     
   void esta_creada(bool creada_){
@@ -37,11 +43,14 @@ class EnviarNivel : public Thread{
       std::string creador = "Mingo";
       uint32_t pjs = 1;
 
-      char mensaje = OK;
+      mensaje = OK;
       while (true){
-                
+        mutex.bloquear();
+        std::cout << "se envia de mensaje " << (int) mensaje << std::endl;
         emisor.enviar(&mensaje, sizeof(char));
-        std::cout << "se envio el mensaje" << (int) mensaje << std::endl;
+        if (mensaje == ERROR) return;
+        mutex.desbloquear();
+        
         
         emisor.enviar_con_prefijo(partida.c_str(), partida.size());
         emisor.enviar(&puntos, sizeof(puntos));
@@ -50,7 +59,6 @@ class EnviarNivel : public Thread{
         mutex.bloquear();
         if (creada){
           mutex.desbloquear();
-          std::cout << "envia el creador" << std::endl;
           emisor.enviar_con_prefijo(creador.c_str(), creador.size());
         }else{
           mutex.desbloquear();
@@ -59,18 +67,17 @@ class EnviarNivel : public Thread{
         puntos++;
         max_pjs++;
         pjs++;
+
+        sleep(1);
         
-        char evento = std::cin.get();
-        if (evento == 'q') mensaje = ERROR;
-        std::cin.get();
       }
     }      
   
   private:
     SocketPrefijo emisor;
-    SocketPrefijo receptor;
     Mutex mutex;
     bool creada;
+    char mensaje;
 };
 
 int main(void){
@@ -108,7 +115,7 @@ int main(void){
   std::string usuario_valido = "Deuteronomio";
   std::string clave_valida = "123qwe";
   while (respuesta == 1){
-  
+    
     uint32_t largo;
     receptor.recibir_largo(largo);
     char *usuario = new char[largo + 1];
@@ -132,7 +139,7 @@ int main(void){
   }
   
   EnviarNivel envio;
-  envio.asignar_sockets(emisor, receptor);
+  envio.asignar_sockets(emisor);
   
   char eleccion;
   receptor.recibir(&eleccion, sizeof(char));
@@ -140,18 +147,28 @@ int main(void){
     envio.esta_creada(false);
   }else if(eleccion == UNIRSE){
     envio.esta_creada(true);
+  }else if(eleccion == SALIRSE){
+    char c = ERROR;
+    emisor.enviar(&c,sizeof(char) );
+    return 0;
   }
   envio.correr();
   
-  while (true){
+  bool lala = true;
+  while (lala){
     receptor.recibir(&eleccion, sizeof(char));
+    std::cout << "se recibio " << (int) eleccion << std::endl;
     if (eleccion == CREAR){
       envio.esta_creada(false);
     }else if(eleccion == UNIRSE){
       envio.esta_creada(true);
+    }else if(eleccion == SALIRSE){
+      envio.enviar_mensaje(ERROR);
+      lala = false;
     }
   }
   
+  envio.join();
   emisor.cerrar_enviar_recibir();
   receptor.cerrar_enviar_recibir();
 

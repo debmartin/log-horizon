@@ -24,7 +24,7 @@ class ReceptorPartidas : public Thread{
     void inicializar(SocketPrefijo *receptor);
     
     //
-    void es_creada(bool &partida_creada){creada = partida_creada;}
+    void partidas_creadas(bool &partida_creada){creada = partida_creada;}
     
     //
     bool esta_creada(){return creada;}

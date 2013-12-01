@@ -6,7 +6,7 @@
 
 #define CREAR 0
 #define UNIRSE 1
-#define SALIRSE -1
+#define FINALIZAR -1
 
 //
 Sala::Sala(){
@@ -35,10 +35,11 @@ int Sala::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* 
   
   // SELECCION
   seleccion->inicializar(path, ventana, enviar, recibir);
+  seleccion->recibir_datos();
   
   // SOCKETS
   socket_enviar = enviar;
-  
+  socket_recibir = recibir;
   // FONDO
   fondo->cargar_textura(path + "imagenes/fondo_sala.png", ventana);
   
@@ -124,6 +125,7 @@ bool Sala::correr(Ventana *ventana){
     // Presentar en ventana
     ventana->presentar(delay);
   }
+  
   return false;
 }
 
@@ -142,20 +144,24 @@ int Sala::dibujar(Ventana *ventana){
 //
 bool Sala::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){
-    this->enviar_datos(SALIRSE);
+    this->enviar_datos(FINALIZAR);
+    std::cout << "antes del join en sala" << std::cout;
+    //socket_recibir->cerrar_enviar_recibir();
+    seleccion->finalizar_recibir_datos();
+    std::cout << "despues del join en sala" << std::cout;
     return false;
   }
   if (!seleccionando){
     crear->analizar_evento(evento);
     unirse->analizar_evento(evento);
     if (crear->activado()){
+      seleccion->partidas_creadas(false);
       this->enviar_datos(CREAR);
       seleccionando = true;
-      seleccion->esta_creada(false);
     }else if(unirse->activado()){
+      seleccion->partidas_creadas(true);
       this->enviar_datos(UNIRSE);
       seleccionando = true;
-      seleccion->esta_creada(true);
     }
   }else{
     seleccionando = seleccion->analizar_evento(evento);
