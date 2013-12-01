@@ -5,7 +5,7 @@
 
 #define MAX_CARACTERES 20
 #define FONDO_TEXTO 175
-#define ALPHA_MENSAJE 220
+#define ALPHA_MENSAJE 255
 #define DELAY 16
 
 //
@@ -21,7 +21,7 @@ CreadorNivel::CreadorNivel(){
   textura_filas = new Textura;
   mensaje = new Mensaje;
   enviando_datos = false;
-  datos_inicializados = false; //
+  datos_inicializados = false;
 }
 
 //
@@ -158,14 +158,14 @@ int CreadorNivel::inicializar(const std::string &path, Ventana *ventana, SocketP
   destino.h = destino.h / 4;
   destino.y = destino.y + destino.h * 2 - destino.h / 2;
   destino.x = destino.x + destino.w / 8;
-  mensaje->asignar_mensaje("Validando Nombre...", destino, ventana);
+  mensaje->asignar_mensaje("Validando Datos...", destino, ventana);
   
   datos_inicializados = true;
   return 0;
 }
 
 //
-bool CreadorNivel::correr(Ventana *ventana){
+bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido){
   if (!datos_inicializados) return false;
   SDL_Event evento;
   bool corriendo = true;
@@ -186,6 +186,10 @@ bool CreadorNivel::correr(Ventana *ventana){
     
     // Presentar en ventana
     ventana->presentar(delay);
+    if (enviando_datos){
+      nombre_leido = nombre->ver_contenido();
+      return true;
+    }
   }
   return false;
 }
@@ -200,16 +204,20 @@ int CreadorNivel::dibujar(Ventana *ventana){
   textura_nombre->dibujar(destino_text_nombre, ventana);
   textura_columnas->dibujar(destino_text_columnas, ventana);
   textura_filas->dibujar(destino_text_filas, ventana);
+  if (enviando_datos) mensaje->dibujar(ventana);
   return 0;
 }
 
 //
 bool CreadorNivel::analizar_evento(SDL_Event &evento){
-  if (evento.type == SDL_QUIT) return false;  
+  if (enviando_datos) return true;
+  if (evento.type == SDL_QUIT) return false;
   nombre->analizar_evento(evento);
   columnas->analizar_evento(evento);
   filas->analizar_evento(evento);
   crear_nivel->analizar_evento(evento);
+  if (crear_nivel->activado())
+    enviando_datos = true;
   return true;
 }
 

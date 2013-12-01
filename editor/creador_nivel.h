@@ -14,7 +14,7 @@ class CreadorNivel{
     virtual ~CreadorNivel();
     
     //
-    bool correr(Ventana *ventana);
+    bool correr(Ventana *ventana, std::string &nombre);
     
     //
     int inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir);

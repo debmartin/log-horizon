@@ -2,8 +2,10 @@
 
 #include "editor.h"
 #include "creador_nivel.h"
+#include "editor_nivel.h"
 #include "../libs/json/include/json/json.h"
 #include "../libs/SDL2/SDL.h"
+#include <sys/stat.h>
 
 #define RECURSOS "../recursos/"
 #define TITULO "Editor de Niveles"
@@ -30,19 +32,8 @@ Editor::~Editor(){
 
 //
 void Editor::correr(){
-  bool seguir = this->crear_nivel();
-  if (!seguir) return;
-/*
-  Sala sala;
-  std::string path = RECURSOS;
-  sala.inicializar(path, ventana, emisor, receptor);
-  while (seguir){
-    seguir = sala.correr(ventana);
-    // path_nivel = sala.ver_nivel();
-    if (seguir){
-      this->nivel();
-    }
-  }*/
+  if (!this->crear_nivel()) return;
+  this->editar_nivel();
 }
 
 //
@@ -50,13 +41,20 @@ bool Editor::crear_nivel(){
   CreadorNivel creador;
   std::string path_recursos = RECURSOS;
   creador.inicializar(path_recursos, ventana, emisor, receptor);
-  return creador.correr(ventana);
+  return creador.correr(ventana, nombre_nivel);
 }
-/*
+
 //
-bool HDA_Online::editar_nivel(){
-  Nivel nivel;
-  nivel.inicializar(RECURSOS, ventana, emisor, receptor);
-  return nivel.correr(ventana);
+bool Editor::editar_nivel(){
+  EditorNivel editor_nivel;
+  
+  std::string path_nivel = "Niveles/" +nombre_nivel;
+  mkdir(path_nivel.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  path_nivel += "/";
+  std::string path_imagenes = path_nivel + "imagenes";
+  mkdir(path_imagenes.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  
+  std::string path_recursos = RECURSOS;
+  editor_nivel.inicializar(path_recursos, ventana);
+  return editor_nivel.correr(ventana, path_nivel);
 }
-*/

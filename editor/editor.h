@@ -24,12 +24,13 @@ class Editor{
     bool crear_nivel();
     
     //
-    //bool editar_nivel();
+    bool editar_nivel();
     
   private:
     SocketPrefijo *emisor;
     SocketPrefijo *receptor;
     Ventana *ventana;
+    std::string nombre_nivel;
     SDL libreria;
 };
 

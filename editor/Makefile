@@ -39,9 +39,12 @@ editor.o: editor.h editor.cpp
 
 creador_nivel.o: creador_nivel.h creador_nivel.cpp
 	$(CC) $(CFLAGS) -c creador_nivel.cpp
+	
+editor_nivel.o: editor_nivel.h editor_nivel.cpp
+	$(CC) $(CFLAGS) -c editor_nivel.cpp
 
-$(CEXE): creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp
-	$(CC) $(CFLAGS) creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp
+	$(CC) $(CFLAGS) editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o
