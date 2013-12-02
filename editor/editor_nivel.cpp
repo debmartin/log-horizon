@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-
+#include "../libs/funciones_auxiliares.h"
 #include "editor_nivel.h"
 
 #define FONDO_TEXTO 175
@@ -20,12 +20,20 @@
 EditorNivel::EditorNivel(){
   fondo = new Textura;
   cambiar_fondo = new Boton;
+  cant_jugadores = new Boton;
+  puntaje_ganar = new Boton;
   escritor = new Texto;
   mensaje = new Mensaje;
   entrada = new TextBox;
   datos_inicializados = false;
-  accion = new CheckBoxDisjuntos;
   matriz = new MatrizEditor;
+  accion = new CheckBoxDisjuntos;
+  tipos = new checkbox_nombres_t;
+  tipos->checkbox = new CheckBoxDisjuntos;
+  tipos->nombres = new std::vector<std::string>;
+  colores = new checkbox_nombres_t;
+  colores->checkbox = new CheckBoxDisjuntos;
+  colores->nombres = new std::vector<std::string>;
   ventana = NULL;
 }
 
@@ -33,17 +41,26 @@ EditorNivel::EditorNivel(){
 EditorNivel::~EditorNivel(){
   delete fondo;
   delete cambiar_fondo;
+  delete cant_jugadores;
+  delete puntaje_ganar;
   delete escritor;
   delete entrada;
   delete mensaje;
   delete accion;
   delete matriz;
+  delete tipos->nombres;
+  delete tipos->checkbox;
+  delete tipos;
+  delete colores->nombres;
+  delete colores->checkbox;
+  delete colores;
 }
 
 //
-int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t filas, Ventana *nueva_ventana){
+int EditorNivel::inicializar(const std::string &path, unsigned int columnas, unsigned int filas, Ventana *nueva_ventana){
   if (columnas == 0 || filas == 0) return -1;
   ventana = nueva_ventana;
+  
   // FONDO
   fondo->cargar_textura(path + "imagenes/fondo_editor.png", ventana);
   
@@ -82,8 +99,8 @@ int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t fi
   escritor->asignar_fuente(path + "fuentes/mono.ttf", 30);
   escritor->asignar_color(0,0,0,255);
   
-  // BOTON CAMBIAR FONDO
-  SDL_Rect normal, apretado, sobre;
+  // BOTON SPRITE
+  SDL_Rect normal, apretado, sobre, destino_boton;
   normal.x = 0;
   normal.y = 0;
   normal.h = 45;
@@ -92,30 +109,54 @@ int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t fi
   apretado.y = 90;
   sobre = normal;
   sobre.y = 45;
-  SDL_Rect destino_boton;
-  destino_boton.y = alto * 3 / 20;
-  destino_boton.w = ancho / 8;
-  destino_boton.x = 10;
-  destino_boton.h = alto / 10;
   estructura_boton_t estructura;
   estructura.normal = normal;
   estructura.apretado = apretado;
   estructura.resaltado = sobre;
-  estructura.destino = destino_boton;
-  
-  cambiar_fondo->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
-  
-  Superficie sup;
-  escritor->asignar_color(255, 255, 255, 255);
-  escritor->copiar_texto("Cambiar Fondo", &sup);
-  escritor->asignar_color(0, 0, 0, 255);
+  destino_boton.w = ancho / 8;
+  destino_boton.x = 10;
+  destino_boton.h = alto / 10;
   
   SDL_Rect destino_texto;
+  escritor->asignar_color(255, 255, 255, 255);
+  Superficie sup;
+  
+  // BOTON CAMBIAR FONDO
+  destino_boton.y = alto * 3 / 20;
+  estructura.destino = destino_boton;
+  cambiar_fondo->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
+  escritor->copiar_texto("Cambiar Fondo", &sup);
   destino_texto.x = destino_boton.x + destino_boton.w / 10;
   destino_texto.y = destino_boton.y + destino_boton.h / 10;
   destino_texto.w = destino_boton.w - destino_boton.w / 5;
   destino_texto.h = destino_boton.h - destino_boton.h / 5;
   cambiar_fondo->agregar_texto(&sup, destino_texto, ventana, 1);
+  
+  // BOTON CANTIDAD DE JUGADORES
+  
+  destino_boton.y += (alto - 200) / 3; 
+  estructura.destino = destino_boton;
+  cant_jugadores->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
+  escritor->copiar_texto("Jugadores Max", &sup);
+  destino_texto.x = destino_boton.x + destino_boton.w / 10;
+  destino_texto.y = destino_boton.y + destino_boton.h / 10;
+  destino_texto.w = destino_boton.w - destino_boton.w / 5;
+  destino_texto.h = destino_boton.h - destino_boton.h / 5;
+  cant_jugadores->agregar_texto(&sup, destino_texto, ventana, 1);
+  
+  // BOTON CANTIDAD DE PUNTOS PARA GANAR
+  destino_boton.y += (alto - 200) / 3; 
+  estructura.destino = destino_boton;
+  puntaje_ganar->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
+  escritor->copiar_texto("Puntaje Max", &sup);
+  destino_texto.x = destino_boton.x + destino_boton.w / 10;
+  destino_texto.y = destino_boton.y + destino_boton.h / 10;
+  destino_texto.w = destino_boton.w - destino_boton.w / 5;
+  destino_texto.h = destino_boton.h - destino_boton.h / 5;
+  puntaje_ganar->agregar_texto(&sup, destino_texto, ventana, 1);
+  
+  escritor->asignar_color(0, 0, 0, 255);
+  
   
   datos_inicializados = true;
   
@@ -127,12 +168,8 @@ int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t fi
   destino_matriz.h = alto - 200;
   matriz->inicializar(path + "imagenes/", columnas, filas, destino_matriz, ventana);
   
-  // CHECKBOX ACCIONES
-  SDL_Rect destino;
-  destino.y = 40;
-  destino.w = 30;
-  destino.h = 20;
-
+  
+  // SPRITE CHECKBOX
   SDL_Rect apretado_sobre;
   normal.x = 0;
   normal.h = 37;
@@ -150,8 +187,13 @@ int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t fi
   estructura_check.normal = normal;
   estructura_check.apretado = apretado;
   estructura_check.resaltado = sobre;
-  
   estructura_check.resaltado_apretado = apretado_sobre;
+  
+  // CHECKBOX ACCIONES
+  SDL_Rect destino;
+  destino.y = 40;
+  destino.w = 30;
+  destino.h = 20;
   
   destino.x = 185;
   for (int i = 0; i < 4; i++){
@@ -182,6 +224,51 @@ int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t fi
   escritor->copiar_texto("Prob. Columna", &sup);
   accion->agregar_texto(PROB_COL, &sup, destino_texto, ventana);
   
+  // COLORES
+  colores->nombres->push_back("rojo");
+  colores->nombres->push_back("azul");
+  colores->nombres->push_back("verde");
+  colores->nombres->push_back("amarillo");
+  colores->nombres->push_back("violeta");
+  
+  destino.x = ancho - 60;
+  destino_texto.x = destino.x - 15;
+  destino_texto.w = 60;
+  
+  destino.y = 125;
+  destino_texto.y = destino.y - 20;
+  for (size_t i = 0; i < colores->nombres->size(); i++){
+    estructura_check.destino = destino;
+    colores->checkbox->agregar_checkbox("../recursos/imagenes/checkbox.png", estructura_check, ventana);
+    std::string nombre = (*colores->nombres)[i];
+    escritor->copiar_texto(nombre, &sup);
+    colores->checkbox->agregar_texto(i, &sup, destino_texto, ventana);
+    destino.y += (alto - 200) / 5;
+    destino_texto.y += (alto - 200) / 5;
+  }
+  
+  // TIPOS
+  tipos->nombres->push_back("button");
+  tipos->nombres->push_back("minibar H");
+  tipos->nombres->push_back("minibar V");
+  tipos->nombres->push_back("golden star");
+  
+  destino.x = ancho - 120;
+  destino_texto.x = destino.x - 15;
+  destino_texto.w += 5;
+  
+  destino.y = 165;
+  destino_texto.y = destino.y - 20;
+  for (size_t i = 0; i < tipos->nombres->size(); i++){
+    estructura_check.destino = destino;
+    tipos->checkbox->agregar_checkbox("../recursos/imagenes/checkbox.png", estructura_check, ventana);
+    std::string nombre = (*tipos->nombres)[i];
+    escritor->copiar_texto(nombre, &sup);
+    tipos->checkbox->agregar_texto(i, &sup, destino_texto, ventana);
+    destino.y += (alto - 200) / 5;
+    destino_texto.y += (alto - 200) / 5;
+  }
+  
   return 0;
 }
 
@@ -189,7 +276,6 @@ int EditorNivel::inicializar(const std::string &path, size_t columnas, size_t fi
 bool EditorNivel::correr(Ventana *ventana, const std::string &path_nivel){
   if (!datos_inicializados) return false;
   nivel_path = path_nivel;
-  std::cout << nivel_path << std::endl;
   SDL_Event evento;
   bool corriendo = true;
   FPS frames;
@@ -221,6 +307,10 @@ int EditorNivel::dibujar(Ventana *ventana){
   mensaje->dibujar(ventana);
   matriz->dibujar(ventana);
   accion->dibujar(ventana);
+  colores->checkbox->dibujar(ventana);
+  tipos->checkbox->dibujar(ventana);
+  cant_jugadores->dibujar(ventana);
+  puntaje_ganar->dibujar(ventana);
   return 0;
 }
 
@@ -232,11 +322,20 @@ bool EditorNivel::analizar_evento(SDL_Event &evento){
     this->cargar_fondo();
   }
   entrada->analizar_evento(evento);
-  size_t fila, columna;
-  if (matriz->analizar_evento(evento, columna, fila)){
-    matriz->cambiar_estado(columna, fila);
-  }
+  unsigned int fila, columna;
   accion->analizar_evento(evento);
+  colores->checkbox->analizar_evento(evento);
+  tipos->checkbox->analizar_evento(evento);
+  cant_jugadores->analizar_evento(evento);
+  puntaje_ganar->analizar_evento(evento);
+  
+  if (matriz->analizar_evento(evento, columna, fila)){
+    if (accion->subindice_activado() == AGUJEROS){
+      this->accion_agujero(columna, fila);
+    }else if(accion->subindice_activado() == IMAGEN_CELDA){
+      this->cambiar_fondo_celda(columna, fila);
+    }
+  }
   return true;
 }
 
@@ -257,6 +356,33 @@ void EditorNivel::cargar_fondo(){
     fondo->cargar_textura(path_destino, ventana);
     mensaje->asignar_mensaje("Fondo cargado correctamente", destino_mensaje, ventana);
   }else{
-    mensaje->asignar_mensaje("Archivo invalido", destino_mensaje, ventana);
+    mensaje->asignar_mensaje("Archivo del fondo invalido", destino_mensaje, ventana);
+  }
+}
+
+//
+void EditorNivel::accion_agujero(unsigned int col, unsigned int fila){
+  if (matriz->celda_especial(col, fila)){
+    std::string celda_especial = nivel_path + archivo_celda(col, fila);
+    std::cout << celda_especial << std::endl;
+    struct stat buffer;
+    if (stat(celda_especial.c_str(), &buffer) == 0){
+      remove(celda_especial.c_str());
+    }
+  }
+  matriz->cambiar_estado(col, fila);
+}
+
+//
+void EditorNivel::cambiar_fondo_celda(unsigned int col, unsigned int fila){
+  std::string path_fondo = entrada->ver_contenido();
+  struct stat buffer;
+  if (stat(path_fondo.c_str(), &buffer) == 0){
+    matriz->insertar_textura(path_fondo, col, fila, ventana);
+    std::string celda_especial = nivel_path + archivo_celda(col, fila);
+    this->copiar_archivo(path_fondo, celda_especial);
+    mensaje->asignar_mensaje("Fondo de celda cargado correctamente", destino_mensaje, ventana);
+  }else{
+    mensaje->asignar_mensaje("Archivo del fondo de celda invalido", destino_mensaje, ventana);
   }
 }

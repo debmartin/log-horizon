@@ -51,6 +51,7 @@ class Nivel{
     Mix_Chunk *sonido_explosion;
     Mix_Chunk *sonido_movimiento;
     Mix_Chunk *sonido_seleccion;
+    Mix_Chunk *sonido_apilar;
     
   protected:
     // Dibuja en la ventana todos los elementos del nivel

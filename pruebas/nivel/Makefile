@@ -52,8 +52,11 @@ thread.o: ../../libs/TDA/thread/thread.h ../../libs/TDA/thread/thread.cpp
 mensaje.o: ../../libs/SDL2/mensaje/mensaje.h ../../libs/SDL2/mensaje/mensaje.cpp
 	$(CC) $(CFLAGS) -c ../../libs/SDL2/mensaje/mensaje.cpp
 
-$(CEXE): mensaje.o puntaje.o ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
-	$(CC) $(CFLAGS) mensaje.o puntaje.o ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
+funciones_auxiliares.o: ../../libs/funciones_auxiliares.h ../../libs/funciones_auxiliares.cpp
+	$(CC) $(CFLAGS) -c ../../libs/funciones_auxiliares.cpp
+
+$(CEXE): funciones_auxiliares.o mensaje.o puntaje.o ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp
+	$(CC) $(CFLAGS) funciones_auxiliares.o mensaje.o puntaje.o ventana.o superficie.o animacion.o fps.o texto.o matriz.o nivel.o explosion.o celdas_vacias.o productos.o receptor_resultados.o socket.o thread.o $(CEXE).cpp -o $(CEXE)
 
 prueba_enviar: receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp
 	$(CC) $(CFLAGS) receptor_resultados.o socket.o thread.o prueba_enviar_datos.cpp -o prueba_enviar

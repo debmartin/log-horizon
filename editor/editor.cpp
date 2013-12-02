@@ -58,5 +58,6 @@ bool Editor::editar_nivel(){
   
   std::string path_recursos = RECURSOS;
   editor_nivel.inicializar(path_recursos, columnas, filas, ventana);
+  std::cout << "path_nivel = " << path_nivel << std::endl;
   return editor_nivel.correr(ventana, path_nivel);
 }

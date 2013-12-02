@@ -21,7 +21,7 @@ MatrizEditor::~MatrizEditor(){
 }
 
 //
-bool MatrizEditor::inicializar(const std::string &path, size_t col, size_t fila, SDL_Rect &dest, Ventana *ventana){
+bool MatrizEditor::inicializar(const std::string &path, unsigned int col, unsigned int fila, SDL_Rect &dest, Ventana *ventana){
   if (col == 0 || fila == 0) return false;
   columnas = col;
   filas = fila;
@@ -30,9 +30,9 @@ bool MatrizEditor::inicializar(const std::string &path, size_t col, size_t fila,
 
   
   matriz = new Textura**[columnas];
-  for (size_t x = 0; x < columnas; x++){
+  for (unsigned int x = 0; x < columnas; x++){
     matriz[x] = new Textura*[filas];
-    for (size_t y = 0; y < filas; y++){
+    for (unsigned int y = 0; y < filas; y++){
       matriz[x][y] = habilitada;
     }
   }
@@ -47,8 +47,8 @@ bool MatrizEditor::inicializar(const std::string &path, size_t col, size_t fila,
 bool MatrizEditor::dibujar(Ventana *ventana){
   if (columnas == 0 || filas == 0) return false;
   SDL_Rect actual = celda_inicial;
-  for (size_t x = 0; x < columnas; x++){
-    for (size_t y = 0; y < filas; y++){
+  for (unsigned int x = 0; x < columnas; x++){
+    for (unsigned int y = 0; y < filas; y++){
       if (matriz[x][y]){
         actual.x = celda_inicial.x + x * actual.w;
         actual.y = celda_inicial.y + y * actual.h;
@@ -60,7 +60,7 @@ bool MatrizEditor::dibujar(Ventana *ventana){
 }
 
 //
-bool MatrizEditor::analizar_evento(SDL_Event &evento, size_t &col, size_t &fila){
+bool MatrizEditor::analizar_evento(SDL_Event &evento, unsigned int &col, unsigned int &fila){
   if (evento.type == SDL_MOUSEBUTTONDOWN && evento.button.button == SDL_BUTTON_LEFT){
     if (evento.button.x >= celda_inicial.x && 
         evento.button.x <= celda_inicial.x + celda_inicial.w * (int)columnas &&
@@ -75,7 +75,7 @@ bool MatrizEditor::analizar_evento(SDL_Event &evento, size_t &col, size_t &fila)
 }
 
 //
-bool MatrizEditor::insertar_textura(const std::string &path, size_t col, size_t fila, Ventana *ventana){
+bool MatrizEditor::insertar_textura(const std::string &path, unsigned int col, unsigned int fila, Ventana *ventana){
   if (col >= columnas || fila >= filas ) return false;
   Textura *aux = new Textura;
   aux->cargar_textura(path, ventana);
@@ -84,7 +84,7 @@ bool MatrizEditor::insertar_textura(const std::string &path, size_t col, size_t 
 }
 
 //
-bool MatrizEditor::cambiar_estado(size_t col, size_t fila){
+bool MatrizEditor::cambiar_estado(unsigned int col, unsigned int fila){
   if (col >= columnas || fila >= filas) return false;
   if (matriz[col][fila] == habilitada){
     matriz[col][fila] = NULL;
@@ -95,5 +95,12 @@ bool MatrizEditor::cambiar_estado(size_t col, size_t fila){
     delete aux;
     matriz[col][fila] = habilitada;
   }
+  return true;
+}
+
+//
+bool MatrizEditor::celda_especial(unsigned int col, unsigned int fila){
+  if (col >= columnas || fila >= filas) return false;
+  if (matriz[col][fila] == habilitada || !matriz[col][fila]) return false;
   return true;
 }

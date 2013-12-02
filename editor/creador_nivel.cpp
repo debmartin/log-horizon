@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "creador_nivel.h"
+#include "../libs/funciones_auxiliares.h"
 #include "../libs/TDA/socket/socket_prefijo.h"
 
 #define MAX_CARACTERES 20
@@ -164,7 +165,7 @@ int CreadorNivel::inicializar(const std::string &path, Ventana *ventana, SocketP
 }
 
 //
-bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, size_t &col, size_t &fil){
+bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, unsigned int &col, unsigned int &fil){
   if (!datos_inicializados) return false;
   SDL_Event evento;
   bool corriendo = true;
@@ -189,8 +190,8 @@ bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, size_t &c
       nombre_leido = nombre->ver_contenido();
       std::string col_str = columnas->ver_contenido();
       std::string fil_str = filas->ver_contenido();
-      if (this->validar_numeros(col_str, col) && this->validar_numeros(fil_str, fil) && nombre_leido != ""){
-        return true;
+      if (validar_numeros(col_str, col) && validar_numeros(fil_str, fil) && nombre_leido != ""){
+        if (col <= 255 || fil <= 255) return true;
       }
       enviando_datos = false;
     }
@@ -198,16 +199,7 @@ bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, size_t &c
   return false;
 }
 
-//
-bool CreadorNivel::validar_numeros(const std::string &str, size_t &numero){
-  size_t aux = 0;
-  for (size_t x = 0; x < str.size(); x++){
-    if (str[x] < '0' || str[x] > '9') return false;
-      aux = str[x] - '0' + 10 * aux;
-  }
-  numero = aux;
-  return true;
-}
+
 
 //
 int CreadorNivel::dibujar(Ventana *ventana){

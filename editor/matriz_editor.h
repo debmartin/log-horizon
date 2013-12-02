@@ -12,25 +12,28 @@ class MatrizEditor{
     ~MatrizEditor();
  
     //
-    bool inicializar(const std::string &path, size_t col, size_t fila, SDL_Rect &dest, Ventana *ventana);
+    bool inicializar(const std::string &path, unsigned int col, unsigned int fila, SDL_Rect &dest, Ventana *ventana);
   
     //
     bool dibujar(Ventana *ventana);
     
     //
-    bool analizar_evento(SDL_Event &evento, size_t &col, size_t &fila);
+    bool analizar_evento(SDL_Event &evento, unsigned int &col, unsigned int &fila);
     
     //
-    bool insertar_textura(const std::string &path, size_t col, size_t fila, Ventana *ventana);
+    bool insertar_textura(const std::string &path, unsigned int col, unsigned int fila, Ventana *ventana);
     
     //
-    bool cambiar_estado(size_t col, size_t fila);
+    bool cambiar_estado(unsigned int col, unsigned int fila);
+    
+    //
+    bool celda_especial(unsigned int col, unsigned int fila);
     
   private:
     Textura *habilitada;
     Textura ***matriz;
-    size_t columnas;
-    size_t filas;
+    unsigned int columnas;
+    unsigned int filas;
     SDL_Rect celda_inicial;
 };
 

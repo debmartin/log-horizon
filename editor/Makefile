@@ -22,7 +22,6 @@ checkbox.o: ../libs/SDL2/boton/checkbox.h ../libs/SDL2/boton/checkbox.cpp
 checkbox_disjuntos.o: ../libs/SDL2/boton/checkbox_disjuntos.h ../libs/SDL2/boton/checkbox_disjuntos.cpp
 	$(CC) $(CFLAGS) -c ../libs/SDL2/boton/checkbox_disjuntos.cpp
 	
-
 fps.o: ../libs/SDL2/fps/fps.h ../libs/SDL2/fps/fps.cpp
 	$(CC) $(CFLAGS) -c ../libs/SDL2/fps/fps.cpp
 
@@ -52,9 +51,12 @@ editor_nivel.o: editor_nivel.h editor_nivel.cpp
 	
 matriz_editor.o: matriz_editor.h matriz_editor.cpp
 	$(CC) $(CFLAGS) -c matriz_editor.cpp
+	
+funciones_auxiliares.o: ../libs/funciones_auxiliares.h ../libs/funciones_auxiliares.cpp
+	$(CC) $(CFLAGS) -c ../libs/funciones_auxiliares.cpp
 
-$(CEXE): matriz_editor.o checkbox_disjuntos.o checkbox.o editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp
-	$(CC) $(CFLAGS) matriz_editor.o checkbox_disjuntos.o checkbox.o editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): funciones_auxiliares.o matriz_editor.o checkbox_disjuntos.o checkbox.o editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp
+	$(CC) $(CFLAGS) funciones_auxiliares.o matriz_editor.o checkbox_disjuntos.o checkbox.o editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

@@ -14,7 +14,7 @@ class CreadorNivel{
     virtual ~CreadorNivel();
     
     //
-    bool correr(Ventana *ventana, std::string &nombre, size_t &columnas, size_t &filas);
+    bool correr(Ventana *ventana, std::string &nombre, unsigned int &columnas, unsigned int &filas);
     
     //
     int inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir);
@@ -44,10 +44,7 @@ class CreadorNivel{
     
     //
     bool analizar_evento(SDL_Event &evento);
-    
-    //
-    bool validar_numeros(const std::string &str, size_t &numero);
-    
+        
     //
     //void enviar_datos();
 };

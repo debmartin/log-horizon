@@ -3,10 +3,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/json/include/json/json.h"
 #include "nivel.h"
+#include "../../libs/funciones_auxiliares.h"
 
 #define POS_X 100 // posicion en x de la matriz
 #define POS_Y 100 // posicion de y en la matriz
@@ -40,6 +42,7 @@ Nivel::Nivel(){
   sonido_explosion = NULL;
   sonido_movimiento = NULL;
   sonido_seleccion = NULL;
+  sonido_apilar = NULL;
 }
 
 //
@@ -59,6 +62,7 @@ Nivel::~Nivel(){
   if (sonido_explosion) Mix_FreeChunk(sonido_explosion);
   if (sonido_movimiento) Mix_FreeChunk(sonido_movimiento);
   if (sonido_seleccion) Mix_FreeChunk(sonido_seleccion);
+  if (sonido_apilar) Mix_FreeChunk(sonido_apilar);
 }
 
 //
@@ -128,10 +132,7 @@ void Nivel::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo
       coordenada_actual.x = x;
       coordenada_actual.y = y;
       if (tablero->celda_existente(coordenada_actual)){
-        char x_char = x + '0';
-        char y_char = y + '0';
-        std::string celda_especial = path + "imagenes/" + x_char + y_char + ".png";
-        
+        std::string celda_especial = path + archivo_celda(x, y);
         struct stat buffer;
         Superficie sup_celda_especial;
         if (stat(celda_especial.c_str(), &buffer) == 0){
@@ -235,14 +236,17 @@ void Nivel::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo
   std::string direccion_explosion = "../../recursos/sonidos/explosion.wav";
   std::string direccion_movimiento = "../../recursos/sonidos/movimiento.wav";
   std::string direccion_seleccion = "../../recursos/sonidos/seleccion.wav";
+  std::string direccion_apilar = "../../recursos/sonidos/apilar.wav";
 
   sonido_explosion = Mix_LoadWAV(direccion_explosion.c_str());
   sonido_movimiento = Mix_LoadWAV(direccion_movimiento.c_str());
   sonido_seleccion = Mix_LoadWAV(direccion_seleccion.c_str());
+  sonido_apilar = Mix_LoadWAV(direccion_apilar.c_str());
 
   if (sonido_explosion) sonido_explosion->volume = VOLUMEN_ANIMACIONES;
   if (sonido_movimiento) sonido_movimiento->volume = VOLUMEN_ANIMACIONES;
   if (sonido_seleccion) sonido_seleccion->volume = VOLUMEN_ANIMACIONES;
+  if (sonido_apilar) sonido_apilar->volume = VOLUMEN_ANIMACIONES;
 }
 
 //
@@ -336,6 +340,7 @@ void Nivel::actualizar_animaciones(){
         Nivel::apilar(reemplazo.tipo,reemplazo.color,reemplazo.celda);
       }
     }
+    Mix_PlayChannel(-1, sonido_apilar, 0);
   }
 }
 
