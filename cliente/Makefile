@@ -79,8 +79,11 @@ partida.o: Sala/partida.h Sala/partida.cpp
 receptor_partidas.o: Sala/receptor_partidas.h Sala/receptor_partidas.cpp
 	$(CC) $(CFLAGS) -c Sala/receptor_partidas.cpp
 
-$(CEXE): receptor_partidas.o partida.o autentificador.o hda_online.o animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp
-	$(CC) $(CFLAGS) receptor_partidas.o partida.o autentificador.o hda_online.o animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp -o $(CEXE)
+funciones_auxiliares.o: ../libs/funciones_auxiliares.h ../libs/funciones_auxiliares.cpp
+	$(CC) $(CFLAGS) -c ../libs/funciones_auxiliares.cpp
+
+$(CEXE): funciones_auxiliares.o receptor_partidas.o partida.o autentificador.o hda_online.o animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp
+	$(CC) $(CFLAGS) funciones_auxiliares.o receptor_partidas.o partida.o autentificador.o hda_online.o animacion.o matriz.o nivel.o explosion.o celdas_vacias.o puntaje.o productos.o receptor_resultados.o thread.o seleccion.o socket.o ventana.o superficie.o  texto.o boton.o text_box.o fps.o mensaje.o login.o sala.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

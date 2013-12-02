@@ -47,7 +47,9 @@ class EnviarNivel : public Thread{
       while (true){
         mutex.bloquear();
         std::cout << "se envia de mensaje " << (int) mensaje << std::endl;
-        emisor.enviar(&mensaje, sizeof(char));
+        int caca = emisor.enviar(&mensaje, sizeof(char));
+        std::cout << "caca = " << caca << std::endl;
+         
         if (mensaje == ERROR) return;
         mutex.desbloquear();
         
@@ -68,7 +70,7 @@ class EnviarNivel : public Thread{
         max_pjs++;
         pjs++;
 
-        sleep(1);
+        sleep(5);
         
       }
     }      
@@ -156,7 +158,12 @@ int main(void){
   
   bool lala = true;
   while (lala){
-    receptor.recibir(&eleccion, sizeof(char));
+    int caca = receptor.recibir(&eleccion, sizeof(char));
+    if (caca == 0){
+      lala = false;
+      continue;
+    }
+    std::cout << "caca 2 = " << caca << std::endl;
     std::cout << "se recibio " << (int) eleccion << std::endl;
     if (eleccion == CREAR){
       envio.esta_creada(false);
@@ -168,9 +175,12 @@ int main(void){
     }
   }
   
-  envio.join();
+  std::cout << "antes del join" << std::endl;
   emisor.cerrar_enviar_recibir();
   receptor.cerrar_enviar_recibir();
+  envio.join();
+  
+  
 
   return 0;
 }

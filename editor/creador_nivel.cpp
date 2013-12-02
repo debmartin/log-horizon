@@ -191,7 +191,7 @@ bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, unsigned 
       std::string col_str = columnas->ver_contenido();
       std::string fil_str = filas->ver_contenido();
       if (validar_numeros(col_str, col) && validar_numeros(fil_str, fil) && nombre_leido != ""){
-        if (col <= 255 || fil <= 255) return true;
+        if (col <= 255 && fil <= 255) return true;
       }
       enviando_datos = false;
     }

@@ -173,26 +173,22 @@ int Seleccion::dibujar(Ventana *ventana){
 
 //
 bool Seleccion::analizar_evento(SDL_Event &evento){
-/*  if (evento.type == SDL_QUIT){
-    this->enviar_datos(FINALIZAR);
-    std::cout << "antes del join en seleccion" << std::cout;
-    partida->finalizar_recibir();
-    std::cout << "despues del join en seleccion" << std::cout;
-    return -1;
-  }*/
   if (!partida_aceptada){
     aceptar->analizar_evento(evento);
     anterior->analizar_evento(evento);
     siguiente->analizar_evento(evento);
     if (anterior->activado()){
       this->enviar_datos(ANTERIOR);
+      std::cout << "se envia anterior " << (int) ANTERIOR << std::endl;
     }else if (siguiente->activado()){
       this->enviar_datos(SIGUIENTE);
+      std::cout << "se envia siguiente " << (int) SIGUIENTE << std::endl;
     }else if (aceptar->activado()){
       partida_aceptada = true;
       anterior->establecer_alpha(100);
       siguiente->establecer_alpha(100);
       this->enviar_datos(ACEPTAR);
+      std::cout << "se envia aceptar " << (int) ACEPTAR << std::endl;
     }
   }else{
     iniciar->analizar_evento(evento);
@@ -201,6 +197,7 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
   retroceder->analizar_evento(evento);
   if (retroceder->activado()){
     this->enviar_datos(RETROCEDER);
+    std::cout << "se envia retroceder " << (int) RETROCEDER << std::endl;
     if (partida_aceptada){
       partida_aceptada = false;
       anterior->establecer_alpha(255);

@@ -30,6 +30,7 @@ class EditorNivel{
     Boton *cambiar_fondo;
     Boton *cant_jugadores;
     Boton *puntaje_ganar;
+    Boton *enviar_nivel;
     Texto *escritor;
     TextBox *entrada;
     Mensaje *mensaje;

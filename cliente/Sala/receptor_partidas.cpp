@@ -31,10 +31,12 @@ void ReceptorPartidas::funcion_a_correr(){
   
   while (seguir){
     char finalizar;
-    receptor->recibir(&finalizar, sizeof(finalizar));
+    int caca = receptor->recibir(&finalizar, sizeof(finalizar));
+    std::cout << "caca = " << caca << std::endl;
+    if (caca == 0) return;
     
-    std::cout << "se recibio de finalizar " << (int) finalizar << std::endl;
     if (finalizar == ERROR) return;
+    std::cout << "se recibio de finalizar " << (int) finalizar << std::endl;
     std::cout << "va a recibir datos de la partida" << std::endl;
     
     receptor->recibir_largo(largo);

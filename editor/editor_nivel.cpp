@@ -22,6 +22,7 @@ EditorNivel::EditorNivel(){
   cambiar_fondo = new Boton;
   cant_jugadores = new Boton;
   puntaje_ganar = new Boton;
+  enviar_nivel = new Boton;
   escritor = new Texto;
   mensaje = new Mensaje;
   entrada = new TextBox;
@@ -43,6 +44,7 @@ EditorNivel::~EditorNivel(){
   delete cambiar_fondo;
   delete cant_jugadores;
   delete puntaje_ganar;
+  delete enviar_nivel;
   delete escritor;
   delete entrada;
   delete mensaje;
@@ -93,7 +95,6 @@ int EditorNivel::inicializar(const std::string &path, unsigned int columnas, uns
   destino_mensaje.x = destino_mensaje_fondo.x + 3;
   destino_mensaje.h = destino_mensaje_fondo.h - 2;
   destino_mensaje.y = destino_mensaje_fondo.y + 1;
-  mensaje->asignar_mensaje("MENSAJE DE PRUEBA", destino_mensaje, ventana);
 
   // TEXTO
   escritor->asignar_fuente(path + "fuentes/mono.ttf", 30);
@@ -113,9 +114,9 @@ int EditorNivel::inicializar(const std::string &path, unsigned int columnas, uns
   estructura.normal = normal;
   estructura.apretado = apretado;
   estructura.resaltado = sobre;
-  destino_boton.w = ancho / 8;
+  destino_boton.w = 120;
   destino_boton.x = 10;
-  destino_boton.h = alto / 10;
+  destino_boton.h = 60;
   
   SDL_Rect destino_texto;
   escritor->asignar_color(255, 255, 255, 255);
@@ -154,6 +155,19 @@ int EditorNivel::inicializar(const std::string &path, unsigned int columnas, uns
   destino_texto.w = destino_boton.w - destino_boton.w / 5;
   destino_texto.h = destino_boton.h - destino_boton.h / 5;
   puntaje_ganar->agregar_texto(&sup, destino_texto, ventana, 1);
+  
+  // Boton ENVIAR NIVEL
+  destino_boton.x = ancho - 125;
+  destino_boton.y = 20; 
+  estructura.destino = destino_boton;
+  enviar_nivel->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
+  escritor->copiar_texto("Enviar Nivel", &sup);
+  destino_texto.x = destino_boton.x + destino_boton.w / 10;
+  destino_texto.y = destino_boton.y + destino_boton.h / 10;
+  destino_texto.w = destino_boton.w - destino_boton.w / 5;
+  destino_texto.h = destino_boton.h - destino_boton.h / 5;
+  enviar_nivel->agregar_texto(&sup, destino_texto, ventana, 1);
+  
   
   escritor->asignar_color(0, 0, 0, 255);
   
@@ -311,6 +325,7 @@ int EditorNivel::dibujar(Ventana *ventana){
   tipos->checkbox->dibujar(ventana);
   cant_jugadores->dibujar(ventana);
   puntaje_ganar->dibujar(ventana);
+  enviar_nivel->dibujar(ventana);
   return 0;
 }
 
@@ -328,6 +343,7 @@ bool EditorNivel::analizar_evento(SDL_Event &evento){
   tipos->checkbox->analizar_evento(evento);
   cant_jugadores->analizar_evento(evento);
   puntaje_ganar->analizar_evento(evento);
+  enviar_nivel->analizar_evento(evento);
   
   if (matriz->analizar_evento(evento, columna, fila)){
     if (accion->subindice_activado() == AGUJEROS){

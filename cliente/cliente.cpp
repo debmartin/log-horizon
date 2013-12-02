@@ -37,6 +37,8 @@ bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *
   iniciador->recibir(&puerto_emisor, sizeof(unsigned int));
   puerto_emisor = ntohl(puerto_emisor);
   
+  std::cout << "puerto receptor = " << puerto_receptor << " puerto emisor = " << puerto_emisor << std::endl;
+  
   receptor->asignar_direccion(puerto_receptor, ip);
   if (receptor->conectar() == -1) return false;;
   emisor->asignar_direccion(puerto_emisor, ip);

@@ -144,9 +144,8 @@ int Sala::dibujar(Ventana *ventana){
 //
 bool Sala::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){
-    this->enviar_datos(FINALIZAR);
     std::cout << "antes del join en sala" << std::cout;
-    //socket_recibir->cerrar_enviar_recibir();
+    socket_recibir->cerrar_enviar_recibir();
     seleccion->finalizar_recibir_datos();
     std::cout << "despues del join en sala" << std::cout;
     return false;
@@ -157,10 +156,12 @@ bool Sala::analizar_evento(SDL_Event &evento){
     if (crear->activado()){
       seleccion->partidas_creadas(false);
       this->enviar_datos(CREAR);
+      std::cout << "se envia crear " << (int) CREAR << std::endl;
       seleccionando = true;
     }else if(unirse->activado()){
       seleccion->partidas_creadas(true);
       this->enviar_datos(UNIRSE);
+      std::cout << "se envia unirse " << (int) UNIRSE << std::endl;
       seleccionando = true;
     }
   }else{
