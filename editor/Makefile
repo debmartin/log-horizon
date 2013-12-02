@@ -16,6 +16,9 @@ superficie.o: ../libs/SDL2/superficie/superficie.h ../libs/SDL2/superficie/super
 boton.o: ../libs/SDL2/boton/boton.h ../libs/SDL2/boton/boton.cpp
 	$(CC) $(CFLAGS) -c ../libs/SDL2/boton/boton.cpp
 	
+checbox.o: ../libs/SDL2/boton/checbox.h ../libs/SDL2/boton/checbox.cpp
+	$(CC) $(CFLAGS) -c ../libs/SDL2/boton/checbox.cpp
+	
 fps.o: ../libs/SDL2/fps/fps.h ../libs/SDL2/fps/fps.cpp
 	$(CC) $(CFLAGS) -c ../libs/SDL2/fps/fps.cpp
 
@@ -43,8 +46,8 @@ creador_nivel.o: creador_nivel.h creador_nivel.cpp
 editor_nivel.o: editor_nivel.h editor_nivel.cpp
 	$(CC) $(CFLAGS) -c editor_nivel.cpp
 
-$(CEXE): editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp
-	$(CC) $(CFLAGS) editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): checbox.o editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp
+	$(CC) $(CFLAGS) checbox.o editor_nivel.o creador_nivel.o editor.o thread.o socket.o ventana.o superficie.o texto.o boton.o text_box.o fps.o mensaje.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

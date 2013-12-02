@@ -59,49 +59,8 @@ bool CheckBox::asignar_texturas(const std::string &path, estructura_checkbox_t &
   return this->asignar_texturas(&sup, estructura, ventana);
 }
 
-/*
-
 //
-Boton::Boton(){
-  textura = new Textura;
-  texto = new Textura;
+void CheckBox::desactivar(){
   apretado = false;
+  src_actual = src_normal;
 }
-
-//
-Boton::~Boton(){
-  delete textura;
-  delete texto;
-}
-
-
-
-//
-bool Boton::agregar_texto(Superficie *sup, SDL_Rect &dest_texto, Ventana *ventana, int desplazamiento){
-  if (!sup || !ventana) return false;
-  texto->cargar_textura(sup, ventana);
-  destino_texto = dest_texto;
-  desp = desplazamiento;
-  return true;
-}
-
-//
-bool Boton::dibujar(Ventana *ventana){
-  if (!textura->dibujar(src_actual, destino, ventana)) return false;
-  if (texto){
-    SDL_Rect destino_aux = destino_texto;
-    if (src_actual.x == src_apretado.x && src_actual.y == src_apretado.y){
-      destino_aux.x = destino_aux.x + desp;
-      destino_aux.y = destino_aux.y + desp;
-    }
-    if (!texto->dibujar(destino_aux, ventana)) return false;
-  }
-  return true;
-}
-
-//
-void Boton::establecer_alpha(Uint8 alpha){
-  textura->establecer_alpha(alpha);
-  texto->establecer_alpha(alpha);
-}
-*/
