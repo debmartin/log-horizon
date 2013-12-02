@@ -12,6 +12,7 @@
 #include "Login.h"
 #include "SalaPartidas.h"
 #include "Nivel.h"
+#include <fstream>
 
 
 class ServidorCrearSocket : public std::exception{};
@@ -20,11 +21,11 @@ class ServidorUsuario;
 
 class Servidor : public Thread{
     public:
-        Servidor();
+        Servidor(int puerto_escucha, std::string& archivo_usuarios);
         virtual ~Servidor();
-        void cargarNiveles();
+        bool cargarNiveles(string& archivo);
         void aceptarConexion();
-        std::string generarUsuario();
+        int generarUsuario(string& nombre);
         int elegirPartida(std::string& nombre_usuario);
         bool iniciarPartida(int nro_partida);
         void correrUsuario();
@@ -44,6 +45,7 @@ class Servidor : public Thread{
         std::vector<ServidorUsuario*>* servidores;
         bool seguir;
         int cant_partidas;
+        ArchivoDirecto* arch_usuarios;
 };
 
 class ServidorUsuario : public Thread {

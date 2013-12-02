@@ -6,7 +6,7 @@
 
 using std::string;
 
-void recibirMsjPrefijo(Socket& sock_cli, string& mensaje){
+bool recibirMsjPrefijo(Socket& sock_cli, string& mensaje){
     char prefijo[TAM_UINT32];
 
     sock_cli.recibir(prefijo, TAM_UINT32);
@@ -18,7 +18,8 @@ void recibirMsjPrefijo(Socket& sock_cli, string& mensaje){
     char datos[TAM_BUFFER];
     while (total < largo) {
         int recibidos = sock_cli.recibir(datos, TAM_BUFFER-1);
-        if ((recibidos == -1) || (recibidos == 0)) break;
+        if (recibidos == -1) break;
+        if (recibidos == 0) return false;
         datos[recibidos] = '\0';
         mensaje += datos;
         total += recibidos;

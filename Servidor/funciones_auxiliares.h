@@ -6,7 +6,7 @@
 
 using std::string;
 
-void recibirMsjPrefijo(Socket& sock_cli, string& mensaje);
+bool recibirMsjPrefijo(Socket& sock_cli, string& mensaje);
 
 void enviarMsjPrefijo(Socket& sock_cli, const void* mensaje, int len_msj);
 

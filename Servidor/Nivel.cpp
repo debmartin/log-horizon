@@ -1,16 +1,34 @@
 #include "Nivel.h"
 
-#define PUERTO_ENVIAR 8000
-#define PUERTO_RECIBIR 8001
-
 
 using std::string;
-using std::istream;
+using std::ifstream;
 
-Nivel::Nivel(istream* arch_estructura, istream* arch_probabilidades, int max_puntos) :
+Nivel::Nivel(ifstream& arch_estructura, ifstream& arch_probabilidades, int max_puntos) :
     puntaje_objetivo(max_puntos) {
     srand(time(NULL));
-//    tablero = new Tablero(tam, estructura);
+
+    Json::Value valores;
+    Json::Value aux;
+    Json::Reader reader;
+
+    if (!reader.parse(arch_estructura, valores, false))
+        throw NivelJsonError();
+    aux = valores.get("filas", aux);
+    int filas = aux.asInt();
+    aux = valores.get("columnas", aux);
+    int columnas = aux.asInt();
+    Dimension tam(filas, columnas);
+
+    aux = valores.get("matriz", aux);
+    Matriz<int> estructura(tam);
+    for (int x = 0; x < columnas; x++){
+        for (int y = 0; y < filas; y++){
+            estructura[x][y] = aux[x][y].asInt();
+        }
+    }
+    tablero = new Tablero(tam);
+    tablero->establecerProbabilidades(estructura, arch_probabilidades);
     mutex_recibir = new Mutex();
     jugadores = new ConjuntoJugadores(mutex_recibir);
 }

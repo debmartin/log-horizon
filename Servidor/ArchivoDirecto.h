@@ -11,12 +11,14 @@ class ArchivoDirecto{
         bool abrir();
         void cerrar();
         bool obtener(std::string& clave, std::string& dato);
-        void agregar(std::string& clave, std::string& dato);
+        bool agregar(std::string& clave, std::string& dato);
     protected:
+        char obtenerLinea(std::string& clave, std::string& dato);
     private:
         std::string* nombre;
-        std::ifstream aux;
-        std::istream* arch_abierto;
+        std::ifstream istream;
+        std::ofstream ostream;
+        int largo;
 };
 
 #endif // ARCHIVODIRECTO_H

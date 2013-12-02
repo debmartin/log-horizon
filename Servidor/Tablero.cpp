@@ -1,21 +1,50 @@
 #include "Tablero.h"
-#define ESPACIO '0'
 
-Tablero::Tablero(Dimension& tam, char** estructura)
+
+using std::ifstream;
+using std::string;
+
+Tablero::Tablero(Dimension& tam)
     : Matriz<Celda>(tam), jugada_en_curso(NULL){
     modificados = new Lista<Dimension*>(true);
-    for(int i=0; i < tam.y(); i++){
-        for(int j=0; j < tam.x(); j++){
-            if(estructura[i][j] == ESPACIO){
-                (*this)[j][i].setTipo(VACIO);
-                (*this)[j][i].setColor(VACIO);
-            }
-        }
-    }
 }
 
 Tablero::~Tablero(){
     delete modificados;
+}
+
+bool Tablero::establecerProbabilidades(Matriz<int>& estructura, ifstream& arch_probabilidades){
+    probabilidades = &arch_probabilidades;
+    Json::Value valores;
+    Json::Value aux;
+    Json::Reader reader;
+
+    if (!reader.parse(arch_probabilidades, valores, false))
+        return false;
+
+    aux = valores.get(TAG_CELDA, aux);
+    char colores_char[] = VEC_COLORES_CHAR;
+    char tipos_char[] = VEC_TIPOS_CHAR;
+
+    for(int x=0; x < tamanio->y(); x++){
+        for(int y=0; y < tamanio->x(); y++){
+            if(estructura[x][y] == ESPACIO){
+                (*this)[y][x].rellenar(VACIO, VACIO);
+                continue;
+            }
+            int prob = (rand() % 100) +1, suma = 0;
+            for(int i=0; i < CANT_COLORES; i++){
+                for(int j=0; j < CANT_TIPOS; j++){
+                    suma += aux[colores_char[i]][tipos_char[j]].asInt();
+                    if (suma > prob){
+                        (*this)[y][x].rellenar(colores_char[i], tipos_char[j]);
+                        break;
+                    }
+                }
+                if (suma > prob) break;
+            }
+        }
+    }
 }
 
 bool Tablero::intercambiar(Jugada* nueva){
@@ -94,6 +123,26 @@ int Tablero::borrarSegmentosCol(Dimension& dest, Dimension& origen, bool dest_in
     return cant;
 }
 
+char calcularRellenoCol(ifstream& arch_probabilidades){
+    Json::Value valores;
+    Json::Value aux;
+    Json::Reader reader;
+
+    if (!reader.parse(arch_probabilidades, valores, false))
+        return '\0';
+
+    aux = valores.get(TAG_COL, aux);
+    char colores_char[] = VEC_COLORES_CHAR;
+
+    int prob = (rand() % 100) +1, suma = 0;
+    for(int i=0; i < CANT_COLORES; i++){
+        suma += aux[colores_char[i]].asInt();
+        if (suma > prob)
+            return colores_char[i];
+    }
+    return '\0';
+}
+
 int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
     if(! dest.esValida() || ! origen.esValida()) return 0;
 
@@ -118,8 +167,10 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
                 break;
             if (superior.esValida() && ! termino_segmento)
                 (*this)[actual] = (*this)[superior];
-            else
-                (*this)[actual].rellenar();
+            else {
+                char color = calcularRellenoCol(*probabilidades);
+                (*this)[actual].rellenar(color, BUTTON);
+            }
             cant++;
             *modificados += new Dimension(actual);
         }

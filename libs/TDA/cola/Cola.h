@@ -3,7 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "FueraDeRango.h"
+#include <exception>
+
+class ColaFueraDeRango : public std::exception{};
 
 template <class T>
 class NodoCola {
@@ -86,13 +88,13 @@ void Cola<U>::encolar(const U& valor){
 
 template <class U>
 U Cola<U>::verPrimero(){
-	if (esVacia()) throw FueraDeRango();
+	if (esVacia()) throw ColaFueraDeRango();
 	return nodoPrim->dato;
 }
 
 template <class U>
 U Cola<U>::desencolar(){
-	if (esVacia()) throw FueraDeRango();
+	if (esVacia()) throw ColaFueraDeRango();
 
 	U dato = verPrimero();
 	NodoCola<U>* nodoIn = nodoPrim;

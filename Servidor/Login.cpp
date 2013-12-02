@@ -6,21 +6,17 @@
 
 #define ARCH_USUARIOS "./usuarios.json"
 #define PUERTO_MAX 65535
-
+#define PUERTO_CLIENTES 8001
 
 using std::string;
 
-int Login::proximo_puerto = PUERTO_ESCUCHA+1;
+int Login::proximo_puerto = PUERTO_CLIENTES;
 
 Login::Login(Socket* cliente, usuario_t* usuario, Mutex* mutex_puertos) :
     nuevo_usuario(usuario), mutex(mutex_puertos), cliente_actual(cliente) {
-    string arch(ARCH_USUARIOS);
-    arch_usuarios = new ArchivoDirecto(arch);
-    arch_usuarios->abrir();
 }
 
 Login::~Login(){
-    arch_usuarios->cerrar();
 }
 
 int Login::asignarPuerto(Socket& sockfd){
@@ -33,7 +29,7 @@ int Login::asignarPuerto(Socket& sockfd){
 
         proximo_puerto++;
         if (proximo_puerto == PUERTO_MAX)
-            proximo_puerto = PUERTO_ESCUCHA +1;
+            proximo_puerto = PUERTO_CLIENTES;
     }
     mutex->desbloquear();
     if (sockfd.escuchar() == -1) return 2;
@@ -76,16 +72,18 @@ bool Login::aceptarSubConexiones(){
 
 void Login::recibirUsuarioContrasenia(){
     nuevo_usuario->nombre = new string();
-    recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), *(nuevo_usuario->nombre));
+    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), *(nuevo_usuario->nombre)))
+        return CONEXION_ABORTADA;
 
     nuevo_usuario->contrasenia = new string();
-    recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), *(nuevo_usuario->contrasenia));
+    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), *(nuevo_usuario->contrasenia)))
+        return CONEXION_ABORTADA;
 }
 
-bool Login::verificarUsuario(){
+bool Login::verificarUsuario(ArchivoDirecto& arch_usuarios){
     string aux_contrasenia;
-    if (! arch_usuarios->obtener(*(nuevo_usuario->nombre), aux_contrasenia)) {
-        arch_usuarios->agregar(*(nuevo_usuario->nombre), *(nuevo_usuario->contrasenia));
+    if (! arch_usuarios.obtener(*(nuevo_usuario->nombre), aux_contrasenia)) {
+        arch_usuarios.agregar(*(nuevo_usuario->nombre), *(nuevo_usuario->contrasenia));
         return true;
     }
     char res = (aux_contrasenia == *(nuevo_usuario->contrasenia)) ? OK : ERROR;

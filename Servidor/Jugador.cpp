@@ -1,8 +1,6 @@
 #include "Jugador.h"
 #include "Constantes.h"
 
-#define LEN_MSJ 5
-
 #define ENVIAR 0
 #define RECIBIR 1
 
@@ -36,7 +34,7 @@ Jugador::~Jugador(){
 }
 
 Jugada* Jugador::obtenerJugada(){
-    recibirPar();
+    if(recibirPar();
     return jugada_actual;
 }
 

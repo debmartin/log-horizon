@@ -16,7 +16,11 @@ SalaPartidas::~SalaPartidas(){
 
 int SalaPartidas::definirTipoPartida(){
     char tipo_partida = ' ';
-    nuevo_usuario->sockets->recibir_cli->recibir(&tipo_partida, sizeof(char));
+    int res = -1;
+    while (res == -1){
+        res = nuevo_usuario->sockets->recibir_cli->recibir(&tipo_partida, sizeof(char));
+        if (res == 0) return CONEXION_ABORTADA;
+    }
     return (tipo_partida - '0');
 }
 
@@ -45,7 +49,11 @@ int SalaPartidas::crearPartida(int& cant_partidas){
             i = 0;
         enviarNivel(*(nuevo_usuario->sockets->enviar_cli), *((*niveles)[i]));
 
-        nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+        int res = -1;
+        while(res == -1){
+            res = nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+            if(res == 0) return CONEXION_ABORTADA;
+        }
     }
     if(accion == VOLVER) return -1;
 
@@ -87,7 +95,11 @@ int SalaPartidas::unirsePartida(){
         uint32_t cant_jug = htonl((uint32_t) it->second->jugadores->size());
         nuevo_usuario->sockets->enviar_cli->enviar(&cant_jug, TAM_UINT32);
 
-        nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+        int res = -1;
+        while(res == -1){
+            res = nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+            if(res == 0) return CONEXION_ABORTADA;
+        }
     }
     if(accion == VOLVER) return -1;
     it->second->jugadores->push_back(nuevo_usuario);
@@ -98,17 +110,24 @@ int SalaPartidas::unirsePartida(){
 
 bool SalaPartidas::esperarInicio(int nro_partida){
     char accion = ' ';
-    if(accion != VOLVER)       //CORREGIR
-        nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+    int res = -1;
+    while(res == -1){
+        res = nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+        if(res == 0) return CONEXION_ABORTADA;
+    }
+
     if(accion == VOLVER) return false;
     return true;
 }
 
 bool SalaPartidas::iniciarPartida(int nro_partida){
     char accion = ' ';
-    while(accion != INICIAR && accion != VOLVER)
-        nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
-    if(accion == VOLVER) return false;
-    return true;
+    int res = -1;
+    while(accion != INICIAR && accion != VOLVER && res == -1){
+        res = nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+        if(res == 0) return CONEXION_ABORTADA;
+    }
+    if(accion == VOLVER) return 0;
+    return 1;
 }
 

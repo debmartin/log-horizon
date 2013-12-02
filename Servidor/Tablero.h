@@ -4,7 +4,9 @@
 #include "Matriz.h"
 #include "Celda.h"
 #include "../libs/TDA/lista/Lista.h"
+#include "../libs/json/include/json/json.h"
 #include "Jugada.h"
+#include <fstream>
 
 /* Tablero de Candy Crush */
 class Tablero : public Matriz<Celda>{
@@ -17,7 +19,7 @@ class Tablero : public Matriz<Celda>{
          * matriz.
          * Post: El tablero fue creado con el tamanio y estructura dadas, y se
          * lleno con Celdas. */
-        Tablero(Dimension& tam, char** estructura);
+        Tablero(Dimension& tam);
         /* Destruye el tablero.
          * Pre: El tablero fue creado.
          * Post: El tablero fue destruido. */
@@ -42,6 +44,7 @@ class Tablero : public Matriz<Celda>{
          * configuracion especial, no son adyacentes o no se hizo estabilizar,
          * devuelve false y no realiza ningun cambio. Devuelve true en caso
          * contrario. */
+        bool establecerProbabilidades(Matriz<int>& estructura, std::ifstream& arch_probabilidades);
         bool intercambiar(Jugada* nueva_jugada);
         /* Elimina todas las configuraciones especiales del tablero.
          * Pre: Se realizo intercambiar inmediatamente antes.
@@ -111,6 +114,7 @@ class Tablero : public Matriz<Celda>{
     private:
         Lista<Dimension*>* modificados;
         Jugada* jugada_en_curso;
+        std::ifstream* probabilidades;
 };
 
 #endif // TABLERO_H

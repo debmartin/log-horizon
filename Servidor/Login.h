@@ -14,14 +14,13 @@ class Login{
         void enviarPuertos();
         bool aceptarSubConexiones();
         void recibirUsuarioContrasenia();
-        bool verificarUsuario();
+        bool verificarUsuario(ArchivoDirecto& arch_usuarios);
     protected:
     private:
         static int proximo_puerto;
         usuario_t* nuevo_usuario;
         Mutex* mutex;
         Socket* cliente_actual;
-        ArchivoDirecto* arch_usuarios;
 };
 
 #endif // LOGIN_H
