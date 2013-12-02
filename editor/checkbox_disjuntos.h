@@ -1,5 +1,5 @@
-#ifndef CHECKBOX_DISJUNTOS
-#define CHECKBOX_DISJUNTOS
+#ifndef CHECKBOX_DISJUNTOS_H
+#define CHECKBOX_DISJUNTOS_H
 
 #include "../libs/SDL2/SDL.h"
 
@@ -17,9 +17,12 @@ class CheckBoxDisjuntos{
     //
     void analizar_evento(SDL_Event &evento);
     
+    //
+    void dibujar(Ventana *ventana);
+    
   private:
-    std::vector<CheckBox> lista_checkbox;
+    std::vector<CheckBox> *lista_checkbox;
     int activado;
 }
 
-#endif // CHECKBOX_DISJUNTOS
+#endif // CHECKBOX_DISJUNTOS_H
