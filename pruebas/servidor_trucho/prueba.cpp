@@ -47,10 +47,10 @@ class EnviarNivel : public Thread{
       while (true){
         mutex.bloquear();
         std::cout << "se envia de mensaje " << (int) mensaje << std::endl;
+        if (mensaje == ERROR) return;
         int caca = emisor.enviar(&mensaje, sizeof(char));
         std::cout << "caca = " << caca << std::endl;
          
-        if (mensaje == ERROR) return;
         mutex.desbloquear();
         
         
@@ -161,6 +161,7 @@ int main(void){
     int caca = receptor.recibir(&eleccion, sizeof(char));
     if (caca == 0){
       lala = false;
+      envio.enviar_mensaje(ERROR);
       continue;
     }
     std::cout << "caca 2 = " << caca << std::endl;
@@ -178,6 +179,9 @@ int main(void){
   std::cout << "antes del join" << std::endl;
   emisor.cerrar_enviar_recibir();
   receptor.cerrar_enviar_recibir();
+  emisor_aux.cerrar_enviar_recibir();
+  receptor_aux.cerrar_enviar_recibir();
+  std::cout << "cerradas todas las conexiones " << std::endl;
   envio.join();
   
   
