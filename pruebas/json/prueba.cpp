@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-
+#include <sstream>
 // This is the JSON header
 #include "../../libs/json/include/json/json.h"
 
@@ -31,7 +31,20 @@ int main(int argc, char **argv){
   fb.open ("estructura.dat",std::ios::out);
   std::ostream os(&fb);
   
-  os << estructura;
+ // os << estructura;
   
- return 0;
+ 
+  Json::StyledWriter escritor;
+  std::string a = escritor.write(estructura);
+  
+  std::cout << a << std::endl;
+  
+  std::istringstream ss(a);
+  Json::Reader reader;
+  Json::Value aux;
+  reader.parse(ss, aux, false);
+  
+  os << aux;
+  
+  return 0;
 }
