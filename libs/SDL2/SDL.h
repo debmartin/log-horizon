@@ -15,6 +15,7 @@
 #include "text_box/text_box.h"
 #include "boton/boton.h"
 #include "boton/checkbox.h"
+#include "boton/checkbox_disjuntos.h"
 #include "mensaje/mensaje.h"
 
 class SDL {

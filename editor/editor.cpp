@@ -23,6 +23,8 @@ Editor::Editor(int ancho, int alto, SocketPrefijo *socket_emisor, SocketPrefijo 
   ventana->dimension_logica(ancho, alto);
   std::string titulo = TITULO;
   ventana->titulo(titulo);
+  filas = 0;
+  columnas = 0;
 }
 
 //
@@ -41,7 +43,7 @@ bool Editor::crear_nivel(){
   CreadorNivel creador;
   std::string path_recursos = RECURSOS;
   creador.inicializar(path_recursos, ventana, emisor, receptor);
-  return creador.correr(ventana, nombre_nivel);
+  return creador.correr(ventana, nombre_nivel, columnas, filas);
 }
 
 //
@@ -55,6 +57,6 @@ bool Editor::editar_nivel(){
   mkdir(path_imagenes.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   
   std::string path_recursos = RECURSOS;
-  editor_nivel.inicializar(path_recursos, ventana);
+  editor_nivel.inicializar(path_recursos, columnas, filas, ventana);
   return editor_nivel.correr(ventana, path_nivel);
 }

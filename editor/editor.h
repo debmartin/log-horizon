@@ -31,6 +31,8 @@ class Editor{
     SocketPrefijo *receptor;
     Ventana *ventana;
     std::string nombre_nivel;
+    size_t columnas;
+    size_t filas;
     SDL libreria;
 };
 

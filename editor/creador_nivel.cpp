@@ -145,7 +145,6 @@ int CreadorNivel::inicializar(const std::string &path, Ventana *ventana, SocketP
   destino_texto.h = destino_boton.h - destino_boton.h / 5;
   crear_nivel->agregar_texto(&sup, destino_texto, ventana, 1);
   
- 
   // MENSAJE
   destino.w = ancho / 3;
   destino.h = alto / 4;
@@ -165,7 +164,7 @@ int CreadorNivel::inicializar(const std::string &path, Ventana *ventana, SocketP
 }
 
 //
-bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido){
+bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, size_t &col, size_t &fil){
   if (!datos_inicializados) return false;
   SDL_Event evento;
   bool corriendo = true;
@@ -188,10 +187,26 @@ bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido){
     ventana->presentar(delay);
     if (enviando_datos){
       nombre_leido = nombre->ver_contenido();
-      return true;
+      std::string col_str = columnas->ver_contenido();
+      std::string fil_str = filas->ver_contenido();
+      if (this->validar_numeros(col_str, col) && this->validar_numeros(fil_str, fil) && nombre_leido != ""){
+        return true;
+      }
+      enviando_datos = false;
     }
   }
   return false;
+}
+
+//
+bool CreadorNivel::validar_numeros(const std::string &str, size_t &numero){
+  size_t aux = 0;
+  for (size_t x = 0; x < str.size(); x++){
+    if (str[x] < '0' || str[x] > '9') return false;
+      aux = str[x] - '0' + 10 * aux;
+  }
+  numero = aux;
+  return true;
 }
 
 //
@@ -210,8 +225,8 @@ int CreadorNivel::dibujar(Ventana *ventana){
 
 //
 bool CreadorNivel::analizar_evento(SDL_Event &evento){
-  if (enviando_datos) return true;
   if (evento.type == SDL_QUIT) return false;
+  if (enviando_datos) return true;
   nombre->analizar_evento(evento);
   columnas->analizar_evento(evento);
   filas->analizar_evento(evento);

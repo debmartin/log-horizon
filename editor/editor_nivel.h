@@ -2,6 +2,8 @@
 #define EDITOR_NIVEL_H
 
 #include "../libs/SDL2/SDL.h"
+#include "matriz_editor.h"
+
 
 class EditorNivel{
   public:
@@ -15,7 +17,7 @@ class EditorNivel{
     bool correr(Ventana *ventana, const std::string &path_nivel);
     
     //
-    int inicializar(const std::string &path, Ventana *ventana);
+    int inicializar(const std::string &path, size_t columnas, size_t filas, Ventana *ventana);
   
   private:
     bool datos_inicializados;
@@ -27,6 +29,10 @@ class EditorNivel{
     SDL_Rect destino_mensaje;
     std::string nivel_path;
     Ventana *ventana;
+    
+    CheckBoxDisjuntos *accion;
+    
+    MatrizEditor *matriz;
     
   protected:
     //
