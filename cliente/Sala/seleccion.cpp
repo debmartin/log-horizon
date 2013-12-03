@@ -228,3 +228,8 @@ void Seleccion::finalizar_recibir_datos(){
 void Seleccion::enviar_datos(char eleccion){
   socket_enviar->enviar(&eleccion, sizeof(eleccion));
 }
+
+//
+bool Seleccion::recibir_nivel(){
+  return partida->recibir_nivel();
+}

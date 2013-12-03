@@ -126,6 +126,7 @@ bool Sala::correr(Ventana *ventana){
     
     // Presentar en ventana
     ventana->presentar(delay);
+    if (seleccion->recibir_nivel()) return true;
   }
   
   return false;

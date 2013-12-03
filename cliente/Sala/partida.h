@@ -28,6 +28,9 @@ class Partida{
     //
     void recibir_datos();
     
+    //
+    bool recibir_nivel(){return finalizar;}
+    
   private:
     Texto *escritor;
     Textura *nombre;
@@ -38,10 +41,11 @@ class Partida{
     ReceptorPartidas receptor_partidas;
     Ventana *ventana;
     bool creada;
+    bool finalizar;
     
   protected:
     //
-    bool actualizar(Ventana *ventana);
+    void actualizar(Ventana *ventana);
     
     //
     std::string itostr(uint32_t valor);

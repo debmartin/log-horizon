@@ -17,6 +17,7 @@ Partida::Partida(){
   jugadores = new Textura;
   creador = new Textura;
   creada = false;
+  finalizar =false;
 }
 
 //
@@ -67,10 +68,12 @@ bool Partida::actualizar(Ventana *ventana){
   Json::Value info;
   receptor_partidas.ver_info(info);
   
-  // if info["tipo"].asInt() == RECIBIR_NIVEL, salir de aca y terminar todo para iniciar el juego
-  
-  if (info["tipo"].asInt() == CREAR && creada) return false;
-  if (info["tipo"].asInt() == UNIRSE && !creada) return false;
+  if (info["tipo"].asInt() == RECIBIR_NIVEL){
+    finalizar = true;
+    return true;
+  }  
+  if (info["tipo"].asInt() == CREAR && creada) return true;
+  if (info["tipo"].asInt() == UNIRSE && !creada) return true;
   
   // NOMBRE DE LA PARTIDA
   texto = "Nivel: " + info["nombre"].asString();
@@ -102,7 +105,7 @@ bool Partida::actualizar(Ventana *ventana){
     escritor->copiar_texto(texto, &sup);
     creador->cargar_textura(&sup, ventana);
   }
-  return true;
+  return true
 }
 
 //
