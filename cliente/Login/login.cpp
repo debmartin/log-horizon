@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "login.h"
 #include "../../libs/TDA/socket/socket_prefijo.h"
@@ -40,7 +41,8 @@ Login::~Login(){
 }
 
 //
-int Login::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir){
+int Login::inicializar(const std::string &path, Ventana *ventana, 
+                       SocketPrefijo* enviar, SocketPrefijo* recibir){
   autentificador->asignar_sockets(enviar, recibir);
   // FONDO
   fondo->cargar_textura(path + "imagenes/fondo_login.png", ventana);
@@ -118,7 +120,8 @@ int Login::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo*
   estructura.resaltado = sobre;
   estructura.destino = destino_boton;
   
-  iniciar_sesion->asignar_texturas(path + "imagenes/boton.png", estructura, ventana);
+  iniciar_sesion->asignar_texturas(path + "imagenes/boton.png", 
+                                   estructura, ventana);
   
   escritor->asignar_color(220,220,0,255);
   escritor->copiar_texto("Iniciar Sesion", &sup);
@@ -212,8 +215,9 @@ bool Login::analizar_evento(SDL_Event &evento){
     usuario->analizar_evento(evento);
     clave->analizar_evento(evento);
     iniciar_sesion->analizar_evento(evento);
-    if (iniciar_sesion->activado()) std::cout << "apretaste el boton" << std::endl;
-    if (iniciar_sesion->activado() && usuario->ver_contenido() != "" && clave->ver_contenido() != ""){
+    if (iniciar_sesion->activado() && 
+        usuario->ver_contenido() != "" && 
+        clave->ver_contenido() != ""){
       this->enviar_datos();
     }
   }
@@ -223,6 +227,7 @@ bool Login::analizar_evento(SDL_Event &evento){
 //
 void Login::enviar_datos(){
   conectando = true;
-  autentificador->autentificar(usuario->ver_contenido(), clave->ver_contenido());
+  autentificador->autentificar(usuario->ver_contenido(), 
+                               clave->ver_contenido());
   autentificador->correr();
 }

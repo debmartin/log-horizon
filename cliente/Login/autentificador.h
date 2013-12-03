@@ -1,6 +1,8 @@
 #ifndef AUTENTIFICADOR_H
 #define AUTENTIFICADOR_H
 
+#include <string>
+
 #include "../../libs/TDA/thread/thread.h"
 #include "../../libs/TDA/socket/socket_prefijo.h"
 
@@ -16,7 +18,8 @@ class Autentificador : public Thread{
     void asignar_sockets(SocketPrefijo *enviar, SocketPrefijo *recibir);
     
     //
-    void autentificar(const std::string &usuario, const std::string &clave);
+    void autentificar(const std::string &usuario, 
+                      const std::string &clave);
     
     //
     bool en_curso();

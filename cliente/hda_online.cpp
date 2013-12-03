@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "hda_online.h"
 #include "Login/login.h"
@@ -11,7 +12,9 @@
 #define TITULO "Hora de Aventura Online"
 
 //
-HDA_Online::HDA_Online(int ancho, int alto, SocketPrefijo *socket_emisor, SocketPrefijo *socket_receptor){
+HDA_Online::HDA_Online(int ancho, int alto, 
+                       SocketPrefijo *socket_emisor, 
+                       SocketPrefijo *socket_receptor){
   emisor = socket_emisor;
   receptor = socket_receptor;
   

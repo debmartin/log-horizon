@@ -1,6 +1,8 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
+#include <string>
+
 #include "../../libs/SDL2/SDL.h"
 #include "../../libs/TDA/socket/socket.h"
 #include "../../libs/TDA/socket/socket_prefijo.h"
@@ -18,7 +20,8 @@ class Login{
     bool correr(Ventana *ventana);
     
     //
-    int inicializar(const std::string &path, Ventana *ventana, SocketPrefijo* enviar, SocketPrefijo* recibir);
+    int inicializar(const std::string &path, Ventana *ventana, 
+                    SocketPrefijo* enviar, SocketPrefijo* recibir);
     
   private:
     bool datos_inicializados;
@@ -38,7 +41,6 @@ class Login{
     Autentificador *autentificador;    
     
   protected:
-    
     //
     int dibujar(Ventana *ventana);
     

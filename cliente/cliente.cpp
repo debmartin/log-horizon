@@ -72,7 +72,7 @@ int main(void){
   if (iniciador->conectar() == -1){
     std::cout << "error al conectar" << std::endl;
     delete iniciador;
-    return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
+    return -1;
   }
   SocketPrefijo *receptor = new SocketPrefijo;
   SocketPrefijo *emisor = new SocketPrefijo;

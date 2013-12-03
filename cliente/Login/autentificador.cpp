@@ -19,14 +19,16 @@ Autentificador::Autentificador(){
 Autentificador::~Autentificador(){}
 
 //
-void Autentificador::asignar_sockets(SocketPrefijo *enviar, SocketPrefijo *recibir){
+void Autentificador::asignar_sockets(SocketPrefijo *enviar, 
+                                     SocketPrefijo *recibir){
   if (!enviar || !recibir) return;
   emisor = enviar;
   receptor = recibir;
 }
 
 //
-void Autentificador::autentificar(const std::string &_usuario, const std::string &_clave){
+void Autentificador::autentificar(const std::string &_usuario, 
+                                  const std::string &_clave){
   usuario = _usuario;
   clave = _clave;
 }
@@ -58,8 +60,10 @@ void Autentificador::funcion_a_correr(){
   char resultado;
   receptor->recibir(&resultado, sizeof(resultado));
   mutex.bloquear();
-  if (resultado == OK) validacion = true;
-  else validacion = false;
+  if (resultado == OK) 
+    validacion = true;
+  else 
+    validacion = false;
   enviando = false;
   mutex.desbloquear();
 }
