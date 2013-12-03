@@ -3,8 +3,8 @@
 #include "../libs/json/include/json/json.h"
 #include <sstream>
 
-#define OK 0
-#define ERROR 1
+#define OK '0'
+#define ERROR '1'
 
 #define PUERTO_MAX 65535
 #define TAG_USUARIO "usuario"
@@ -101,7 +101,7 @@ bool Login::verificarUsuario(string& arch_usuarios){
     reader.parse(arch, valores, false);
     aux = valores[*(nuevo_usuario->nombre)];
 
-    int res;
+    char res;
     if (! aux){
         Json::StyledStreamWriter escritor;
         valores[*(nuevo_usuario->nombre)] = *(nuevo_usuario->contrasenia);

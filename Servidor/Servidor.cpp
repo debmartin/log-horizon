@@ -234,7 +234,7 @@ int Servidor::generarUsuario(string& nombre){
     (*conectados)[*(nuevo_usuario->nombre)] = nuevo_usuario;
     mutex_conectados->desbloquear();
     nombre = *(nuevo_usuario->nombre);
-
+    std::cout<<"nombre:"<<nombre;
     cliente_actual->cerrar_enviar_recibir();
     delete cliente_actual;
     cliente_actual = NULL;
