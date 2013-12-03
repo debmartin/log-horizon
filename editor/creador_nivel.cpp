@@ -199,8 +199,6 @@ bool CreadorNivel::correr(Ventana *ventana, std::string &nombre_leido, unsigned 
   return false;
 }
 
-
-
 //
 int CreadorNivel::dibujar(Ventana *ventana){
   fondo->dibujar(ventana);

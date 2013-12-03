@@ -5,9 +5,9 @@
 #include "partida.h"
 #include "../../libs/json/include/json/json.h"
 
-#define CREAR 0
-#define UNIRSE 1
-#define RECIBIR_NIVEL 2
+#define CREAR '0'
+#define UNIRSE '1'
+#define RECIBIR_NIVEL '2'
 
 //
 Partida::Partida(){

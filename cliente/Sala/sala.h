@@ -35,7 +35,7 @@ class Sala{
     int dibujar(Ventana *ventana);
     
     //
-    bool analizar_evento(SDL_Event &evento);
+    int analizar_evento(SDL_Event &evento);
     
     //
     virtual void enviar_datos(char dato);

@@ -4,9 +4,9 @@
 
 #define DELAY 16
 
-#define CREAR 0
-#define UNIRSE 1
-#define FINALIZAR -1
+#define CREAR '0'
+#define UNIRSE '1'
+#define FINALIZAR '2'
 
 //
 Sala::Sala(){
@@ -113,7 +113,9 @@ bool Sala::correr(Ventana *ventana){
   while (corriendo){
     // Eventos
     while (SDL_PollEvent(&evento)){
-      corriendo = this->analizar_evento(evento);
+      int resultado = this->analizar_evento(evento);
+      if (resultado == -1) corriendo = false;
+      if (resultado == 1) return true;
     }
     // Dibujado
     ventana->limpiar();
@@ -142,11 +144,11 @@ int Sala::dibujar(Ventana *ventana){
 }
 
 //
-bool Sala::analizar_evento(SDL_Event &evento){
+int Sala::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){
     socket_recibir->cerrar_enviar_recibir();
     seleccion->finalizar_recibir_datos();
-    return false;
+    return -1;
   }
   if (!seleccionando){
     crear->analizar_evento(evento);
@@ -165,9 +167,9 @@ bool Sala::analizar_evento(SDL_Event &evento){
   }else{
     int resultado = seleccion->analizar_evento(evento);
     if (resultado == -1) seleccionando = false;
-    else if (resultado == 1) return true;
+    else if (resultado == 1) return 1;
   }
-  return true;
+  return 0;
 }
 
 //

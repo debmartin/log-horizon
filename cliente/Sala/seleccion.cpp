@@ -4,13 +4,13 @@
 
 #define DELAY 16
 
-#define ANTERIOR 2
-#define SIGUIENTE 3
-#define ACEPTAR 4
-#define RETROCEDER 5
-#define OK 6
-#define ERROR 7
-#define FINALIZAR -1
+#define ANTERIOR '2'
+#define SIGUIENTE '3'
+#define ACEPTAR '4'
+#define RETROCEDER '5'
+#define OK '6'
+#define ERROR '7'
+#define FINALIZAR '8'
 
 //
 Seleccion::Seleccion(){

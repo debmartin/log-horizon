@@ -3,7 +3,7 @@
 #include "autentificador.h"
 #include "../../libs/json/include/json/json.h"
 
-#define OK 0
+#define OK '0'
 
 //
 Autentificador::Autentificador(){

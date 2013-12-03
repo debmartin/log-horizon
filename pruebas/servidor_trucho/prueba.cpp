@@ -83,7 +83,7 @@ int main(void){
   asignador.reusar();
   asignador.asociar();
   asignador.escuchar();
-  Socket asignador_emisor;
+  SocketPrefijo asignador_emisor;
   asignador.aceptar(asignador_emisor);
   
   SocketPrefijo receptor_aux, emisor_aux;
@@ -96,13 +96,22 @@ int main(void){
   emisor_aux.asociar();
   emisor_aux.escuchar();
   
+  Json::Value valor;
+  Json::StyledWriter escritor; 
+  
   int puerto_emisor = 8011;
   puerto_emisor = htonl(puerto_emisor);
   int puerto_receptor = 8010;
   puerto_receptor = htonl(puerto_receptor);
   
-  asignador_emisor.enviar(&puerto_emisor, sizeof(int));
-  asignador_emisor.enviar(&puerto_receptor, sizeof(int));
+  valor["recibir"] = puerto_emisor;
+  valor["enviar"] = puerto_receptor;
+  
+  std::string puertos = escritor.write(valor);
+  
+  std::cout << "se envia = " << puertos << std::endl;
+  
+  asignador_emisor.enviar_con_prefijo(puertos.c_str(), puertos.size());
   
   SocketPrefijo receptor, emisor;
   emisor_aux.aceptar(emisor);

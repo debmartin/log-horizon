@@ -23,7 +23,6 @@ int main(){
 //    do{
 //        std::cin >> salida;
 //    } while(salida != 'q');
-
     server.cerrar();
 //    coordinador.terminar();
 //    server.join();

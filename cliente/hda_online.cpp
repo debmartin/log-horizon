@@ -59,6 +59,7 @@ bool HDA_Online::login(){
 bool HDA_Online::nivel(){
   Nivel nivel;
   std::string path_recursos = RECURSOS;
-  nivel.inicializar(path_recursos, ventana, emisor, receptor);
+  //nivel.inicializar(path_recursos, ventana, emisor, receptor);
+  nivel.inicializar("nivel1/", ventana, emisor, receptor);
   return nivel.correr(ventana);
 }
