@@ -13,7 +13,6 @@ int main(){
     string usu("usuarios.dat"), niv("niveles.dat");
     Servidor server(8000, usu);
     server.cargarNiveles(niv);
-    std::cout<<"llega";
     server.correr();
     CoordinadorServidor coordinador(&server);
     coordinador.correr();

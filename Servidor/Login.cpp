@@ -45,8 +45,8 @@ void Login::enviarPuertos(){
 
     Json::Value mensaje;
     Json::StyledWriter escritor;
-    mensaje["recibir"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->enviar)));
-    mensaje["enviar"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->recibir)));
+    mensaje["recibir"] = asignarPuerto(*(nuevo_usuario->sockets->enviar));
+    mensaje["enviar"] = asignarPuerto(*(nuevo_usuario->sockets->recibir));
     std::string envio = escritor.write(mensaje);
 
     cliente_actual->enviar(envio.c_str(), envio.length());

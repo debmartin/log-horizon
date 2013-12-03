@@ -181,7 +181,7 @@ bool Servidor::cargarNiveles(string& archivo){
 
 void Servidor::aceptarConexion(){
     Socket* cliente_actual = new Socket();
-    std::cout << "res_aceptar" <<socket_escucha->aceptar(*cliente_actual)<<std::endl;
+    socket_escucha->aceptar(*cliente_actual);
     mutex_aceptados->bloquear();
     aceptados->push_back(cliente_actual);
     mutex_aceptados->desbloquear();
