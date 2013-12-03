@@ -144,10 +144,8 @@ int Sala::dibujar(Ventana *ventana){
 //
 bool Sala::analizar_evento(SDL_Event &evento){
   if (evento.type == SDL_QUIT){
-    std::cout << "antes del join en sala" << std::cout;
     socket_recibir->cerrar_enviar_recibir();
     seleccion->finalizar_recibir_datos();
-    std::cout << "despues del join en sala" << std::cout;
     return false;
   }
   if (!seleccionando){

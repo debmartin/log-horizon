@@ -37,10 +37,11 @@ class Partida{
     SDL_Rect destino;
     ReceptorPartidas receptor_partidas;
     Ventana *ventana;
+    bool creada;
     
   protected:
     //
-    void actualizar(Ventana *ventana);
+    bool actualizar(Ventana *ventana);
     
     //
     std::string itostr(uint32_t valor);

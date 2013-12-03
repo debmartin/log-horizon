@@ -41,41 +41,32 @@ class EnviarNivel : public Thread{
   protected:
     void funcion_a_correr(){
       
-      std::string partida = "Locuras en el Dulce Reino";
-      uint32_t puntos = 2000;
-      uint32_t max_pjs = 5;
-      std::string creador = "Mingo";
-      uint32_t pjs = 1;
-
-      mensaje = OK;
+      Json::Value envio;
+      if (creada) envio["tipo"] = UNIRSE;
+      else envio["tipo"] = CREAR;
+      
+      envio["nombre"] = "Partida Loca";
+      envio["puntaje"] = 2123;
+      envio["jugadores"] = 0;
+      envio["max jugadores"] = 5;
+      envio["credor"] = "Mingo";
+      
+      Json::StyledWriter escritor;
+      std::string a_enviar = escritor.write(envio);
+      
+      std::cout << "a_enviar = " << a_enviar << std::endl;
+      
+      int contador = 0;
       while (true){
+        
         mutex.bloquear();
-        std::cout << "se envia de mensaje " << (int) mensaje << std::endl;
         if (mensaje == ERROR) return;
-        int caca = emisor.enviar(&mensaje, sizeof(char));
-        std::cout << "caca = " << caca << std::endl;
-         
         mutex.desbloquear();
-        
-        
-        emisor.enviar_con_prefijo(partida.c_str(), partida.size());
-        emisor.enviar(&puntos, sizeof(puntos));
-        emisor.enviar(&max_pjs, sizeof(max_pjs));
-        emisor.enviar(&pjs, sizeof(pjs));
-        mutex.bloquear();
-        if (creada){
-          mutex.desbloquear();
-          emisor.enviar_con_prefijo(creador.c_str(), creador.size());
-        }else{
-          mutex.desbloquear();
-        }
-
-        puntos++;
-        max_pjs++;
-        pjs++;
-
+        emisor.enviar_con_prefijo(a_enviar.c_str(), a_enviar.size());
         sleep(5);
-        
+        contador++;
+        envio["jugadores"] = contador;
+        a_enviar = escritor.write(envio);
       }
     }      
   

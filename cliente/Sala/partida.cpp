@@ -1,7 +1,13 @@
-#include "partida.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "partida.h"
+#include "../../libs/json/include/json/json.h"
+
+#define CREAR 0
+#define UNIRSE 1
+#define RECIBIR_NIVEL 2
 
 //
 Partida::Partida(){
@@ -10,6 +16,7 @@ Partida::Partida(){
   puntos = new Textura;
   jugadores = new Textura;
   creador = new Textura;
+  creada = false;
 }
 
 //
@@ -25,7 +32,7 @@ Partida::~Partida(){
 //
 void Partida::inicializar(SocketPrefijo *socket_receptor, const std::string &fuente, 
                           SDL_Rect &nuevo_destino, Ventana* nueva_ventana){
-  receptor_partidas.inicializar(socket_receptor);
+  receptor_partidas.inicializar(socket_receptor, RECIBIR_NIVEL);
   destino = nuevo_destino;
   escritor->asignar_fuente(fuente, 50);
   escritor->asignar_color(0,0,0,255);
@@ -44,53 +51,57 @@ int Partida::dibujar(Ventana *ventana){
   aux.y += aux.h;
   jugadores->dibujar(aux, ventana);
   aux.y += aux.h;
-  if (receptor_partidas.esta_creada())
+  if (creada)
     creador->dibujar(aux, ventana);
   return 0;
 }
 
 
 //
-void Partida::actualizar(Ventana *ventana){
-  if (!receptor_partidas.datos_recibidos() || !ventana) return;
+bool Partida::actualizar(Ventana *ventana){
+  if (!receptor_partidas.datos_recibidos() || !ventana) return false;
   
   std::string texto;
   Superficie sup;
   
-  nivel_info_t info;
+  Json::Value info;
   receptor_partidas.ver_info(info);
-  receptor_partidas.datos_leidos();
+  
+  // if info["tipo"].asInt() == RECIBIR_NIVEL, salir de aca y terminar todo para iniciar el juego
+  
+  if (info["tipo"].asInt() == CREAR && creada) return false;
+  if (info["tipo"].asInt() == UNIRSE && !creada) return false;
   
   // NOMBRE DE LA PARTIDA
-  texto = "Nivel: " + info.nombre_partida;
+  texto = "Nivel: " + info["nombre"].asString();
   escritor->copiar_texto(texto, &sup);
   nombre->cargar_textura(&sup, ventana);
   
   // PUNTOS MAXIMOS
-  texto = "Puntaje para Ganar: " + this->itostr(info.puntaje_max);  
+  std::string puntaje_str = this->itostr(info["puntaje"].asInt());
+  texto = "Puntaje para Ganar: " + puntaje_str;  
   escritor->copiar_texto(texto, &sup);
-  puntos->cargar_textura(&sup, ventana);  
-   
+  puntos->cargar_textura(&sup, ventana);
    
   // CANTIDAD DE JUGADORES Y JUGADORES MAXIMA
-  std::string numero_max_jugadores = this->itostr(info.jugadores_max);
-  
-  std::string jugadores_conectados = this->itostr(info.jugadores);
-  texto = jugadores_conectados + " de " + numero_max_jugadores + " jugadores";  
+  std::string jugadores_str = this->itostr(info["jugadores"].asInt());
+  std::string max_jugadores_str = this->itostr(info["max jugadores"].asInt());
+  texto = jugadores_str + " de " + max_jugadores_str + " jugadores";
   escritor->copiar_texto(texto, &sup);
   jugadores->cargar_textura(&sup, ventana);  
   
   // CREADOR DE LA PARTIDA
-  if (receptor_partidas.esta_creada()){
-    texto = "Partida de " + info.nombre_creador;
+  if (info["tipo"] == UNIRSE){
+    texto = "Partida de " + info["creador"].asString();
     escritor->copiar_texto(texto, &sup);
     creador->cargar_textura(&sup, ventana);
   }
+  return true;
 }
 
 //
 void Partida::partidas_creadas(bool es_creada){
-  receptor_partidas.partidas_creadas(es_creada);
+  creada = es_creada;
 }
 
 //
@@ -100,7 +111,8 @@ void Partida::recibir_datos(){
 
 //
 std::string Partida::itostr(uint32_t valor){
-  size_t largo_clave = (int)log10((double)valor) + 1;
+  size_t largo_clave = 1;
+  if (valor > 0) largo_clave = (int)log10((double)valor) + 1;
   char *clave = new char[largo_clave + 1];
   snprintf(clave, largo_clave + 1, "%ud", valor);
   std::string str(clave);

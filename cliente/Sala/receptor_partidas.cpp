@@ -1,23 +1,19 @@
 #include "receptor_partidas.h"
 #include <string>
+#include <fstream>
+#include <sstream>
 
-#define OK 6
-#define ERROR 7
 
 ReceptorPartidas::ReceptorPartidas(){
-  creada = false;
   datos_nuevos = false;
   seguir = true;
-  info.nombre_creador = "";
-  info.nombre_partida = "";
-  info.jugadores = 0;
-  info.puntaje_max = 0;
-  info.jugadores_max = 0;
+  tipo_finalizador = 0;
 }
 
 //
-void ReceptorPartidas::inicializar(SocketPrefijo *socket_receptor){
+void ReceptorPartidas::inicializar(SocketPrefijo *socket_receptor, char finalizar){
   receptor = socket_receptor;
+  tipo_finalizador = finalizar;
 }
 
 //
@@ -26,59 +22,34 @@ ReceptorPartidas::~ReceptorPartidas(){
 
 //
 void ReceptorPartidas::funcion_a_correr(){
-  uint32_t max_pjs, pjs, max_puntos, largo;
-  char *partida_aux, *creador_aux;
-  
-  while (seguir){
-    char finalizar;
-    int caca = receptor->recibir(&finalizar, sizeof(finalizar));
-    std::cout << "caca = " << caca << std::endl;
-    if (caca == 0) return;
-    
-    if (finalizar == ERROR) return;
-    std::cout << "se recibio de finalizar " << (int) finalizar << std::endl;
-    std::cout << "va a recibir datos de la partida" << std::endl;
-    
-    receptor->recibir_largo(largo);
-    partida_aux = new char[largo+1];
-    partida_aux[largo] = '\0';
-    receptor->recibir(partida_aux, largo);
-    receptor->recibir(&max_puntos, sizeof(max_puntos));
-    receptor->recibir(&max_pjs, sizeof(max_pjs));
-    receptor->recibir(&pjs, sizeof(pjs));
-    std::cout << "largo = " << largo << " partida = " << partida_aux << " puntos = " << max_puntos << " max pjs = " << max_pjs << " pjs = " << pjs << std::endl;
-    if (creada){
-      receptor->recibir_largo(largo);
-      creador_aux = new char[largo+1];
-      creador_aux[largo] = '\0';
-      receptor->recibir(creador_aux, largo);
-      std::cout << " largo2 = " << largo << " creador = " << creador_aux << std::endl;
-    }
-    
-    mutex.bloquear();
-    info.nombre_partida = std::string(partida_aux);
-    delete[] partida_aux;
-    info.puntaje_max = max_puntos;
-    info.jugadores_max = max_pjs;
-    info.jugadores = pjs;
-    if (creada){
-      info.nombre_creador = std::string(creador_aux);
-      delete[] creador_aux;
-    }
+  if (!receptor )return;  
+  while (seguir){    
+    uint32_t largo;
+    if (receptor->recibir_largo(largo) == 0) return;
     datos_nuevos = true;
+    char *mensaje_char = new char[largo + 1];
+    mensaje_char[largo] = '\0';
+    if (receptor->recibir(mensaje_char, largo) == 0) return;
+    std::string mensaje_str = std::string(mensaje_char);
+    delete[] mensaje_char;
+    std::istringstream mensaje_stream(mensaje_str);
+    Json::Reader reader;
+    mutex.bloquear();
+    reader.parse(mensaje_stream, recibido, false);
     mutex.desbloquear();
+    std::cout << "json::value recibido = " << std::endl;
+    std::cout << recibido << std::endl;
+    
+    if (recibido["tipo"] == tipo_finalizador) seguir = false;;
   }
 }
 
 //
-void ReceptorPartidas::ver_info(nivel_info_t &nivel){
-  nivel.nombre_partida = info.nombre_partida;
-  nivel.puntaje_max = info.puntaje_max;
-  nivel.jugadores_max = info.jugadores_max;
-  nivel.jugadores = info.jugadores;
-  if (creada){
-    nivel.nombre_creador = info.nombre_creador;
-  }
+void ReceptorPartidas::ver_info(Json::Value &mensaje_recibido){
+  mutex.bloquear();
+  mensaje_recibido = recibido;
+  datos_nuevos = false;
+  mutex.desbloquear();
 }
 
 //
@@ -87,11 +58,4 @@ bool ReceptorPartidas::datos_recibidos(){
   bool aux = datos_nuevos;
   mutex.desbloquear();
   return aux;
-}
-
-//
-void ReceptorPartidas::datos_leidos(){
-  mutex.bloquear();
-  datos_nuevos = false;
-  mutex.desbloquear();
 }
