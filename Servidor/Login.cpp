@@ -45,12 +45,10 @@ void Login::enviarPuertos(){
 
     Json::Value mensaje;
     Json::StyledWriter escritor;
-    int puerto1 = asignarPuerto(*(nuevo_usuario->sockets->enviar));
-    int puerto2 = asignarPuerto(*(nuevo_usuario->sockets->recibir));
-    std::cout << "recibir: " << puerto1 << ", enviar: " << puerto2 << std::endl;
-    mensaje["recibir"] = htonl((uint32_t) puerto1);
-    mensaje["enviar"] = htonl((uint32_t) puerto2);
+    mensaje["recibir"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->enviar)));
+    mensaje["enviar"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->recibir)));
     std::string envio = escritor.write(mensaje);
+    std::cout << "recibir: " << nuevo_usuario->sockets->enviar->ver_puerto() << ", enviar: " << nuevo_usuario->sockets->recibir->ver_puerto() << std::endl;
 
     cliente_actual->enviar(envio.c_str(), envio.length());
     cliente_actual->cerrar_enviar_recibir();
@@ -69,10 +67,10 @@ bool Login::aceptarSubConexiones(){
             return false;
         }
     }
-    nuevo_usuario->sockets->enviar->cerrar_enviar_recibir();
-    nuevo_usuario->sockets->recibir->cerrar_enviar_recibir();
-    delete nuevo_usuario->sockets->enviar;
-    delete nuevo_usuario->sockets->recibir;
+//    nuevo_usuario->sockets->enviar->cerrar_enviar_recibir();
+//    nuevo_usuario->sockets->recibir->cerrar_enviar_recibir();
+//    delete nuevo_usuario->sockets->enviar;
+//    delete nuevo_usuario->sockets->recibir;
     return true;
 }
 

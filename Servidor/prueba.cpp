@@ -18,6 +18,7 @@ int main(){
     coordinador.correr();
     usleep(10000000);
     server.cerrar();
+    coordinador.terminar();
     server.join();
     return 0;
 }
