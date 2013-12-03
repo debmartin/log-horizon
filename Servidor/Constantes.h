@@ -45,6 +45,11 @@
 #define CREAR 0
 #define UNIRSE 1
 
+#define INFO_CREAR 0
+#define INFO_UNIRSE 1
+#define INFO_NIVEL 2
+
+
 #define ELEGIR '4'
 #define AVANZAR '3'
 #define RETROCEDER '2'

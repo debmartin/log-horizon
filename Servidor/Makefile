@@ -1,7 +1,7 @@
 #Compilador
 CC = g++
 #Opciones usadas para compilar
-CFLAGS = -Wall -pedantic -std=c++98 -g -pthread
+CFLAGS = -Wall -pedantic -std=c++98 -g -pthread -L./lib ../libs/json/libs/linux-gcc-4.8/libjson_linux-gcc-4.8_libmt.so
 #Nombre del programa principal
 CEXE = prueba
 
@@ -62,8 +62,8 @@ thread.o: ../libs/TDA/thread/thread.h ../libs/TDA/thread/thread.cpp
 socket.o: ../libs/TDA/socket/socket.h ../libs/TDA/socket/socket.cpp
 	$(CC) $(CFLAGS) -c ../libs/TDA/socket/socket.cpp
 
-$(CEXE): Celda.o ArchivoDirecto.o Jugador.o dimension.o Servidor.o Jugada.o Nivel.o EmisorTablero.o ReceptorJugada.o funciones_auxiliares.o SalaPartidas.o ConjuntoJugadores.o Tablero.o emisor_resultados.o Login.o thread.o socket.o $(CEXE).cpp
-	$(CC) $(CFLAGS) Celda.o Jugador.o ArchivoDirecto.o dimension.o Jugada.o Nivel.o funciones_auxiliares.o SalaPartidas.o EmisorTablero.o ReceptorJugada.o ConjuntoJugadores.o Tablero.o emisor_resultados.o thread.o Login.o socket.o $(CEXE).cpp -o $(CEXE)
+$(CEXE): Celda.o ArchivoDirecto.o Jugador.o dimension.o Servidor.o Jugada.o Nivel.o EmisorTablero.o ReceptorJugada.o funciones_auxiliares.o SalaPartidas.o ConjuntoJugadores.o Tablero.o emisor_resultados.o Login.o thread.o socket.o Servidor.o $(CEXE).cpp
+	$(CC) $(CFLAGS) Celda.o Jugador.o ArchivoDirecto.o dimension.o Jugada.o Nivel.o funciones_auxiliares.o SalaPartidas.o EmisorTablero.o ReceptorJugada.o ConjuntoJugadores.o Tablero.o emisor_resultados.o thread.o Login.o socket.o Servidor.o $(CEXE).cpp -o $(CEXE)
 
 clean:
 	-rm *.o

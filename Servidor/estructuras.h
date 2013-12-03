@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "../libs/TDA/socket/socket.h"
+#include "../libs/TDA/thread/thread.h"
 
 typedef struct _socks{
     Socket* enviar;
@@ -30,6 +31,7 @@ typedef struct _partida {
     std::string* creador;
     nivel_t* nivel;
     std::vector<usuario_t*>* jugadores;
+    Mutex jugando;
 } partida_t;
 
 #endif // ESTRUCTURAS_H_INCLUDED

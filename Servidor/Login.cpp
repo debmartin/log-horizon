@@ -1,12 +1,15 @@
 #include "Login.h"
 #include "funciones_auxiliares.h"
+#include "../libs/json/include/json/json.h"
+#include <sstream>
 
 #define OK '0'
 #define ERROR '1'
 
-#define ARCH_USUARIOS "./usuarios.json"
 #define PUERTO_MAX 65535
 #define PUERTO_CLIENTES 8001
+#define TAG_USUARIO "usuario"
+#define TAG_CLAVE "clave"
 
 using std::string;
 
@@ -39,14 +42,14 @@ int Login::asignarPuerto(Socket& sockfd){
 void Login::enviarPuertos(){
     nuevo_usuario->sockets->enviar = new Socket();
     nuevo_usuario->sockets->recibir = new Socket();
-    Socket* socks[] = {nuevo_usuario->sockets->enviar, nuevo_usuario->sockets->recibir};
 
-    for(int i = 0; i < 2; i++){
-        Socket& actual = *(socks[i]);
-        asignarPuerto(actual);
-        uint32_t nro_puerto = htonl((uint32_t) actual.ver_puerto());
-        cliente_actual->enviar(&nro_puerto, sizeof(uint32_t));
-    }
+    Json::Value mensaje;
+    Json::StyledWriter escritor;
+    mensaje["recibir"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->enviar)));
+    mensaje["enviar"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->recibir)));
+    std::string envio = escritor.write(mensaje);
+
+    cliente_actual->enviar(envio.c_str(), envio.length());
     cliente_actual->cerrar_enviar_recibir();
 }
 
@@ -58,7 +61,7 @@ bool Login::aceptarSubConexiones(){
 
     for(int i=0; i < 2 ; i++){
         if (sockfds[i]->aceptar(*(socks_cli[i])) == -1) {
-            delete nuevo_usuario->sockets->enviar_cli;  // REVISAR no hay que cerrar antes de borrar?
+            delete nuevo_usuario->sockets->enviar_cli;
             delete nuevo_usuario->sockets->recibir_cli;
             return false;
         }
@@ -70,14 +73,19 @@ bool Login::aceptarSubConexiones(){
     return true;
 }
 
-void Login::recibirUsuarioContrasenia(){
-    nuevo_usuario->nombre = new string();
-    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), *(nuevo_usuario->nombre)))
+int Login::recibirUsuarioContrasenia(){
+    string aux;
+    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), aux))
         return CONEXION_ABORTADA;
+    Json::Value datos;
+    Json::Reader reader;
+    std::istringstream ss(aux);
 
-    nuevo_usuario->contrasenia = new string();
-    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), *(nuevo_usuario->contrasenia)))
-        return CONEXION_ABORTADA;
+    reader.parse(ss, datos, false);
+    nuevo_usuario->nombre = new string(datos[TAG_USUARIO].asString());
+    nuevo_usuario->contrasenia = new string(datos[TAG_CLAVE].asString());
+
+    return 0;
 }
 
 bool Login::verificarUsuario(ArchivoDirecto& arch_usuarios){

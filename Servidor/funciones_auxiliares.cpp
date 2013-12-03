@@ -24,6 +24,7 @@ bool recibirMsjPrefijo(Socket& sock_cli, string& mensaje){
         mensaje += datos;
         total += recibidos;
     }
+    return true;
 }
 
 void enviarMsjPrefijo(Socket& sock_cli, const void* mensaje, int len_msj){

@@ -24,13 +24,9 @@ void EmisorTablero::agregarTablero(Lista<celda_t*>* celdas){
 void EmisorTablero::funcion_a_correr(){
     ListaIter<celda_t*> iter(celdas_tablero);
     while(! iter.alFinal()){
-        msj_celda_t msj;
-        msj.celda.col = iter.verActual()->col;
-        msj.celda.fila = iter.verActual()->fila;
-        msj.celda.tipo = iter.verActual()->tipo;
-        msj.celda.color = iter.verActual()->color;
-        msj.tipo = INSERTAR;
-        socket->enviar(&msj, sizeof(msj_celda_t));
+        celda_t* celda = iter.verActual();
+        char msj[LEN_MSJ] = {INSERTAR, celda->col, celda->fila, celda->tipo, celda->color};
+        socket->enviar(&msj, sizeof(char)* LEN_MSJ);
         iter.avanzar();
     }
 }

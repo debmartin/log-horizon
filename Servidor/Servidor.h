@@ -18,8 +18,12 @@
 class ServidorCrearSocket : public std::exception{};
 
 class ServidorUsuario;
+class CoordinadorServidor;
 
 class Servidor : public Thread{
+    friend class ServidorUsuario;
+    friend class CoordinadorServidor;
+
     public:
         Servidor(int puerto_escucha, std::string& archivo_usuarios);
         virtual ~Servidor();
@@ -35,14 +39,15 @@ class Servidor : public Thread{
         void cerrarPartida(int nro_partida, std::vector<usuario_t*>*& jugadores_partida);
         void funcion_a_correr();
     private:
-        Mutex* mutex_login;
+        Mutex* mutex_puerto;
+        Mutex* mutex_aceptados;
+        Mutex* mutex_conectados;
+        Mutex* mutex_partidas;
         Socket* socket_escucha;
         std::vector<nivel_t*>* niveles;
         std::vector<Socket*>* aceptados;
-        std::vector<usuario_t*>* en_espera_login;
         std::map<std::string, usuario_t*>* conectados;
         std::map<int, partida_t*>* partidas;
-        std::vector<ServidorUsuario*>* servidores;
         bool seguir;
         int cant_partidas;
         ArchivoDirecto* arch_usuarios;
@@ -50,7 +55,7 @@ class Servidor : public Thread{
 
 class ServidorUsuario : public Thread {
     public:
-        ServidorUsuario(Servidor* nuevo_servidor);
+        ServidorUsuario(Servidor* server);
         ~ServidorUsuario();
         void terminar();
     protected:
@@ -59,5 +64,30 @@ class ServidorUsuario : public Thread {
         Servidor* servidor;
         bool seguir;
 };
+
+//class ServidorEditor : public Thread {
+//    public:
+//        ServidorEditor();
+//        ~ServidorEditor();
+//    protected:
+//        void funcion_a_correr();
+//    private:
+//        Servidor*
+//};
+
+
+class CoordinadorServidor : public Thread{
+    public:
+        CoordinadorServidor(Servidor* server);
+        ~CoordinadorServidor();
+        void terminar();
+    protected:
+        void funcion_a_correr();
+    private:
+        Servidor* servidor;
+        std::vector<ServidorUsuario*>* servidores_usuarios;
+        bool seguir;
+};
+
 
 #endif // SERVIDOR_H

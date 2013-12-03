@@ -2,16 +2,23 @@
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
-#include "Nivel.h"
-#include "Tablero.h"
-#define SEPARADORES ",\n"
+#include <arpa/inet.h>
+#include <unistd.h>
+#include "Servidor.h"
 
 using std::string;
 
 
 int main(){
-    Servidor server(8000, "usuarios.dat");
-    server.cargarNiveles("niveles.dat");
-
+    string usu("usuarios.dat"), niv("niveles.dat");
+    Servidor server(8000, usu);
+    server.cargarNiveles(niv);
+    std::cout<<"llega";
+    server.correr();
+    CoordinadorServidor coordinador(&server);
+    coordinador.correr();
+    usleep(10000000);
+    server.cerrar();
+    server.join();
     return 0;
 }

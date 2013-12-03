@@ -13,7 +13,7 @@ class Login{
         int asignarPuerto(Socket& sockfd);
         void enviarPuertos();
         bool aceptarSubConexiones();
-        void recibirUsuarioContrasenia();
+        int recibirUsuarioContrasenia();
         bool verificarUsuario(ArchivoDirecto& arch_usuarios);
     protected:
     private:

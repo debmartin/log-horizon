@@ -5,20 +5,53 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fstream>
-
+#include <iostream>
 #define MILISEGUNDOS 10
 
-#define ARCH_NIVELES "./niveles.json"
-
-#define SEPARADOR ','
+#define SEPARADOR ",\n"
 
 using std::string;
 using std::vector;
 using std::map;
 using std::ifstream;
 
-ServidorUsuario::ServidorUsuario(Servidor* nuevo_servidor) :
-    Thread(), servidor(nuevo_servidor), seguir(true) {
+
+/*      CoordinadorUsuario      */
+
+
+CoordinadorServidor::CoordinadorServidor(Servidor* server) :
+    servidor(server), seguir(true){
+    servidores_usuarios = new vector<ServidorUsuario*>();
+}
+
+CoordinadorServidor::~CoordinadorServidor(){
+    delete servidores_usuarios;
+}
+
+void CoordinadorServidor::funcion_a_correr(){
+    while(seguir){
+        while (servidor->aceptados->size() == 0)
+            usleep(MILISEGUNDOS * 1000);
+        ServidorUsuario* server = new ServidorUsuario(servidor);
+        servidores_usuarios->push_back(server);
+        server->correr();
+    }
+}
+
+void CoordinadorServidor::terminar(){
+    seguir = false;
+    for(vector<ServidorUsuario*>::iterator it = servidores_usuarios->begin(); it != servidores_usuarios->end(); ++it){
+        (*it)->terminar();
+        (*it)->join();
+        delete (*it);
+    }
+}
+
+
+/*      ServidorUsuario     */
+
+ServidorUsuario::ServidorUsuario(Servidor* server) :
+    Thread(), servidor(server), seguir(true){
 }
 
 ServidorUsuario::~ServidorUsuario(){
@@ -29,11 +62,30 @@ void ServidorUsuario::terminar(){
 }
 
 void ServidorUsuario::funcion_a_correr(){
-    servidor->correrUsuario();
+    string nombre;
+    int res = servidor->generarUsuario(nombre);
+    bool salir = (res == CONEXION_ABORTADA);
+
+    while(seguir && !salir){
+        int nro_partida = servidor->elegirPartida(nombre);
+        if(nro_partida == CONEXION_ABORTADA) break;
+
+//        if(nombre == *((*(servidor->partidas))[nro_partida]->creador)){
+//            (*(servidor->partidas))[nro_partida]->jugando.bloquear();
+//            servidor->iniciarPartida(nro_partida);
+//            vector<usuario_t*>* jugadores = NULL;
+//            cerrarPartida(nro_partida, jugadores);
+//            (*(servidor->partidas))[nro_partida]->jugando.desbloquear();
+//        } else {
+//            (*(servidor->partidas))[nro_partida]->jugando.bloquear();
+//            (*(servidor->partidas))[nro_partida]->jugando.desbloquear();
+//        }
+    }
+    servidor->cerrarUsuario(nombre);
 }
 
 
-
+/*      Servidor        */
 
 
 Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) : seguir(true), cant_partidas(0) {
@@ -43,10 +95,13 @@ Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) : seguir(true),
     if (socket_escucha->asociar() == -1) throw ServidorCrearSocket();
     if (socket_escucha->escuchar() == -1) throw ServidorCrearSocket();
 
+    Mutex* mutex_puerto = new Mutex();
+    Mutex* mutex_aceptados = new Mutex();
+    Mutex* mutex_conectados = new Mutex();
+    Mutex* mutex_partidas = new Mutex();
+
     aceptados = new vector<Socket*>();
-    en_espera_login = new vector<usuario_t*>();
     niveles = new vector<nivel_t*>();
-    mutex_login = new Mutex();
     conectados = new map<string, usuario_t*>;
     partidas = new map<int, partida_t*>();
 
@@ -56,19 +111,34 @@ Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) : seguir(true),
 
 Servidor::~Servidor(){
     delete aceptados;
-    delete en_espera_login;
-    for(vector<nivel_t*>::iterator it = niveles->begin(); it != niveles->end(); ++it)
+    for(vector<nivel_t*>::iterator it = niveles->begin(); it != niveles->end(); ++it){
+        delete (*it)->nombre;
+        delete (*it)->archivo_tablero;
+        delete (*it)->archivo_probabilidades;
         delete (*it);
+    }
     delete niveles;
-    delete mutex_login;
     delete conectados;
     delete partidas;
     delete socket_escucha;
     arch_usuarios->cerrar();
     delete arch_usuarios;
+
+    delete mutex_aceptados;
+    delete mutex_conectados;
+    delete mutex_partidas;
 }
 
 bool Servidor::cargarNiveles(string& archivo){
+//    string comando("ls >./niveles.dat");
+//    system(comando.c_str());
+//    Json::Value valores;
+//    Json::Reader reader;
+//
+//    if (!reader.parse(archivo, valores, false))
+//        return false;
+
+
     ifstream arch_niveles;
     arch_niveles.open(archivo.c_str(), std::ifstream::in);
     if(!arch_niveles.is_open()) return false;
@@ -76,12 +146,15 @@ bool Servidor::cargarNiveles(string& archivo){
     while(arch_niveles.good()){
         string linea_nivel;
         getline(arch_niveles, linea_nivel);
+        if(linea_nivel.length() == 0) break;
         nivel_t* nivel = new nivel_t();
         int i = 0;
-        while(linea_nivel.length() != 0){
-            int pos = linea_nivel.find_first_of(SEPARADOR);
-            string aux = linea_nivel.substr(0, pos);
-            linea_nivel.erase(0, pos);
+
+        while(i < 5){
+            size_t pos = linea_nivel.find_first_of(SEPARADOR);
+            string aux(linea_nivel.substr(0, pos));
+            linea_nivel.erase(0, pos+1);
+
             switch (i){
                 case 0:
                     nivel->nombre = new string(aux);
@@ -98,6 +171,7 @@ bool Servidor::cargarNiveles(string& archivo){
                 case 4:
                     nivel->archivo_probabilidades = new string(aux);
             }
+            i++;
         }
         niveles->push_back(nivel);
     }
@@ -107,18 +181,22 @@ bool Servidor::cargarNiveles(string& archivo){
 
 void Servidor::aceptarConexion(){
     Socket* cliente_actual = new Socket();
-    socket_escucha->aceptar(*cliente_actual);
+    std::cout << "res_aceptar" <<socket_escucha->aceptar(*cliente_actual)<<std::endl;
+    mutex_aceptados->bloquear();
     aceptados->push_back(cliente_actual);
+    mutex_aceptados->desbloquear();
 }
 
 int Servidor::generarUsuario(string& nombre){
+    mutex_aceptados->bloquear();
     int largo = aceptados->size();
     if(largo == 0) return -1;
 
     Socket* cliente_actual = (*aceptados)[largo-1];
     aceptados->pop_back();
+    mutex_aceptados->desbloquear();
     usuario_t* nuevo_usuario = new usuario_t();
-    Login* nuevo_login = new Login(cliente_actual, nuevo_usuario, mutex_login);
+    Login* nuevo_login = new Login(cliente_actual, nuevo_usuario, mutex_puerto);
 
     nuevo_login->enviarPuertos();
 
@@ -132,15 +210,21 @@ int Servidor::generarUsuario(string& nombre){
     } while (! nuevo_login->verificarUsuario(*arch_usuarios));
 
     delete nuevo_login;
+    mutex_conectados->bloquear();
     conectados->insert(std::pair<string, usuario_t*>(*(nuevo_usuario->nombre), nuevo_usuario));
+    mutex_conectados->desbloquear();
     nombre = *(nuevo_usuario->nombre);
     return 0;
 }
 
 int Servidor::elegirPartida(string& nombre_usuario){
+    mutex_conectados->bloquear();
     usuario_t* usuario = (*conectados)[nombre_usuario];
+    mutex_conectados->desbloquear();
+
     SalaPartidas* nueva_sala = new SalaPartidas(usuario, niveles, partidas);
-    int nro_partida = -1;
+    nueva_sala->agregarMutex(mutex_partidas);
+    int nro_partida = -1, res = -1;
 
     while(true){
         int tipo_partida = nueva_sala->definirTipoPartida();
@@ -150,25 +234,27 @@ int Servidor::elegirPartida(string& nombre_usuario){
         while(volver) {
             if(tipo_partida == CREAR){
                 nro_partida = nueva_sala->crearPartida(cant_partidas);
-                if (nro_partida == CONEXION_ABORTADA) return CONEXION_ABORTADA;
+                if (nro_partida == CONEXION_ABORTADA) break;
                 if(nro_partida == -1) break;
 
-                int res = nueva_sala->iniciarPartida(nro_partida);
-                if (res == CONEXION_ABORTADA) return CONEXION_ABORTADA;
-                volver = !res;
+                res = nueva_sala->iniciarPartida(nro_partida);
+                if (res == CONEXION_ABORTADA) break;
+                volver = (res == VOLVER);
             } else {
                 nro_partida = nueva_sala->unirsePartida();
-                if (nro_partida == CONEXION_ABORTADA) return CONEXION_ABORTADA;
+                if (nro_partida == CONEXION_ABORTADA) break;
                 if(nro_partida == -1) break;
 
-                int res = nueva_sala->esperarInicio(nro_partida);
-                if (res == CONEXION_ABORTADA) return CONEXION_ABORTADA;
-                volver = !res;
+                res = nueva_sala->esperarInicio(nro_partida);
+                if (res == CONEXION_ABORTADA) break;
+                volver = (res == VOLVER);
             }
         }
         if(! volver) break;
     }
     delete nueva_sala;
+    if (res == CONEXION_ABORTADA || nro_partida == CONEXION_ABORTADA)
+        return CONEXION_ABORTADA;
     return nro_partida;
 }
 
@@ -208,8 +294,10 @@ void Servidor::cerrarPartida(int nro_partida, vector<usuario_t*>*& jugadores_par
 }
 
 void Servidor::cerrarUsuario(string& nombre){
+    mutex_conectados->bloquear();
     usuario_t* usuario = (*conectados)[nombre];
     conectados->erase(nombre);
+    mutex_conectados->desbloquear();
     delete usuario->nombre;
 
     if(usuario->contrasenia) delete usuario->contrasenia;
@@ -219,49 +307,46 @@ void Servidor::cerrarUsuario(string& nombre){
     usuario->sockets->recibir_cli->cerrar_enviar_recibir();
     delete usuario->sockets->recibir_cli;
     delete usuario->sockets;
-}
-
-void Servidor::correrUsuario(){
-    string nombre;
-    int res = generarUsuario(nombre);
-    bool salir = (res == CONEXION_ABORTADA);
-
-    while (res == -1){
-        usleep(MILISEGUNDOS * 1000);
-        int res = generarUsuario(nombre);
-    }
-    while(seguir){
-        int nro_partida = elegirPartida(nombre);
-        if(nro_partida == CONEXION_ABORTADA) break;
-
-        if(nombre == *((*partidas)[nro_partida]->creador)){
-            iniciarPartida(nro_partida);
-            vector<usuario_t*>* jugadores = NULL;
-            cerrarPartida(nro_partida, jugadores);
-            for(vector<usuario_t*>::iterator it = jugadores->begin(); it != jugadores->end(); ++it)
-                en_espera_login->push_back(*it);
-            delete jugadores;
-        }
-    }
-    cerrarUsuario(nombre);
-    usuario_t* usuario = (*conectados)[nombre];
-    conectados->erase(nombre);
     delete usuario;
 }
 
+//void Servidor::correrUsuario(){
+//    string nombre;
+//    int res = generarUsuario(nombre);
+//    bool salir = (res == CONEXION_ABORTADA);
+//
+//    while (res == -1){
+//        usleep(MILISEGUNDOS * 1000);
+//        res = generarUsuario(nombre);
+//    }
+//    while(seguir && !salir){
+//        int nro_partida = elegirPartida(nombre);
+//        if(nro_partida == CONEXION_ABORTADA) break;
+//
+////        if(nombre == *((*partidas)[nro_partida]->creador)){
+////            (*partidas)[nro_partida]->jugando.bloquear();
+////            iniciarPartida(nro_partida);
+////            vector<usuario_t*>* jugadores = NULL;
+////            cerrarPartida(nro_partida, jugadores);
+////            for(vector<usuario_t*>::iterator it = jugadores->begin(); it != jugadores->end(); ++it)
+////                en_espera_login->push_back(*it);
+////            delete jugadores;
+////            (*partidas)[nro_partida]->jugando.desbloquear();
+////        } else {
+////            (*partidas)[nro_partida]->jugando.bloquear();
+////            (*partidas)[nro_partida]->jugando.desbloquear();
+////        }
+//    }
+//    cerrarUsuario(nombre);
+//}
+
 void Servidor::funcion_a_correr(){
+    seguir = true;
     while(seguir){
         aceptarConexion();
-        ServidorUsuario* server = new ServidorUsuario(this);
-        servidores->push_back(server);
     }
 }
 
 void Servidor::cerrar(){
     seguir = false;
-    for(vector<ServidorUsuario*>::iterator it = servidores->begin(); it != servidores->end(); ++it){
-        (*it)->terminar();
-        (*it)->join();
-        delete (*it);
-    }
 }

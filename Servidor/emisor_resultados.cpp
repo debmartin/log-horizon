@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-
+#include "Constantes.h"
 #define PUNTAJE 3
 #define MILISEGUNDOS 10
 
@@ -45,8 +45,8 @@ void EmisorResultados::funcion_a_correr(){
 
       mutex->desbloquear();
       int a = actual.tipo;
-
-      socket->enviar(&actual , sizeof(resultado_t));
+      char msj[LEN_MSJ] = {actual.tipo, actual.primero.valor1, actual.primero.valor2, actual.segundo.valor1, actual.segundo.valor2};
+      socket->enviar(&msj , sizeof(char)* LEN_MSJ);
       std::cout << "se enviara resultado del tipo " << a << std::endl;
     }
     mutex->desbloquear();

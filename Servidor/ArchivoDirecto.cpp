@@ -87,7 +87,7 @@ char ArchivoDirecto::obtenerLinea(string& clave, string& dato){
 }
 
 bool ArchivoDirecto::agregar(string& clave, string& dato){
-    int len = clave.length() + dato.length() + 1, len_linea;
+    int len = clave.length() + dato.length() + 1;
 
     int pos = funHash(clave, largo);
     istream.seekg(pos, ios::beg);

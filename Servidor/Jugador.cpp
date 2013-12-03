@@ -34,7 +34,7 @@ Jugador::~Jugador(){
 }
 
 Jugada* Jugador::obtenerJugada(){
-    if(recibirPar();
+    recibirPar();
     return jugada_actual;
 }
 

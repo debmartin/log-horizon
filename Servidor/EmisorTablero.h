@@ -12,11 +12,6 @@ typedef struct celda_tablero{
     char color;
 } celda_t;
 
-typedef struct msj_celda{
-    char tipo;
-    celda_t celda;
-} msj_celda_t;
-
 class EmisorTablero : public Thread {
     public:
         EmisorTablero();

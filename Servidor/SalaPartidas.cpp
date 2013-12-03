@@ -1,4 +1,5 @@
 #include "SalaPartidas.h"
+#include "../libs/json/include/json/json.h"
 
 #define TAM_UINT32 sizeof(uint32_t)
 #define OK '0'
@@ -7,12 +8,15 @@ using std::vector;
 using std::map;
 
 SalaPartidas::SalaPartidas(usuario_t* usuario, vector<nivel_t*>* v_niveles, map<int,partida_t*>* v_partidas) :
-    nuevo_usuario(usuario), niveles(v_niveles), partidas(v_partidas){
+    nuevo_usuario(usuario), niveles(v_niveles), partidas(v_partidas), mutex_partidas(NULL){
 }
 
 SalaPartidas::~SalaPartidas(){
 }
 
+void SalaPartidas::agregarMutex(Mutex* mutex_v_partidas){
+    mutex_partidas = mutex_v_partidas;
+}
 
 int SalaPartidas::definirTipoPartida(){
     char tipo_partida = ' ';
@@ -24,16 +28,20 @@ int SalaPartidas::definirTipoPartida(){
     return (tipo_partida - '0');
 }
 
-void enviarNivel(Socket& sockfd, nivel_t& nivel){
-    char msj = OK;
-    sockfd.enviar(&msj, sizeof(char));        //SIGUE VALIENDO?
-    enviarMsjPrefijo(sockfd, nivel.nombre->c_str(), sizeof(nivel.nombre->c_str()));
+void enviarNivel(Socket& sockfd, nivel_t& nivel, string* creador = NULL, int jugadores = 0){
+    Json::Value mensaje;
+    Json::StyledWriter escritor;
+    int info = (creador == NULL) ? INFO_CREAR : INFO_UNIRSE;
+    mensaje["tipo"] = info;
+    mensaje["nombre"] = nivel.nombre;
+    mensaje["creador"] = "";
+    mensaje["puntaje"] = nivel.puntaje;
+    mensaje["max jugadores"] = nivel.cant_jugadores_max;
+    mensaje["jugadores"] = jugadores;
 
-    uint32_t puntos = htonl((uint32_t) nivel.puntaje);
-    sockfd.enviar(&puntos, TAM_UINT32);
+    std::string envio = escritor.write(mensaje);
 
-    uint32_t cant_jug = htonl((uint32_t) nivel.cant_jugadores_max);
-    sockfd.enviar(&cant_jug, TAM_UINT32);
+    enviarMsjPrefijo(sockfd, envio.c_str(), envio.length());
 }
 
 int SalaPartidas::crearPartida(int& cant_partidas){
@@ -63,18 +71,15 @@ int SalaPartidas::crearPartida(int& cant_partidas){
     nueva_partida->jugadores = new vector<usuario_t*>();
     nueva_partida->jugadores->push_back(nuevo_usuario);
 
+    mutex_partidas->bloquear();
     partidas->insert(std::pair<int, partida_t*> (cant_partidas++, nueva_partida));
+    mutex_partidas->desbloquear();
     return (cant_partidas -1);
 }
 
-void enviarNuevoJugador(partida_t* partida){
-    int uno = 1;
-    uint32_t cant = htonl((uint32_t) uno);
-    for(vector<usuario_t*>::iterator it = partida->jugadores->begin(); it != partida->jugadores->end(); ++it){
-        enviarNivel(*((*it)->sockets->enviar_cli), *(partida->nivel));
-        (*it)->sockets->enviar_cli->enviar(&cant, sizeof(uint32_t));
-    }
-}       //ENVIO SOLO EL NUMERO O TODO?
+void enviarNuevoJugador(Socket& sockfd, partida_t* partida){
+    enviarNivel(sockfd, *(partida->nivel), partida->creador, partida->jugadores->size() +1);
+}
 
 int SalaPartidas::unirsePartida(){
     char accion = AVANZAR;
@@ -88,12 +93,8 @@ int SalaPartidas::unirsePartida(){
             if(it == partidas->begin()) it = partidas->end();
             --it;
         }
-
-        enviarNivel(*(nuevo_usuario->sockets->enviar_cli), *(it->second->nivel));
-        const char* creador = it->second->creador->c_str();
-        enviarMsjPrefijo(*(nuevo_usuario->sockets->enviar_cli), creador, sizeof(creador));
-        uint32_t cant_jug = htonl((uint32_t) it->second->jugadores->size());
-        nuevo_usuario->sockets->enviar_cli->enviar(&cant_jug, TAM_UINT32);
+        string* creador = it->second->creador;
+        enviarNivel(*(nuevo_usuario->sockets->enviar_cli), *(it->second->nivel), creador, it->second->jugadores->size());
 
         int res = -1;
         while(res == -1){
@@ -103,7 +104,7 @@ int SalaPartidas::unirsePartida(){
     }
     if(accion == VOLVER) return -1;
     it->second->jugadores->push_back(nuevo_usuario);
-    enviarNuevoJugador(it->second);
+    enviarNuevoJugador(*(nuevo_usuario->sockets->enviar_cli), it->second);
 
     return it->first;
 }

@@ -45,6 +45,7 @@ bool Tablero::establecerProbabilidades(Matriz<int>& estructura, ifstream& arch_p
             }
         }
     }
+    return true;
 }
 
 bool Tablero::intercambiar(Jugada* nueva){
