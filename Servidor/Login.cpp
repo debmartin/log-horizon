@@ -53,7 +53,7 @@ void Login::enviarPuertos(int& proximo_puerto, Mutex* mutex_prox_puerto){
 //    std::cout << "recibir: " << nuevo_usuario->sockets->enviar->ver_puerto() << ", enviar: " << nuevo_usuario->sockets->recibir->ver_puerto() << std::endl;
 
     enviarMsjPrefijo(*cliente_actual, envio.c_str(), envio.length());
-    cliente_actual->cerrar_enviar_recibir();
+//    cliente_actual->cerrar_enviar_recibir();
 }
 
 bool Login::aceptarSubConexiones(){
@@ -64,8 +64,9 @@ bool Login::aceptarSubConexiones(){
 
     for(int i=0; i < 2 ; i++){
         if (sockfds[i]->aceptar(*(socks_cli[i])) == -1) {
-            delete nuevo_usuario->sockets->enviar_cli;
-            delete nuevo_usuario->sockets->recibir_cli;
+//            std::cout << "sale";
+//            delete nuevo_usuario->sockets->enviar_cli;
+//            delete nuevo_usuario->sockets->recibir_cli;
             return false;
         }
     }
@@ -83,7 +84,7 @@ int Login::recibirUsuarioContrasenia(){
     Json::Value datos;
     Json::Reader reader;
     std::istringstream ss(aux);
-    std::cout <<ss;
+    std::cout << aux;
     reader.parse(ss, datos, false);
     nuevo_usuario->nombre = new string(datos[TAG_USUARIO].asString());
     nuevo_usuario->contrasenia = new string(datos[TAG_CLAVE].asString());

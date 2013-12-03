@@ -30,8 +30,14 @@ CoordinadorServidor::~CoordinadorServidor(){
 
 void CoordinadorServidor::funcion_a_correr(){
     while(seguir){
-        while (servidor->aceptados->size() == 0)
+        servidor->mutex_aceptados->bloquear();
+        while (servidor->aceptados->size() == 0){
+            servidor->mutex_aceptados->desbloquear();
             usleep(MILISEGUNDOS * 1000);
+            servidor->mutex_aceptados->bloquear();
+        }
+        servidor->mutex_aceptados->desbloquear();
+//        std::cout <<"pasa";
         ServidorUsuario* serverus = new ServidorUsuario(servidor);
         servidores_usuarios->push_back(serverus);
         serverus->correr();
@@ -65,7 +71,7 @@ void ServidorUsuario::funcion_a_correr(){
     string nombre;
     int res = servidor->generarUsuario(nombre);
     bool salir = (res == CONEXION_ABORTADA);
-    std::cout <<"nombre"<< nombre<<"termino";
+//    std::cout <<"nombre"<< nombre<<"termino";
     while(seguir && !salir){
         int nro_partida = servidor->elegirPartida(nombre);
         if(nro_partida == CONEXION_ABORTADA) break;
@@ -196,7 +202,10 @@ bool Servidor::cargarNiveles(string& archivo){
 
 void Servidor::aceptarConexion(){
     Socket* cliente_actual = new Socket();
-    socket_escucha->aceptar(*cliente_actual);
+    mutex_escucha->bloquear();
+    if(socket_escucha->aceptar(*cliente_actual) == -1)
+        delete cliente_actual;
+    mutex_escucha->desbloquear();
     mutex_aceptados->bloquear();
     aceptados->push_back(cliente_actual);
     mutex_aceptados->desbloquear();
@@ -216,10 +225,8 @@ int Servidor::generarUsuario(string& nombre){
 
     nuevo_login->enviarPuertos(proximo_puerto, mutex_prox_puerto);
 
-    delete cliente_actual;
-    cliente_actual = NULL;
-
     nuevo_login->aceptarSubConexiones();
+
     do{
         if (nuevo_login->recibirUsuarioContrasenia() == CONEXION_ABORTADA)
             return CONEXION_ABORTADA;
@@ -231,6 +238,11 @@ int Servidor::generarUsuario(string& nombre){
 //    std::cout << *(nuevo_usuario->nombre);
     mutex_conectados->desbloquear();
     nombre = *(nuevo_usuario->nombre);
+
+    cliente_actual->cerrar_enviar_recibir();
+    delete cliente_actual;
+    cliente_actual = NULL;
+
     return 0;
 }
 
@@ -360,9 +372,9 @@ void Servidor::cerrarUsuario(string& nombre){
 
 void Servidor::funcion_a_correr(){
 //    seguir = true;
-    while(seguir){
+//    while(seguir){
         aceptarConexion();
-    }
+//    }
 }
 
 void Servidor::cerrar(){
