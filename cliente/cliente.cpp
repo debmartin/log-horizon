@@ -35,10 +35,10 @@ bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *
   
   uint32_t largo;
   Json::Value recibido;
-  if (receptor->recibir_largo(largo) == 0) return false;
+  if (iniciador->recibir_largo(largo) == 0) return false;
   char *mensaje_char = new char[largo + 1];
   mensaje_char[largo] = '\0';
-  if (receptor->recibir(mensaje_char, largo) == 0) return false;
+  if (iniciador->recibir(mensaje_char, largo) == 0) return false;
   std::string mensaje_str = std::string(mensaje_char);
   delete[] mensaje_char;
   std::istringstream mensaje_stream(mensaje_str);

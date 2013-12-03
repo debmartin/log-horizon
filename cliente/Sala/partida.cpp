@@ -78,14 +78,20 @@ bool Partida::actualizar(Ventana *ventana){
   nombre->cargar_textura(&sup, ventana);
   
   // PUNTOS MAXIMOS
-  std::string puntaje_str = this->itostr(info["puntaje"].asInt());
+  unsigned int puntaje_int = info["puntaje"].asInt();
+  puntaje_int = ntohl(puntaje_int);
+  std::string puntaje_str = this->itostr(puntaje_int);
   texto = "Puntaje para Ganar: " + puntaje_str;  
   escritor->copiar_texto(texto, &sup);
   puntos->cargar_textura(&sup, ventana);
    
   // CANTIDAD DE JUGADORES Y JUGADORES MAXIMA
-  std::string jugadores_str = this->itostr(info["jugadores"].asInt());
-  std::string max_jugadores_str = this->itostr(info["max jugadores"].asInt());
+  unsigned int jugadores_int = info["jugadores"].asInt();
+  jugadores_int = ntohl(jugadores_int);
+  std::string jugadores_str = this->itostr(jugadores_int);
+  unsigned int max_jugadores_int = info["max jugadores"].asInt();
+  max_jugadores_int = ntohl(max_jugadores_int);
+  std::string max_jugadores_str = this->itostr(max_jugadores_int);
   texto = jugadores_str + " de " + max_jugadores_str + " jugadores";
   escritor->copiar_texto(texto, &sup);
   jugadores->cargar_textura(&sup, ventana);  
