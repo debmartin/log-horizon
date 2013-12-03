@@ -95,10 +95,10 @@ Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) : seguir(true),
     if (socket_escucha->asociar() == -1) throw ServidorCrearSocket();
     if (socket_escucha->escuchar() == -1) throw ServidorCrearSocket();
 
-    Mutex* mutex_puerto = new Mutex();
-    Mutex* mutex_aceptados = new Mutex();
-    Mutex* mutex_conectados = new Mutex();
-    Mutex* mutex_partidas = new Mutex();
+    mutex_puerto = new Mutex();
+    mutex_aceptados = new Mutex();
+    mutex_conectados = new Mutex();
+    mutex_partidas = new Mutex();
 
     aceptados = new vector<Socket*>();
     niveles = new vector<nivel_t*>();
