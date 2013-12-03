@@ -32,9 +32,9 @@ void CoordinadorServidor::funcion_a_correr(){
     while(seguir){
         while (servidor->aceptados->size() == 0)
             usleep(MILISEGUNDOS * 1000);
-        ServidorUsuario* server = new ServidorUsuario(servidor);
-        servidores_usuarios->push_back(server);
-//        server->correr();
+        ServidorUsuario* serverus = new ServidorUsuario(servidor);
+        servidores_usuarios->push_back(serverus);
+        serverus->correr();
     }
 }
 
@@ -198,7 +198,7 @@ int Servidor::generarUsuario(string& nombre){
     int largo = aceptados->size();
     if(largo == 0) return -1;
 
-    Socket* cliente_actual = (*aceptados)[largo-1];
+    Socket* cliente_actual = aceptados->back();
     aceptados->pop_back();
     mutex_aceptados->desbloquear();
     usuario_t* nuevo_usuario = new usuario_t();
@@ -351,7 +351,6 @@ void Servidor::funcion_a_correr(){
     seguir = true;
     while(seguir){
         aceptarConexion();
-        std::cout << "llega";
     }
 }
 

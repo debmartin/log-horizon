@@ -35,7 +35,7 @@ bool Tablero::establecerProbabilidades(Matriz<int>& estructura, ifstream& arch_p
             int prob = (rand() % 100) +1, suma = 0;
             for(int i=0; i < CANT_COLORES; i++){
                 for(int j=0; j < CANT_TIPOS; j++){
-                    suma += aux[colores_char[i]][tipos_char[j]].asInt();
+                    suma += aux[colores_char[i]][tipos_char[j]][x][y].asInt();
                     if (suma > prob){
                         (*this)[y][x].rellenar(colores_char[i], tipos_char[j]);
                         break;
@@ -124,7 +124,7 @@ int Tablero::borrarSegmentosCol(Dimension& dest, Dimension& origen, bool dest_in
     return cant;
 }
 
-char calcularRellenoCol(ifstream& arch_probabilidades){
+char calcularRellenoCol(ifstream& arch_probabilidades, int col){
     Json::Value valores;
     Json::Value aux;
     Json::Reader reader;
@@ -137,7 +137,7 @@ char calcularRellenoCol(ifstream& arch_probabilidades){
 
     int prob = (rand() % 100) +1, suma = 0;
     for(int i=0; i < CANT_COLORES; i++){
-        suma += aux[colores_char[i]].asInt();
+        suma += aux[colores_char[i]][col][i].asInt();
         if (suma > prob)
             return colores_char[i];
     }
@@ -169,7 +169,7 @@ int Tablero::borrarColumna(Dimension& dest, Dimension& origen){
             if (superior.esValida() && ! termino_segmento)
                 (*this)[actual] = (*this)[superior];
             else {
-                char color = calcularRellenoCol(*probabilidades);
+                char color = calcularRellenoCol(*probabilidades, actual.y());
                 (*this)[actual].rellenar(color, BUTTON);
             }
             cant++;

@@ -7,7 +7,6 @@
 #define ERROR '1'
 
 #define PUERTO_MAX 65535
-#define PUERTO_CLIENTES 8001
 #define TAG_USUARIO "usuario"
 #define TAG_CLAVE "clave"
 
@@ -28,10 +27,10 @@ int Login::asignarPuerto(Socket& sockfd, int& proximo_puerto, Mutex* mutex_prox_
         sockfd.asignar_direccion(proximo_puerto);
         if (sockfd.reusar() == -1) return 1;
         asociado = (sockfd.asociar() != -1);
-
+        std::cout << proximo_puerto << '\n';
         proximo_puerto += 1;
-        if (proximo_puerto == PUERTO_MAX)
-            proximo_puerto = PUERTO_CLIENTES;
+//        if (proximo_puerto == PUERTO_MAX)
+//            proximo_puerto = 8010;
     }
     if (sockfd.escuchar() == -1) return 2;
     mutex_prox_puerto->desbloquear();
