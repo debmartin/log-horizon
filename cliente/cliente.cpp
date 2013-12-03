@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
+#include <sstream>
 
 #include "hda_online.h"
 #include "../libs/TDA/socket/socket_prefijo.h"
@@ -26,17 +27,27 @@ void leer_datos_iniciales(int &ancho, int &alto, std::string &ip, int &puerto){
   ip = aux.asString();
   aux = datos.get("puerto", aux);
   puerto = aux.asInt();
-  puerto = ntohl(puerto);
 }
 
 bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *emisor){
   in_addr_t ip = iniciador->ver_ip();
   unsigned int puerto_receptor, puerto_emisor;
   
-  iniciador->recibir(&puerto_receptor, sizeof(unsigned int));
-  puerto_receptor = ntohl(puerto_receptor);
-  iniciador->recibir(&puerto_emisor, sizeof(unsigned int));
+  uint32_t largo;
+  Json::Value recibido;
+  if (receptor->recibir_largo(largo) == 0) return false;
+  char *mensaje_char = new char[largo + 1];
+  mensaje_char[largo] = '\0';
+  if (receptor->recibir(mensaje_char, largo) == 0) return false;
+  std::string mensaje_str = std::string(mensaje_char);
+  delete[] mensaje_char;
+  std::istringstream mensaje_stream(mensaje_str);
+  Json::Reader reader;
+  reader.parse(mensaje_stream, recibido, false);
+  puerto_emisor = recibido["enviar"].asInt();
   puerto_emisor = ntohl(puerto_emisor);
+  puerto_receptor = recibido["recibir"].asInt();
+  puerto_receptor = ntohl(puerto_receptor);
   
   std::cout << "puerto receptor = " << puerto_receptor << " puerto emisor = " << puerto_emisor << std::endl;
   
@@ -53,8 +64,11 @@ int main(void){
   
   SocketPrefijo *iniciador = new SocketPrefijo;
   iniciador->asignar_direccion(puerto, ip.c_str());
-  if (iniciador->conectar() == -1) return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
-  
+  std::cout << "intentando conectar al puerto : " << puerto << std::endl;
+  if (iniciador->conectar() == -1){
+    std::cout << "error al conectar" << std::endl;
+    return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
+  }
   SocketPrefijo *receptor = new SocketPrefijo;
   SocketPrefijo *emisor = new SocketPrefijo;
   
