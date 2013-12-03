@@ -20,7 +20,7 @@ class Seleccion{
     int dibujar(Ventana *ventana);
     
     //
-    bool analizar_evento(SDL_Event &evento);
+    int analizar_evento(SDL_Event &evento);
     
     //
     void partidas_creadas(bool es_creada);

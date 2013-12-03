@@ -172,7 +172,7 @@ int Seleccion::dibujar(Ventana *ventana){
 }
 
 //
-bool Seleccion::analizar_evento(SDL_Event &evento){
+int Seleccion::analizar_evento(SDL_Event &evento){
   if (!partida_aceptada){
     aceptar->analizar_evento(evento);
     anterior->analizar_evento(evento);
@@ -189,7 +189,7 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
       siguiente->establecer_alpha(100);
       this->enviar_datos(ACEPTAR);
       std::cout << "se envia aceptar " << (int) ACEPTAR << std::endl;
-      return false;
+      return 1;
     }
   }else{
     iniciar->analizar_evento(evento);
@@ -204,10 +204,10 @@ bool Seleccion::analizar_evento(SDL_Event &evento){
       anterior->establecer_alpha(255);
       siguiente->establecer_alpha(255);
     }else{
-      return false;
+      return -1;
     }
   }
-  return true;
+  return 0;
 }
 
 //

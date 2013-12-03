@@ -163,7 +163,9 @@ bool Sala::analizar_evento(SDL_Event &evento){
       seleccionando = true;
     }
   }else{
-    seleccionando = seleccion->analizar_evento(evento);
+    int resultado = seleccion->analizar_evento(evento);
+    if (resultado == -1) seleccionando = false;
+    else if (resultado == 1) return true;
   }
   return true;
 }
