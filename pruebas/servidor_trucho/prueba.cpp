@@ -7,6 +7,10 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fstream>
+#include <sstream>
+
+#include "../../libs/json/include/json/json.h"
 
 #define CREAR 0
 #define UNIRSE 1
@@ -120,22 +124,24 @@ int main(void){
     
     uint32_t largo;
     receptor.recibir_largo(largo);
-    char *usuario = new char[largo + 1];
-    usuario[largo] = '\0';
-    receptor.recibir(usuario, largo);
-    std::cout << "largo = " << largo << " usuario: " << usuario << std::endl;
+    char *mensaje = new char[largo + 1];
+    mensaje[largo] = '\0';
+    receptor.recibir(mensaje, largo);
+    std::string temp = std::string(mensaje);
+    std::istringstream ss(temp);
+    Json::Reader reader;
+    Json::Value aux;
+    reader.parse(ss, aux, false);
     
-    receptor.recibir_largo(largo);
-    char *clave = new char[largo + 1];
-    clave[largo] = '\0';
-    receptor.recibir(clave, largo);
-    std::cout << "largo = " << largo << " clave: " << clave << std::endl;
+    std::cout << aux << std::endl;
     
-    if (strcmp(usuario, usuario_valido.c_str()) == 0 && strcmp(clave, clave_valida.c_str()) == 0)
+    std::string usuario = aux["usuario"].asString();
+    std::string clave  = aux["clave"].asString();
+    
+    if (usuario == usuario_valido && clave == clave_valida)
       respuesta = 0;
     
-    delete[] usuario;
-    delete[] clave;
+    delete[] mensaje;
 
     emisor.enviar(&respuesta, sizeof(char));
   }

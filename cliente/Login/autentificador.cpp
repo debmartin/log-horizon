@@ -1,9 +1,12 @@
+#include <string>
+
 #include "autentificador.h"
+#include "../../libs/json/include/json/json.h"
 
 #define OK 0
 
 //
-Autentificador(){
+Autentificador::Autentificador(){
   emisor = NULL;
   receptor = NULL;
   enviando = false;
@@ -13,33 +16,33 @@ Autentificador(){
 }
 
 //
-~Autentificador(){}
+Autentificador::~Autentificador(){}
 
 //
-void asignar_sockets(SocketPrefijo *enviar, SocketPrefijo *recibir){
+void Autentificador::asignar_sockets(SocketPrefijo *enviar, SocketPrefijo *recibir){
   if (!enviar || !recibir) return;
   emisor = enviar;
   receptor = recibir;
 }
 
 //
-void autentificar(const std::string &_usuario, const std::string &_clave){
+void Autentificador::autentificar(const std::string &_usuario, const std::string &_clave){
   usuario = _usuario;
   clave = _clave;
 }
 
 //
-bool en_curso(){
+bool Autentificador::en_curso(){
   return enviando;
 }
 
 //
-bool usuario_valido(){
+bool Autentificador::usuario_valido(){
   return validacion;
 }
 
 //
-void funcion_a_correr(){
+void Autentificador::funcion_a_correr(){
   if (!emisor || !receptor || usuario == "" || clave == "") return;
   mutex.bloquear();
   enviando = true;
@@ -49,7 +52,7 @@ void funcion_a_correr(){
   mensaje["usuario"] = usuario;
   mensaje["clave"] = clave;
   std::string envio = escritor.write(mensaje);
-  emisor->enviar_con_prefijo(envio, envio.size());
+  emisor->enviar_con_prefijo(envio.c_str(), envio.size());
   char resultado;
   receptor->recibir(&resultado, sizeof(resultado));
   mutex.bloquear();

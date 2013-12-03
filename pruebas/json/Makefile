@@ -16,7 +16,6 @@ prueba_leer: prueba_leer.cpp
 prueba_config: escribir_config.cpp
 	$(CC) $(CFLAGS) escribir_config.cpp -o escribir_config
 
-
 json:
 	cd ../../libs/json/; make
 
