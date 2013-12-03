@@ -93,7 +93,7 @@ int Login::recibirUsuarioContrasenia(){
 
 bool Login::verificarUsuario(string& arch_usuarios){
     std::fstream arch;
-    arch.open(arch_usuarios.c_str(), std::fstream::binary | std::fstream::in | std::fstream::out);
+    arch.open(arch_usuarios.c_str(), std::fstream::binary | std::fstream::in | std::fstream::out | std::fstream::app);
     Json::Value valores;
     Json::Reader reader;
     Json::Value aux;
