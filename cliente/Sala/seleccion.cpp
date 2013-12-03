@@ -188,8 +188,6 @@ int Seleccion::analizar_evento(SDL_Event &evento){
       anterior->establecer_alpha(100);
       siguiente->establecer_alpha(100);
       this->enviar_datos(ACEPTAR);
-      std::cout << "se envia aceptar " << (int) ACEPTAR << std::endl;
-      return 1;
     }
   }else{
     iniciar->analizar_evento(evento);
