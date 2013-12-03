@@ -3,8 +3,8 @@
 #include "../libs/json/include/json/json.h"
 #include <sstream>
 
-#define OK '0'
-#define ERROR '1'
+#define OK 0
+#define ERROR 1
 
 #define PUERTO_MAX 65535
 #define TAG_USUARIO "usuario"
@@ -78,32 +78,46 @@ bool Login::aceptarSubConexiones(){
 }
 
 int Login::recibirUsuarioContrasenia(){
-    string aux;
-    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), aux))
+    string temp;
+    if (!recibirMsjPrefijo(*(nuevo_usuario->sockets->recibir_cli), temp))
         return CONEXION_ABORTADA;
-    Json::Value datos;
+    std::istringstream ss(temp);
     Json::Reader reader;
-    std::istringstream ss(aux);
-    std::cout << aux;
-    reader.parse(ss, datos, false);
-    nuevo_usuario->nombre = new string(datos[TAG_USUARIO].asString());
-    nuevo_usuario->contrasenia = new string(datos[TAG_CLAVE].asString());
-    std::cout << "jaja"<<*(nuevo_usuario->nombre)<<"jejeje";
+    Json::Value aux;
+    reader.parse(ss, aux, false);
+
+    nuevo_usuario->nombre = new string(aux["usuario"].asString());
+    nuevo_usuario->contrasenia = new string(aux["clave"].asString());
     return 0;
 }
 
-bool Login::verificarUsuario(ArchivoDirecto& arch_usuarios){
-    string aux_contrasenia;
-    if (! arch_usuarios.obtener(*(nuevo_usuario->nombre), aux_contrasenia)) {
-        arch_usuarios.agregar(*(nuevo_usuario->nombre), *(nuevo_usuario->contrasenia));
-        return true;
+bool Login::verificarUsuario(string& arch_usuarios){
+    std::fstream arch;
+    arch.open(arch_usuarios.c_str(), std::fstream::binary | std::fstream::in | std::fstream::out);
+    Json::Value valores;
+    Json::Reader reader;
+    Json::Value aux;
+//    std::cout << "llega";
+
+    reader.parse(arch, valores, false);
+    aux = valores[*(nuevo_usuario->nombre)];
+
+    int res;
+    if (! aux){
+        Json::StyledStreamWriter escritor;
+        valores[*(nuevo_usuario->nombre)] = *(nuevo_usuario->contrasenia);
+        escritor.write(arch, valores);
+        res = OK;
+    } else if(*(nuevo_usuario->contrasenia) == aux.asString()){
+        res = OK;
+    } else {
+        delete nuevo_usuario->nombre;
+        delete nuevo_usuario->contrasenia;
+        res = ERROR;
     }
-    char res = (aux_contrasenia == *(nuevo_usuario->contrasenia)) ? OK : ERROR;
-    nuevo_usuario->sockets->enviar_cli->enviar(&res, sizeof(char));
-
-    if (res == ERROR) delete nuevo_usuario->nombre;
-    delete nuevo_usuario->contrasenia;
-
+//    int res = OK;
+    nuevo_usuario->sockets->enviar_cli->enviar(&res, sizeof(res));
+    arch.close();
     return (res == OK);
 }
 

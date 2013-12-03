@@ -40,5 +40,5 @@ void enviarMsjPrefijo(Socket& sock_cli, const void* mensaje, int len_msj){
         if (cant == -1) break;
         enviados += cant;
     }
-    delete msj;
+    delete[] msj;
 }

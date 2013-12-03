@@ -96,6 +96,8 @@ void ServidorUsuario::funcion_a_correr(){
 
 Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) :
     seguir(true), cant_partidas(0), proximo_puerto(puerto_escucha+1) {
+    arch_usuarios = new string(archivo_usuarios);
+
     socket_escucha = new Socket();
     mutex_escucha = new Mutex();
     socket_escucha->asignar_direccion(puerto_escucha);
@@ -112,9 +114,6 @@ Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) :
     niveles = new vector<nivel_t*>();
     conectados = new map<string, usuario_t*>;
     partidas = new map<int, partida_t*>();
-
-    arch_usuarios = new ArchivoDirecto(archivo_usuarios);
-    arch_usuarios->abrir();
 }
 
 Servidor::~Servidor(){
@@ -139,7 +138,6 @@ Servidor::~Servidor(){
     delete niveles;
     delete conectados;
     delete partidas;
-    arch_usuarios->cerrar();
     delete arch_usuarios;
 
     delete aceptados;
@@ -226,11 +224,12 @@ int Servidor::generarUsuario(string& nombre){
     nuevo_login->enviarPuertos(proximo_puerto, mutex_prox_puerto);
 
     nuevo_login->aceptarSubConexiones();
-
+    bool mires;
     do{
         if (nuevo_login->recibirUsuarioContrasenia() == CONEXION_ABORTADA)
             return CONEXION_ABORTADA;
-    } while (! nuevo_login->verificarUsuario(*arch_usuarios));
+            mires = nuevo_login->verificarUsuario(*arch_usuarios);
+    } while (! mires);
 
     delete nuevo_login;
     mutex_conectados->bloquear();

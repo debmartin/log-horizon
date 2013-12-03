@@ -51,7 +51,7 @@ class Servidor : public Thread{
         std::map<int, partida_t*>* partidas;
         bool seguir;
         int cant_partidas;
-        ArchivoDirecto* arch_usuarios;
+        std::string* arch_usuarios;
         int proximo_puerto;
 };
 

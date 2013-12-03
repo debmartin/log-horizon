@@ -14,7 +14,7 @@ class Login{
         void enviarPuertos(int& prox_puerto, Mutex* mutex_prox);
         bool aceptarSubConexiones();
         int recibirUsuarioContrasenia();
-        bool verificarUsuario(ArchivoDirecto& arch_usuarios);
+        bool verificarUsuario(std::string& arch_usuarios);
     protected:
     private:
         usuario_t* nuevo_usuario;

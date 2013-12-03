@@ -40,7 +40,7 @@ int funHash(const std::string clave, int tamanio){
     for (int i=0; i < largo; i++){
         hash = clave[i] + (hash << 6) + (hash << 8) - hash;
     }
-    return hash % tamanio;
+    return hash % (tamanio+100);
 }
 
 bool ArchivoDirecto::obtener(string& clave, string& dato){
