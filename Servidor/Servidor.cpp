@@ -196,6 +196,7 @@ int Servidor::generarUsuario(string& nombre){
     aceptados->pop_back();
     mutex_aceptados->desbloquear();
     usuario_t* nuevo_usuario = new usuario_t();
+    nuevo_usuario->sockets = new sockets_jugador_t();
     Login* nuevo_login = new Login(cliente_actual, nuevo_usuario, mutex_puerto);
 
     nuevo_login->enviarPuertos();
