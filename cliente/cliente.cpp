@@ -35,7 +35,10 @@ bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *
   
   uint32_t largo;
   Json::Value recibido;
-  if (iniciador->recibir_largo(largo) == 0) return false;
+  if (iniciador->recibir_largo(largo) == 0){
+    std::cout << "entra al if" << std::endl;
+    return false;
+  }
   char *mensaje_char = new char[largo + 1];
   mensaje_char[largo] = '\0';
   if (iniciador->recibir(mensaje_char, largo) == 0) return false;
@@ -52,7 +55,7 @@ bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *
   std::cout << "puerto receptor = " << puerto_receptor << " puerto emisor = " << puerto_emisor << std::endl;
   
   receptor->asignar_direccion(puerto_receptor, ip);
-  if (receptor->conectar() == -1) return false;;
+  if (receptor->conectar() == -1) return false;
   emisor->asignar_direccion(puerto_emisor, ip);
   return emisor->conectar() != -1;  
 }
@@ -67,6 +70,7 @@ int main(void){
   std::cout << "intentando conectar al puerto : " << puerto << std::endl;
   if (iniciador->conectar() == -1){
     std::cout << "error al conectar" << std::endl;
+    delete iniciador;
     return -1;   // AGREGAR MAS PUERTOS O ALGUN WHILE PARA QUE INTENTE VARIAS VECES
   }
   SocketPrefijo *receptor = new SocketPrefijo;
@@ -74,6 +78,7 @@ int main(void){
   
   
   if (!conectar(iniciador, receptor, emisor)){
+     delete iniciador;
      delete receptor;
      delete emisor;
      return -2;
