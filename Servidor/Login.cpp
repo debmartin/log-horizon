@@ -83,7 +83,7 @@ int Login::recibirUsuarioContrasenia(){
     Json::Value datos;
     Json::Reader reader;
     std::istringstream ss(aux);
-
+    std::cout <<ss;
     reader.parse(ss, datos, false);
     nuevo_usuario->nombre = new string(datos[TAG_USUARIO].asString());
     nuevo_usuario->contrasenia = new string(datos[TAG_CLAVE].asString());
