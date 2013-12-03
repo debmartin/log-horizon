@@ -13,18 +13,17 @@
 
 using std::string;
 
-int Login::proximo_puerto = PUERTO_CLIENTES;
 
-Login::Login(Socket* cliente, usuario_t* usuario, Mutex* mutex_puertos) :
-    nuevo_usuario(usuario), mutex(mutex_puertos), cliente_actual(cliente) {
+Login::Login(Socket* cliente, usuario_t* usuario) :
+    nuevo_usuario(usuario), cliente_actual(cliente) {
 }
 
 Login::~Login(){
 }
 
-int Login::asignarPuerto(Socket& sockfd){
+int Login::asignarPuerto(Socket& sockfd, int& proximo_puerto, Mutex* mutex_prox_puerto){
     bool asociado = false;
-    mutex->bloquear();
+    mutex_prox_puerto->bloquear();
     while(! asociado){
         sockfd.asignar_direccion(proximo_puerto);
         if (sockfd.reusar() == -1) return 1;
@@ -34,19 +33,19 @@ int Login::asignarPuerto(Socket& sockfd){
         if (proximo_puerto == PUERTO_MAX)
             proximo_puerto = PUERTO_CLIENTES;
     }
-    mutex->desbloquear();
     if (sockfd.escuchar() == -1) return 2;
+    mutex_prox_puerto->desbloquear();
     return 0;
 }
 
-void Login::enviarPuertos(){
+void Login::enviarPuertos(int& proximo_puerto, Mutex* mutex_prox_puerto){
     nuevo_usuario->sockets->enviar = new Socket();
     nuevo_usuario->sockets->recibir = new Socket();
 
     Json::Value mensaje;
     Json::StyledWriter escritor;
-    mensaje["recibir"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->enviar)));
-    mensaje["enviar"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->recibir)));
+    mensaje["recibir"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->enviar), proximo_puerto, mutex_prox_puerto));
+    mensaje["enviar"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->recibir), proximo_puerto, mutex_prox_puerto));
     std::string envio = escritor.write(mensaje);
     std::cout << "recibir: " << nuevo_usuario->sockets->enviar->ver_puerto() << ", enviar: " << nuevo_usuario->sockets->recibir->ver_puerto() << std::endl;
 

@@ -39,10 +39,10 @@ class Servidor : public Thread{
         void cerrarPartida(int nro_partida, std::vector<usuario_t*>*& jugadores_partida);
         void funcion_a_correr();
     private:
-        Mutex* mutex_puerto;
         Mutex* mutex_aceptados;
         Mutex* mutex_conectados;
         Mutex* mutex_partidas;
+        Mutex* mutex_prox_puerto;
         Socket* socket_escucha;
         std::vector<nivel_t*>* niveles;
         std::vector<Socket*>* aceptados;
@@ -51,6 +51,7 @@ class Servidor : public Thread{
         bool seguir;
         int cant_partidas;
         ArchivoDirecto* arch_usuarios;
+        int proximo_puerto;
 };
 
 class ServidorUsuario : public Thread {

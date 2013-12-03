@@ -88,17 +88,18 @@ void ServidorUsuario::funcion_a_correr(){
 /*      Servidor        */
 
 
-Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) : seguir(true), cant_partidas(0) {
+Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) :
+    seguir(true), cant_partidas(0), proximo_puerto(puerto_escucha+1) {
     socket_escucha = new Socket();
     socket_escucha->asignar_direccion(puerto_escucha);
     if (socket_escucha->reusar() == -1) throw ServidorCrearSocket();
     if (socket_escucha->asociar() == -1) throw ServidorCrearSocket();
     if (socket_escucha->escuchar() == -1) throw ServidorCrearSocket();
 
-    mutex_puerto = new Mutex();
     mutex_aceptados = new Mutex();
     mutex_conectados = new Mutex();
     mutex_partidas = new Mutex();
+    mutex_prox_puerto = new Mutex();
 
     aceptados = new vector<Socket*>();
     niveles = new vector<nivel_t*>();
@@ -110,7 +111,6 @@ Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) : seguir(true),
 }
 
 Servidor::~Servidor(){
-    delete aceptados;
     for(vector<nivel_t*>::iterator it = niveles->begin(); it != niveles->end(); ++it){
         delete (*it)->nombre;
         delete (*it)->archivo_tablero;
@@ -123,7 +123,13 @@ Servidor::~Servidor(){
     delete socket_escucha;
     arch_usuarios->cerrar();
     delete arch_usuarios;
+    for(vector<Socket*>::iterator it = aceptados->begin(); it != aceptados->end(); ++it){
+        (*it)->cerrar_enviar_recibir();
+        delete (*it);
+    }
+    delete aceptados;
 
+    delete mutex_prox_puerto;
     delete mutex_aceptados;
     delete mutex_conectados;
     delete mutex_partidas;
@@ -197,9 +203,9 @@ int Servidor::generarUsuario(string& nombre){
     mutex_aceptados->desbloquear();
     usuario_t* nuevo_usuario = new usuario_t();
     nuevo_usuario->sockets = new sockets_jugador_t();
-    Login* nuevo_login = new Login(cliente_actual, nuevo_usuario, mutex_puerto);
+    Login* nuevo_login = new Login(cliente_actual, nuevo_usuario);
 
-    nuevo_login->enviarPuertos();
+    nuevo_login->enviarPuertos(proximo_puerto, mutex_prox_puerto);
 
     delete cliente_actual;
     cliente_actual = NULL;
