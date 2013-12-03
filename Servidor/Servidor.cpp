@@ -34,7 +34,7 @@ void CoordinadorServidor::funcion_a_correr(){
             usleep(MILISEGUNDOS * 1000);
         ServidorUsuario* server = new ServidorUsuario(servidor);
         servidores_usuarios->push_back(server);
-        server->correr();
+//        server->correr();
     }
 }
 
@@ -351,6 +351,7 @@ void Servidor::funcion_a_correr(){
     seguir = true;
     while(seguir){
         aceptarConexion();
+        std::cout << "llega";
     }
 }
 
