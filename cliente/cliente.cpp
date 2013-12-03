@@ -47,6 +47,7 @@ bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *
   std::istringstream mensaje_stream(mensaje_str);
   Json::Reader reader;
   reader.parse(mensaje_stream, recibido, false);
+  std::cout << "value = " << recibido << std::endl;
   puerto_emisor = recibido["enviar"].asInt();
   puerto_emisor = ntohl(puerto_emisor);
   puerto_receptor = recibido["recibir"].asInt();

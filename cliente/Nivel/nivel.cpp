@@ -236,7 +236,7 @@ void Nivel::inicializar(const std::string &path, Ventana *ventana, SocketPrefijo
   std::string direccion_explosion = "../../recursos/sonidos/explosion.wav";
   std::string direccion_movimiento = "../../recursos/sonidos/movimiento.wav";
   std::string direccion_seleccion = "../../recursos/sonidos/seleccion.wav";
-  std::string direccion_apilar = "../../recursos/sonidos/apilar.wav";
+  std::string direccion_apilar = "../../recursos/sonidos/sound.wav";
 
   sonido_explosion = Mix_LoadWAV(direccion_explosion.c_str());
   sonido_movimiento = Mix_LoadWAV(direccion_movimiento.c_str());

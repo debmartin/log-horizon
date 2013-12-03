@@ -52,6 +52,8 @@ void Autentificador::funcion_a_correr(){
   mensaje["usuario"] = usuario;
   mensaje["clave"] = clave;
   std::string envio = escritor.write(mensaje);
+  std::cout << "value del usuario y contraseña: " << std::endl;
+  std::cout << envio << std::endl;
   emisor->enviar_con_prefijo(envio.c_str(), envio.size());
   char resultado;
   receptor->recibir(&resultado, sizeof(resultado));
