@@ -2,6 +2,7 @@
 #define CHECKBOX_DISJUNTOS_H
 
 #include "checkbox.h"
+#include <vector>
 
 class CheckBoxDisjuntos{
   public:
@@ -12,7 +13,7 @@ class CheckBoxDisjuntos{
     ~CheckBoxDisjuntos();
   
     //
-    bool agregar_checkbox(const std::string &path, estructura_checkbox_t &estructura, Ventana *ventana);
+    void agregar_checkbox(const std::string &path, estructura_checkbox_t &estructura, Ventana *ventana);
     
     //
     void dibujar(Ventana *ventana);
@@ -22,6 +23,9 @@ class CheckBoxDisjuntos{
   
     //
     int subindice_activado(){return activado;}
+  
+    //
+    bool agregar_texto(int subindice, Superficie *sup, SDL_Rect &destino, Ventana *ventana);
   
   private:
     std::vector<CheckBox*> vector;
