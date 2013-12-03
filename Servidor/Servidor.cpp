@@ -91,6 +91,7 @@ void ServidorUsuario::funcion_a_correr(){
 Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) :
     seguir(true), cant_partidas(0), proximo_puerto(puerto_escucha+1) {
     socket_escucha = new Socket();
+    mutex_escucha = new Mutex();
     socket_escucha->asignar_direccion(puerto_escucha);
     if (socket_escucha->reusar() == -1) throw ServidorCrearSocket();
     if (socket_escucha->asociar() == -1) throw ServidorCrearSocket();
@@ -111,22 +112,30 @@ Servidor::Servidor(int puerto_escucha, string& archivo_usuarios) :
 }
 
 Servidor::~Servidor(){
+    socket_escucha->cerrar_enviar_recibir();
+    delete socket_escucha;
+    for(map<int, partida_t*>::iterator it = partidas->begin(); it != partidas->end(); ++it){
+        delete (it->second->jugadores);
+    }
     for(vector<nivel_t*>::iterator it = niveles->begin(); it != niveles->end(); ++it){
         delete (*it)->nombre;
         delete (*it)->archivo_tablero;
         delete (*it)->archivo_probabilidades;
         delete (*it);
     }
-    delete niveles;
-    delete conectados;
-    delete partidas;
-    delete socket_escucha;
-    arch_usuarios->cerrar();
-    delete arch_usuarios;
     for(vector<Socket*>::iterator it = aceptados->begin(); it != aceptados->end(); ++it){
         (*it)->cerrar_enviar_recibir();
         delete (*it);
     }
+//    for(map<string, usuario_t*>::iterator it = conectados->begin(); it != conectados->end(); ++it){
+//        cerrarUsuario(it->first);
+//    }
+    delete niveles;
+    delete conectados;
+    delete partidas;
+    arch_usuarios->cerrar();
+    delete arch_usuarios;
+
     delete aceptados;
 
     delete mutex_prox_puerto;
@@ -348,7 +357,7 @@ void Servidor::cerrarUsuario(string& nombre){
 //}
 
 void Servidor::funcion_a_correr(){
-    seguir = true;
+//    seguir = true;
     while(seguir){
         aceptarConexion();
     }

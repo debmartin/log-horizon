@@ -27,10 +27,10 @@ int Login::asignarPuerto(Socket& sockfd, int& proximo_puerto, Mutex* mutex_prox_
         sockfd.asignar_direccion(proximo_puerto);
         if (sockfd.reusar() == -1) return 1;
         asociado = (sockfd.asociar() != -1);
-        std::cout << proximo_puerto << '\n';
         proximo_puerto += 1;
-//        if (proximo_puerto == PUERTO_MAX)
-//            proximo_puerto = 8010;
+//        std::cout << proximo_puerto;
+        if (proximo_puerto == PUERTO_MAX)
+            proximo_puerto = 8010;
     }
     if (sockfd.escuchar() == -1) return 2;
     mutex_prox_puerto->desbloquear();
@@ -43,12 +43,16 @@ void Login::enviarPuertos(int& proximo_puerto, Mutex* mutex_prox_puerto){
 
     Json::Value mensaje;
     Json::StyledWriter escritor;
-    mensaje["recibir"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->enviar), proximo_puerto, mutex_prox_puerto));
-    mensaje["enviar"] = htonl((uint32_t) asignarPuerto(*(nuevo_usuario->sockets->recibir), proximo_puerto, mutex_prox_puerto));
+    asignarPuerto(*(nuevo_usuario->sockets->enviar), proximo_puerto, mutex_prox_puerto);
+    asignarPuerto(*(nuevo_usuario->sockets->recibir), proximo_puerto, mutex_prox_puerto);
+//    std::cout<<"recibir"<<nuevo_usuario->sockets->recibir->ver_puerto();
+//    std::cout<<"enviar"<<nuevo_usuario->sockets->enviar->ver_puerto();
+    mensaje["recibir"] = htonl((uint32_t) nuevo_usuario->sockets->enviar->ver_puerto());
+    mensaje["enviar"] = htonl((uint32_t) nuevo_usuario->sockets->recibir->ver_puerto());
     std::string envio = escritor.write(mensaje);
-    std::cout << "recibir: " << nuevo_usuario->sockets->enviar->ver_puerto() << ", enviar: " << nuevo_usuario->sockets->recibir->ver_puerto() << std::endl;
+//    std::cout << "recibir: " << nuevo_usuario->sockets->enviar->ver_puerto() << ", enviar: " << nuevo_usuario->sockets->recibir->ver_puerto() << std::endl;
 
-    cliente_actual->enviar(envio.c_str(), envio.length());
+    enviarMsjPrefijo(*cliente_actual, envio.c_str(), envio.length());
     cliente_actual->cerrar_enviar_recibir();
 }
 

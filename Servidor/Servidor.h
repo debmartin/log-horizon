@@ -39,6 +39,7 @@ class Servidor : public Thread{
         void cerrarPartida(int nro_partida, std::vector<usuario_t*>*& jugadores_partida);
         void funcion_a_correr();
     private:
+        Mutex* mutex_escucha;
         Mutex* mutex_aceptados;
         Mutex* mutex_conectados;
         Mutex* mutex_partidas;
