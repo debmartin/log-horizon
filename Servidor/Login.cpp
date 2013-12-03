@@ -97,7 +97,6 @@ bool Login::verificarUsuario(string& arch_usuarios){
     Json::Value valores;
     Json::Reader reader;
     Json::Value aux;
-//    std::cout << "llega";
 
     reader.parse(arch, valores, false);
     aux = valores[*(nuevo_usuario->nombre)];
@@ -115,7 +114,6 @@ bool Login::verificarUsuario(string& arch_usuarios){
         delete nuevo_usuario->contrasenia;
         res = ERROR;
     }
-//    int res = OK;
     nuevo_usuario->sockets->enviar_cli->enviar(&res, sizeof(res));
     arch.close();
     return (res == OK);

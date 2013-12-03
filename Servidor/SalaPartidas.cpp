@@ -22,7 +22,6 @@ int SalaPartidas::definirTipoPartida(){
     char tipo_partida = ' ';
     int res = -1;
     while (res == -1){
-//        std::cout << *(nuevo_usuario->nombre);
         res = nuevo_usuario->sockets->recibir_cli->recibir(&tipo_partida, sizeof(char));
         if (res == 0) return CONEXION_ABORTADA;
     }
@@ -33,9 +32,9 @@ void enviarNivel(Socket& sockfd, nivel_t& nivel, string* creador = NULL, int jug
     Json::Value mensaje;
     Json::StyledWriter escritor;
     int info = (creador == NULL) ? INFO_CREAR : INFO_UNIRSE;
-    mensaje["tipo"] = htonl((uint32_t) info);
+    mensaje["tipo"] = info;
     mensaje["nombre"] = nivel.nombre;
-    mensaje["creador"] = "";
+    mensaje["creador"] = (creador == NULL) ? "" : *creador;
     mensaje["puntaje"] = htonl((uint32_t) nivel.puntaje);
     mensaje["max jugadores"] = htonl((uint32_t) nivel.cant_jugadores_max);
     mensaje["jugadores"] = htonl((uint32_t) jugadores);

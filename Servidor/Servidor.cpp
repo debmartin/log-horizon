@@ -224,17 +224,14 @@ int Servidor::generarUsuario(string& nombre){
     nuevo_login->enviarPuertos(proximo_puerto, mutex_prox_puerto);
 
     nuevo_login->aceptarSubConexiones();
-    bool mires;
     do{
         if (nuevo_login->recibirUsuarioContrasenia() == CONEXION_ABORTADA)
             return CONEXION_ABORTADA;
-            mires = nuevo_login->verificarUsuario(*arch_usuarios);
-    } while (! mires);
+    } while (! nuevo_login->verificarUsuario(*arch_usuarios));
 
     delete nuevo_login;
     mutex_conectados->bloquear();
     (*conectados)[*(nuevo_usuario->nombre)] = nuevo_usuario;
-//    std::cout << *(nuevo_usuario->nombre);
     mutex_conectados->desbloquear();
     nombre = *(nuevo_usuario->nombre);
 
@@ -258,7 +255,7 @@ int Servidor::elegirPartida(string& nombre_usuario){
     while(true){
         int tipo_partida = nueva_sala->definirTipoPartida();
         if (tipo_partida == CONEXION_ABORTADA) return CONEXION_ABORTADA;
-
+        std::cout << "tipo"<<tipo_partida;
         bool volver = true;
         while(volver) {
             if(tipo_partida == CREAR){
