@@ -26,6 +26,7 @@ void leer_datos_iniciales(int &ancho, int &alto, std::string &ip, int &puerto){
   ip = aux.asString();
   aux = datos.get("puerto", aux);
   puerto = aux.asInt();
+  puerto = ntohl(puerto);
 }
 
 bool conectar(SocketPrefijo *iniciador, SocketPrefijo *receptor, SocketPrefijo *emisor){
