@@ -22,7 +22,6 @@ int SalaPartidas::definirTipoPartida(){
     char tipo_partida = ' ';
     int res = -1;
     while (res == -1){
-        std::cout << nuevo_usuario->sockets->recibir_cli;
         res = nuevo_usuario->sockets->recibir_cli->recibir(&tipo_partida, sizeof(char));
         if (res == 0) return CONEXION_ABORTADA;
     }
