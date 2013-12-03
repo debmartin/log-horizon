@@ -33,15 +33,19 @@ void enviarNivel(Socket& sockfd, nivel_t& nivel, string* creador = NULL, int jug
     Json::StyledWriter escritor;
 
     mensaje["tipo"] = (creador == NULL) ? INFO_CREAR : INFO_UNIRSE;
-    mensaje["nombre"] = nivel.nombre;
+    mensaje["nombre"] = *(nivel.nombre);
     mensaje["creador"] = (creador == NULL) ? "" : *creador;
     mensaje["puntaje"] = htonl((uint32_t) nivel.puntaje);
     mensaje["max jugadores"] = htonl((uint32_t) nivel.cant_jugadores_max);
     mensaje["jugadores"] = htonl((uint32_t) jugadores);
-
+    std::cout<<mensaje;
     std::string envio = escritor.write(mensaje);
 
     enviarMsjPrefijo(sockfd, envio.c_str(), envio.length());
+}
+
+void enviarNuevoJugador(Socket& sockfd, partida_t* partida){
+    enviarNivel(sockfd, *(partida->nivel), partida->creador, partida->jugadores->size() +1);
 }
 
 int SalaPartidas::crearPartida(int& cant_partidas){
@@ -55,11 +59,12 @@ int SalaPartidas::crearPartida(int& cant_partidas){
             i = niveles->size() -1;
         else if (i == niveles->size())
             i = 0;
+        std::cout << i << ":"<<niveles->size();
         enviarNivel(*(nuevo_usuario->sockets->enviar_cli), *((*niveles)[i]));
 
         int res = -1;
         while(res == -1){
-            res = nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(char));
+            res = nuevo_usuario->sockets->recibir_cli->recibir(&accion, sizeof(accion));
             if(res == 0) return CONEXION_ABORTADA;
         }
     }
@@ -71,15 +76,14 @@ int SalaPartidas::crearPartida(int& cant_partidas){
     nueva_partida->jugadores = new vector<usuario_t*>();
     nueva_partida->jugadores->push_back(nuevo_usuario);
 
+    enviarNuevoJugador(*(nuevo_usuario->sockets->enviar_cli), nueva_partida);
+
     mutex_partidas->bloquear();
     (*partidas)[cant_partidas++] = nueva_partida;
     mutex_partidas->desbloquear();
     return (cant_partidas -1);
 }
 
-void enviarNuevoJugador(Socket& sockfd, partida_t* partida){
-    enviarNivel(sockfd, *(partida->nivel), partida->creador, partida->jugadores->size() +1);
-}
 
 int SalaPartidas::unirsePartida(){
     char accion = AVANZAR;

@@ -104,8 +104,9 @@ bool Login::verificarUsuario(string& arch_usuarios){
     char res;
     if (! aux){
         Json::StyledStreamWriter escritor;
-        valores[*(nuevo_usuario->nombre)] = *(nuevo_usuario->contrasenia);
-        escritor.write(arch, valores);
+        Json::Value nuevo;
+        nuevo[*(nuevo_usuario->nombre)] = *(nuevo_usuario->contrasenia);
+        escritor.write(arch, nuevo);
         res = OK;
     } else if(*(nuevo_usuario->contrasenia) == aux.asString()){
         res = OK;

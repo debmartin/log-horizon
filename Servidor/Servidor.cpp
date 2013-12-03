@@ -168,7 +168,7 @@ bool Servidor::cargarNiveles(string& archivo){
         if(linea_nivel.length() == 0) break;
         nivel_t* nivel = new nivel_t();
         int i = 0;
-
+        std::cout<<"out";
         while(i < 5){
             size_t pos = linea_nivel.find_first_of(SEPARADOR);
             string aux(linea_nivel.substr(0, pos));
