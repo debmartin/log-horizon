@@ -190,7 +190,5 @@ int main(void){
   std::cout << "cerradas todas las conexiones " << std::endl;
   envio.join();
   
-  
-
   return 0;
 }
