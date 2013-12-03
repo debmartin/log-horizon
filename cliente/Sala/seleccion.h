@@ -34,6 +34,9 @@ class Seleccion{
     //
     void finalizar_recibir_datos();
     
+    //
+    bool recibir_nivel();
+    
   private:
     Textura *fondo;
     Boton *aceptar;

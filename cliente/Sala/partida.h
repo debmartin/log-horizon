@@ -45,7 +45,7 @@ class Partida{
     
   protected:
     //
-    void actualizar(Ventana *ventana);
+    bool actualizar(Ventana *ventana);
     
     //
     std::string itostr(uint32_t valor);

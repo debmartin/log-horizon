@@ -68,44 +68,52 @@ bool Partida::actualizar(Ventana *ventana){
   Json::Value info;
   receptor_partidas.ver_info(info);
   
-  if (info["tipo"].asInt() == RECIBIR_NIVEL){
+  if (info["tipo"].asUInt() == RECIBIR_NIVEL){
     finalizar = true;
     return true;
   }  
-  if (info["tipo"].asInt() == CREAR && creada) return true;
-  if (info["tipo"].asInt() == UNIRSE && !creada) return true;
+  if (info["tipo"].asUInt() == CREAR && creada) return true;
+  if (info["tipo"].asUInt() == UNIRSE && !creada) return true;
   
   // NOMBRE DE LA PARTIDA
   texto = "Nivel: " + info["nombre"].asString();
   escritor->copiar_texto(texto, &sup);
   nombre->cargar_textura(&sup, ventana);
   
+  std::cout << "nombre: " << texto << std::endl;
+  
   // PUNTOS MAXIMOS
-  unsigned int puntaje_int = info["puntaje"].asInt();
+  std::cout << "lala" << std::endl;
+  unsigned int puntaje_int = info["puntaje"].asUInt();
+  std::cout << "puntaje_int = " << puntaje_int << std::endl;
   puntaje_int = ntohl(puntaje_int);
+  
   std::string puntaje_str = this->itostr(puntaje_int);
   texto = "Puntaje para Ganar: " + puntaje_str;  
+  std::cout << "puntaje: " << texto << std::endl;
   escritor->copiar_texto(texto, &sup);
   puntos->cargar_textura(&sup, ventana);
    
   // CANTIDAD DE JUGADORES Y JUGADORES MAXIMA
-  unsigned int jugadores_int = info["jugadores"].asInt();
+  unsigned int jugadores_int = info["jugadores"].asUInt();
   jugadores_int = ntohl(jugadores_int);
   std::string jugadores_str = this->itostr(jugadores_int);
-  unsigned int max_jugadores_int = info["max jugadores"].asInt();
+  unsigned int max_jugadores_int = info["max jugadores"].asUInt();
   max_jugadores_int = ntohl(max_jugadores_int);
   std::string max_jugadores_str = this->itostr(max_jugadores_int);
   texto = jugadores_str + " de " + max_jugadores_str + " jugadores";
+  std::cout << "pjs: " << texto << std::endl;
   escritor->copiar_texto(texto, &sup);
   jugadores->cargar_textura(&sup, ventana);  
   
   // CREADOR DE LA PARTIDA
   if (info["tipo"] == UNIRSE){
     texto = "Partida de " + info["creador"].asString();
+    std::cout << "creador: " << texto << std::endl;
     escritor->copiar_texto(texto, &sup);
     creador->cargar_textura(&sup, ventana);
   }
-  return true
+  return true;
 }
 
 //
