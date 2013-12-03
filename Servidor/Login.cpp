@@ -28,7 +28,7 @@ int Login::asignarPuerto(Socket& sockfd, int& proximo_puerto, Mutex* mutex_prox_
         if (sockfd.reusar() == -1) return 1;
         asociado = (sockfd.asociar() != -1);
         proximo_puerto += 1;
-//        std::cout << proximo_puerto;
+
         if (proximo_puerto == PUERTO_MAX)
             proximo_puerto = 8010;
     }
@@ -87,7 +87,7 @@ int Login::recibirUsuarioContrasenia(){
     reader.parse(ss, datos, false);
     nuevo_usuario->nombre = new string(datos[TAG_USUARIO].asString());
     nuevo_usuario->contrasenia = new string(datos[TAG_CLAVE].asString());
-
+    std::cout << "jaja"<<*(nuevo_usuario->nombre)<<"jejeje";
     return 0;
 }
 

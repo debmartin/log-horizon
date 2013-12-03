@@ -22,6 +22,7 @@ int SalaPartidas::definirTipoPartida(){
     char tipo_partida = ' ';
     int res = -1;
     while (res == -1){
+        std::cout << *(nuevo_usuario->nombre);
         res = nuevo_usuario->sockets->recibir_cli->recibir(&tipo_partida, sizeof(char));
         if (res == 0) return CONEXION_ABORTADA;
     }
@@ -72,7 +73,7 @@ int SalaPartidas::crearPartida(int& cant_partidas){
     nueva_partida->jugadores->push_back(nuevo_usuario);
 
     mutex_partidas->bloquear();
-    partidas->insert(std::pair<int, partida_t*> (cant_partidas++, nueva_partida));
+    (*partidas)[cant_partidas++] = nueva_partida;
     mutex_partidas->desbloquear();
     return (cant_partidas -1);
 }

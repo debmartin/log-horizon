@@ -65,7 +65,7 @@ void ServidorUsuario::funcion_a_correr(){
     string nombre;
     int res = servidor->generarUsuario(nombre);
     bool salir = (res == CONEXION_ABORTADA);
-
+    std::cout <<"nombre"<< nombre<<"termino";
     while(seguir && !salir){
         int nro_partida = servidor->elegirPartida(nombre);
         if(nro_partida == CONEXION_ABORTADA) break;
@@ -227,7 +227,8 @@ int Servidor::generarUsuario(string& nombre){
 
     delete nuevo_login;
     mutex_conectados->bloquear();
-    conectados->insert(std::pair<string, usuario_t*>(*(nuevo_usuario->nombre), nuevo_usuario));
+    (*conectados)[*(nuevo_usuario->nombre)] = nuevo_usuario;
+//    std::cout << *(nuevo_usuario->nombre);
     mutex_conectados->desbloquear();
     nombre = *(nuevo_usuario->nombre);
     return 0;
@@ -235,6 +236,7 @@ int Servidor::generarUsuario(string& nombre){
 
 int Servidor::elegirPartida(string& nombre_usuario){
     mutex_conectados->bloquear();
+//    std::cout << nombre_usuario;
     usuario_t* usuario = (*conectados)[nombre_usuario];
     mutex_conectados->desbloquear();
 
