@@ -45,9 +45,9 @@
 #define CREAR 0
 #define UNIRSE 1
 
-#define INFO_CREAR 0
-#define INFO_UNIRSE 1
-#define INFO_NIVEL 2
+#define INFO_CREAR '0'
+#define INFO_UNIRSE '1'
+#define INFO_NIVEL '2'
 
 
 #define ELEGIR '4'
