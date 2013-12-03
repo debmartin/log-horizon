@@ -29,7 +29,7 @@ int Login::asignarPuerto(Socket& sockfd, int& proximo_puerto, Mutex* mutex_prox_
         if (sockfd.reusar() == -1) return 1;
         asociado = (sockfd.asociar() != -1);
 
-        proximo_puerto++;
+        proximo_puerto += 1;
         if (proximo_puerto == PUERTO_MAX)
             proximo_puerto = PUERTO_CLIENTES;
     }

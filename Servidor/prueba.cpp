@@ -16,7 +16,11 @@ int main(){
     server.correr();
     CoordinadorServidor coordinador(&server);
     coordinador.correr();
-    usleep(10000000);
+    char salida;
+    do{
+        std::cin >> salida;
+    } while(salida != 'q');
+
     server.cerrar();
     coordinador.terminar();
     server.join();
