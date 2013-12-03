@@ -32,12 +32,12 @@ void enviarNivel(Socket& sockfd, nivel_t& nivel, string* creador = NULL, int jug
     Json::Value mensaje;
     Json::StyledWriter escritor;
     int info = (creador == NULL) ? INFO_CREAR : INFO_UNIRSE;
-    mensaje["tipo"] = info;
+    mensaje["tipo"] = htonl((uint32_t) info);
     mensaje["nombre"] = nivel.nombre;
     mensaje["creador"] = "";
-    mensaje["puntaje"] = nivel.puntaje;
-    mensaje["max jugadores"] = nivel.cant_jugadores_max;
-    mensaje["jugadores"] = jugadores;
+    mensaje["puntaje"] = htonl((uint32_t) nivel.puntaje);
+    mensaje["max jugadores"] = htonl((uint32_t) nivel.cant_jugadores_max);
+    mensaje["jugadores"] = htonl((uint32_t) jugadores);
 
     std::string envio = escritor.write(mensaje);
 
